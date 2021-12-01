@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';import { AddGalleryPackageComponent } from './add-package/add-gallery-package/add-gallery-package.component';
 import { AddModelPackageComponent } from './add-package/add-model-package/add-model-package.component';
-import { AddMultiresPackageComponent } from './add-package/add-multires-package/add-multires-package.component';
-import { AddQuizPackageComponent } from './add-package/add-quiz-package/add-quiz-package.component';
 import { AddScenePackageComponent } from './add-package/add-scene-package/add-scene-package.component';
 import { AddVideoPackageComponent } from './add-package/add-video-package/add-video-package.component';
 import { HelpSceneImportComponent } from './help/help-scene-import/help-scene-import.component';
@@ -26,10 +24,8 @@ const routes: Routes = [
     path: 'add-package', children: [
       { path: 'gallery/:id', component: AddGalleryPackageComponent },
       { path: 'video/:id', component: AddVideoPackageComponent },
-      { path: 'map/:id', component: AddMultiresPackageComponent },
       { path: 'scene/:id', component: AddScenePackageComponent },
-      { path: 'model/:id', component: AddModelPackageComponent },
-      { path: 'quiz/:id', component: AddQuizPackageComponent },
+      { path: 'model/:id', component: AddModelPackageComponent }
     ]
   },
 

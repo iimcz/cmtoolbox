@@ -41,10 +41,8 @@ import { AddMetadataComponent } from './add-common-steps/add-metadata/add-metada
 import { AddScriptsComponent } from './add-common-steps/add-scripts/add-scripts.component';
 import { AddVideoPackageComponent } from './add-package/add-video-package/add-video-package.component';
 import { AddGalleryPackageComponent } from './add-package/add-gallery-package/add-gallery-package.component';
-import { AddMultiresPackageComponent } from './add-package/add-multires-package/add-multires-package.component';
 import { AddModelPackageComponent } from './add-package/add-model-package/add-model-package.component';
 import { AddScenePackageComponent } from './add-package/add-scene-package/add-scene-package.component';
-import { AddQuizPackageComponent } from './add-package/add-quiz-package/add-quiz-package.component';
 import { AddScriptComponent } from './add-script/add-script.component';
 import { ScriptListComponent } from './script-list/script-list.component';
 import { ScriptDetailComponent } from './script-detail/script-detail.component';
@@ -68,10 +66,8 @@ import { environment } from 'src/environments/environment';
     AddScriptsComponent,
     AddVideoPackageComponent,
     AddGalleryPackageComponent,
-    AddMultiresPackageComponent,
     AddModelPackageComponent,
     AddScenePackageComponent,
-    AddQuizPackageComponent,
     AddScriptComponent,
     ScriptListComponent,
     ScriptDetailComponent,
