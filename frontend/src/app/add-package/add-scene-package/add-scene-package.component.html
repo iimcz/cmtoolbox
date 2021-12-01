@@ -1,0 +1,26 @@
+<mat-horizontal-stepper [linear]="true">
+    <mat-step label="Nahrání dat">
+        <div class="mat-elevation-z1 raised-box">
+            <app-add-local-upload accept=".zip"></app-add-local-upload>
+        </div>
+        <div class="button-row">
+            <button mat-raised-button (click)="goBack()">Zrušit</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+
+    <mat-step label="Přídavné skripty">
+        <app-add-scripts></app-add-scripts>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Metadata">
+        <app-add-metadata></app-add-metadata>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button (click)="finishAddingPackage()">Uložit balíček</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

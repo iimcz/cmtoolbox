@@ -1,0 +1,22 @@
+<h2>Nahrát soubor z tohoto zařízení:</h2>
+<p>
+    <input type="file" id="file" [accept]="accept" (change)="handleFileInput($event)">
+</p>
+<h2>Nahrané soubory:</h2>
+<mat-grid-list cols="8" [rowHeight]="showPreview ? '20:30' : '2:1'">
+    <mat-grid-tile *ngFor="let file of uploadedFiles">
+        <mat-card>
+            <img matCardImage [src]="file.thumbUrl" *ngIf="showPreview && file.uploadComplete">
+            <mat-progress-spinner mode="indeterminate" *ngIf="showPreview && !file.uploadComplete">
+            </mat-progress-spinner>
+            <mat-progress-bar mode="indeterminate" *ngIf="!showPreview && !file.uploadComplete">
+            </mat-progress-bar>
+            <div>
+                {{file.filename}}
+                <button mat-icon-button>
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </mat-card>
+    </mat-grid-tile>
+</mat-grid-list>

@@ -1,0 +1,23 @@
+<h1 class="component-title">Status a konfigurace</h1>
+
+<!--
+<mat-table>
+    <mat-row>
+    </mat-row>
+</mat-table>
+-->
+
+<h3>Konfigurace nástrojů</h3>
+<mat-expansion-panel *ngFor='let tool of toolList'>
+    <mat-expansion-panel-header>
+        {{tool.toolName}}
+    </mat-expansion-panel-header>
+    <mat-list>
+        <mat-list-item *ngFor='let setting of tool.settings'>
+            <div>{{setting.name}}</div>
+            <div>
+                <input type="checkbox" *ngIf='setting.type === "bool"' [(ngModel)]="setting.value">
+            </div>
+        </mat-list-item>
+    </mat-list>
+</mat-expansion-panel>

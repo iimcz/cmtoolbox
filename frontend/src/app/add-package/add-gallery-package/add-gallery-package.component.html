@@ -1,0 +1,321 @@
+<mat-horizontal-stepper [linear]="true">
+    <mat-step label="Nahrání dat">
+        <div class="mat-elevation-z1 raised-box">
+            <app-add-local-upload accept="image/*" [showPreview]="true"></app-add-local-upload>
+        </div>
+        <div class="button-row">
+            <button mat-raised-button (click)="goBack()">Zrušit</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Rozložení galerie">
+        <div fxLayout="row">
+            <div fxFlex="50%" class="raised-box">
+                <h3>Náhled</h3>
+                <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="1em">
+                    <mat-button-toggle-group>
+                        <mat-button-toggle checked>
+                            IPS (na šířku)
+                        </mat-button-toggle>
+                        <mat-button-toggle>
+                            IPS (na výšku)
+                        </mat-button-toggle>
+                        <mat-button-toggle>
+                            PGE
+                        </mat-button-toggle>
+                    </mat-button-toggle-group>
+                    <div class="preview-ips" id="preview" [style.gap]="gallerySettings.gap + gallerySettings.gapUnit"
+                        [style.grid-template-columns]="'repeat('+gallerySettings.columns+',1fr)'"
+                        [style.background-color]="gallerySettings.backgroundColor">
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+                    </div>
+                </div>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxFlex
+                class="settings-pane mat-elevation-z2 raised-box">
+                <div class="setting" fxLayout="row">
+                    <label fxFlex="80%">Počet sloupců:</label>
+                    <div fxLayout="row" fxLayoutAlign="space-between center">
+                        <mat-form-field fxFlex="20%">
+                            <input matInput type="number" min="0" max="100" [(ngModel)]="gallerySettings.columns">
+                        </mat-form-field>
+                        <mat-slider min="0" max="100" [(ngModel)]="gallerySettings.columns">
+                        </mat-slider>
+                    </div>
+                </div>
+                <div class="setting" fxLayout="row">
+                    <label fxFlex="80%">Velikost mezery:</label>
+                    <div fxLayout="row" fxLayoutAlign="space-between center">
+                        <mat-form-field fxFlex="20%">
+                            <input matInput type="number" min="0" max="100" [(ngModel)]="gallerySettings.gap">
+                        </mat-form-field>
+                        <mat-slider min="0" max="100" [(ngModel)]="gallerySettings.gap">
+                        </mat-slider>
+                    </div>
+                </div>
+                <div class="setting">
+                    <label>Jednotka velikosti mezery:</label>
+                    <mat-form-field>
+                        <select matNativeControl [(ngModel)]="gallerySettings.gapUnit">
+                            <option value="px">Pixely</option>
+                            <option value="cm">Centimetry</option>
+                            <option value="in">Palce</option>
+                            <option value="em">Em</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+                <div class="setting">
+                    <label>Výchozí typ škálování obrázků:</label>
+                    <mat-form-field>
+                        <select matNativeControl [(ngModel)]="gallerySettings.defaultContentFit">
+                            <option value="fill">Vyplnit</option>
+                            <option value="fit-width">Přizpůsobit na šířku</option>
+                            <option value="fit-height">Přizpůsobit na výšku</option>
+                            <option value="stretch">Roztáhnout (nezachová poměry stran)</option>
+                        </select>
+                    </mat-form-field>
+                </div>
+                <div class="setting">
+                    <label>Barva pozadí:</label>
+                    <mat-form-field>
+                        <input matInput type="color" [(ngModel)]="gallerySettings.backgroundColor">
+                    </mat-form-field>
+                </div>
+                <mat-expansion-panel class="full-width">
+                    <mat-expansion-panel-header>
+                        Řazení a individuální nastavení obrázků
+                    </mat-expansion-panel-header>
+                    <mat-table [dataSource]="galleryItemsDataSource" cdkDropList
+                        [cdkDropListData]="galleryItemsDataSource.data"
+                        (cdkDropListDropped)="onGalleryOrderListDropped($event)">
+                        <ng-container matColumnDef="preview">
+                            <mat-header-cell *matHeaderCellDef>
+                                <mat-icon>image</mat-icon>
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let pic"> <img class="preview-pic" [src]="pic.previewUrl">
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="filename">
+                            <mat-header-cell *matHeaderCellDef> Název </mat-header-cell>
+                            <mat-cell *matCellDef="let pic"> {{pic.filename}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="content-fit">
+                            <mat-header-cell *matHeaderCellDef> Škálování </mat-header-cell>
+                            <mat-cell *matCellDef="let pic">
+                                <mat-form-field>
+                                    <select matNativeControl>
+                                        <option value="none">Výchozí</option>
+                                        <option value="fill">Vyplnit</option>
+                                        <option value="fit-width">Přizpůsobit na šířku</option>
+                                        <option value="fit-height">Přizpůsobit na výšku</option>
+                                        <option value="stretch">Roztáhnout (nezachová poměry stran)</option>
+                                    </select>
+                                </mat-form-field>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="['preview', 'filename', 'content-fit']"></mat-header-row>
+                        <mat-row class="draggable"
+                            *matRowDef="let pic; columns: ['preview', 'filename', 'content-fit'];" cdkDrag></mat-row>
+                    </mat-table>
+                </mat-expansion-panel>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+
+    <mat-step label="Ovládání galerie">
+        <div fxLayout="row">
+            <div class="raised-box" fxFlex="50%">
+                <h3>Náhled</h3>
+                <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="1em">
+                    <mat-button-toggle-group>
+                        <mat-button-toggle checked>
+                            IPS (na šířku)
+                        </mat-button-toggle>
+                        <mat-button-toggle>
+                            IPS (na výšku)
+                        </mat-button-toggle>
+                        <mat-button-toggle>
+                            PGE
+                        </mat-button-toggle>
+                    </mat-button-toggle-group>
+                    <div class="preview-ips" id="preview" [style.gap]="gallerySettings.gap + gallerySettings.gapUnit"
+                        [style.grid-template-columns]="'repeat('+gallerySettings.columns+',1fr)'"
+                        [style.background-color]="gallerySettings.backgroundColor">
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+
+                        <img src="https://picsum.photos/100/100">
+                    </div>
+                </div>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxFlex
+                class="settings-pane mat-elevation-z2 raised-box">
+
+                <div class="setting full-width">
+                    <label>Ovádání galerie:</label>
+                    <mat-form-field>
+                        <select matNativeControl [(ngModel)]="gallerySettings.basicControls">
+                            <option value="grab-drag">Gesta tažení</option>
+                            <option value="swipe-gestures">Swipe gesta</option>
+                            <option value="custom">Vlastní nastavení (speciální)</option>
+                        </select>
+                    </mat-form-field>
+                    <p *ngIf="gallerySettings.basicControls === 'grab-drag'">
+                        <img src="https://picsum.photos/200/200" class="controls-preview">
+                    </p>
+                    <p *ngIf="gallerySettings.basicControls === 'swipe-gestures'">
+                        <img src="https://picsum.photos/300/300" class="controls-preview">
+                    </p>
+                </div>
+                <div *ngIf="gallerySettings.basicControls === 'custom'"
+                    class="mat-elevation-z1 raised-box-padless full-width">
+                    <div class="raised-box">
+                        <button mat-raised-button (click)="addCustomControl()">Přidat akci</button>
+                    </div>
+                    <mat-table [dataSource]="galleryCustomControls">
+                        <ng-container matColumnDef="action">
+                            <mat-header-cell *matHeaderCellDef> Akce </mat-header-cell>
+                            <mat-cell *matCellDef="let control">
+                                <button mat-icon-button (click)="removeCustomControl(control)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                                <mat-form-field>
+                                    <select matNativeControl [(ngModel)]="control.action">
+                                        <option value="move-left">Posunout doleva</option>
+                                        <option value="move-right">Posunout doprava</option>
+                                        <option value="move-up">Posunout nahoru</option>
+                                        <option value="move-down">Posunout dolů</option>
+                                    </select>
+                                </mat-form-field>
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="event">
+                            <mat-header-cell *matHeaderCellDef> Událost ovládání </mat-header-cell>
+                            <mat-cell *matCellDef="let control">
+                                <mat-form-field>
+                                    <select matNativeControl [(ngModel)]="control.eventType">
+                                        <option value="gesture">Gesto</option>
+                                        <option value="sensor-volume">Sensor hlasitosti (dB)</option>
+                                        <option value="sensor-distance">Senzor vzdálenosti (cm)</option>
+                                    </select>
+                                </mat-form-field>
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="event-detail">
+                            <mat-header-cell *matHeaderCellDef> Detail události </mat-header-cell>
+                            <mat-cell *matCellDef="let control">
+                                <mat-form-field>
+                                    <select *ngIf="control.eventType === 'gesture'" matNativeControl
+                                        [(ngModel)]="control.eventParams">
+                                        <option value="swipe-up">Swipe nahoru</option>
+                                        <option value="swipe-down">Swipe dolů</option>
+                                        <option value="swipe-left">Swipe doleva</option>
+                                        <option value="swipe-right">Swipe doprava</option>
+                                    </select>
+                                    <div
+                                        *ngIf="control.eventType === 'sensor-volume' || control.eventType === 'sensor-distance'">
+                                        <mat-label>Hraniční hodnota</mat-label>
+                                        <input matInput type="number" [(ngModel)]="control.eventParams">
+                                    </div>
+                                </mat-form-field>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="['action', 'event', 'event-detail']"></mat-header-row>
+                        <mat-row *matRowDef="let control; columns: ['action', 'event', 'event-detail'];"></mat-row>
+                    </mat-table>
+                </div>
+                <mat-expansion-panel class="full-width">
+                    <mat-expansion-panel-header>
+                        Nastavení interakce obrázků
+                    </mat-expansion-panel-header>
+                    <mat-table [dataSource]="galleryItemsDataSource">
+                        <ng-container matColumnDef="preview">
+                            <mat-header-cell *matHeaderCellDef>
+                                <mat-icon>image</mat-icon>
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let pic"> <img class="preview-pic" [src]="pic.previewUrl">
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="filename">
+                            <mat-header-cell *matHeaderCellDef> Název </mat-header-cell>
+                            <mat-cell *matCellDef="let pic"> {{pic.filename}} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="can-zoom">
+                            <mat-header-cell *matHeaderCellDef> Jde přiblížit </mat-header-cell>
+                            <mat-cell *matCellDef="let pic" class="checkbox-column">
+                                <mat-checkbox [(ngModel)]="pic.canZoom"></mat-checkbox>
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="has-link">
+                            <mat-header-cell *matHeaderCellDef> Je odkazem </mat-header-cell>
+                            <mat-cell *matCellDef="let pic" class="checkbox-column">
+                                <mat-checkbox [(ngModel)]="pic.hasLink"></mat-checkbox>
+                            </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="link">
+                            <mat-header-cell *matHeaderCellDef> Cíl odkazu </mat-header-cell>
+                            <mat-cell *matCellDef="let pic">
+                                <mat-form-field>
+                                    <input matInput type="text" [(ngModel)]="pic.link">
+                                </mat-form-field>
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="['preview', 'filename', 'can-zoom', 'has-link', 'link']">
+                        </mat-header-row>
+                        <mat-row
+                            *matRowDef="let pic; columns: ['preview', 'filename', 'can-zoom', 'has-link', 'link'];">
+                        </mat-row>
+                    </mat-table>
+                </mat-expansion-panel>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Přídavné skripty">
+        <app-add-scripts></app-add-scripts>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Metadata">
+        <app-add-metadata></app-add-metadata>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button (click)="finishAddingPackage()">Uložit balíček</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

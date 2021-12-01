@@ -1,0 +1,86 @@
+<mat-toolbar color="primary">
+  <mat-icon>construction</mat-icon>
+  <span class="app-title">Content Manager</span>
+
+  <button mat-button routerLink="/packages">
+    <mat-icon>list</mat-icon>
+    Procházet balíčky
+  </button>
+
+  <button mat-button [mat-menu-trigger-for]="addMenu">
+    <mat-icon>add</mat-icon>
+    Vytvořit balíček
+  </button>
+  <mat-menu #addMenu="matMenu">
+    <button mat-menu-item (click)="addPackageImage()">
+      <mat-icon>image</mat-icon>
+      <span>Galerie</span>
+    </button>
+    <!-- <button mat-menu-item routerLink="add-package/map">
+      <mat-icon>map</mat-icon>
+      <span>Multirezoluční mapa</span>
+    </button> -->
+    <button mat-menu-item (click)="addPackageVideo()">
+      <mat-icon>movie</mat-icon>
+      <span>Video</span>
+    </button>
+    <!-- <button mat-menu-item routerLink="add-package/quiz">
+      <mat-icon>quiz</mat-icon>
+      <span>Kvíz</span>
+    </button> -->
+    <button mat-menu-item (click)="addPackageModel()">
+      <mat-icon>view_in_ar</mat-icon>
+      <span>3D Model</span>
+    </button>
+    <button mat-menu-item (click)="addPackageScene()">
+      <mat-icon>grain</mat-icon>
+      <span>3D Scéna</span>
+    </button>
+  </mat-menu>
+
+  <button mat-button routerLink="scripts">
+    <mat-icon>code</mat-icon>
+    Spravovat skripty
+  </button>
+
+  <button mat-button [mat-menu-trigger-for]="adminMenu">
+    <mat-icon>build</mat-icon>
+    Administrace
+  </button>
+  <mat-menu #adminMenu="matMenu">
+    <button mat-menu-item routerLink="users">
+      <mat-icon>person</mat-icon>
+      <span>Uživatelé</span>
+    </button>
+    <button mat-menu-item routerLink="status">
+      <mat-icon>settings</mat-icon>
+      <span>Status</span>
+    </button>
+  </mat-menu>
+
+  <button mat-button [mat-menu-trigger-for]="helpMenu">
+    <mat-icon>help</mat-icon>
+    Nápověda
+  </button>
+  <mat-menu #helpMenu="matMenu">
+    <button mat-menu-item routerLink="help/scene-import">
+      <mat-icon>archive</mat-icon>
+      <span>Konverze scén</span>
+    </button>
+    <button mat-menu-item routerLink="help/scripts">
+      <mat-icon>engineering</mat-icon>
+      <span>Uživatelské skripty</span>
+    </button>
+  </mat-menu>
+
+  <span class="space-fill"></span>
+
+  <button mat-stroked-button (click)="navigateUserProfile()">
+    <mat-icon>person</mat-icon>
+    Uživatel
+  </button>
+</mat-toolbar>
+
+<div class="main-content">
+  <router-outlet></router-outlet>
+</div>

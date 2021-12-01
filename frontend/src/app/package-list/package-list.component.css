@@ -1,0 +1,17 @@
+.search-filters-tab {
+    background-color: lightgray;
+}
+
+.list-tab-icon {
+    margin-right: 1em;
+}
+
+tr.package-row:hover {
+    background: whitesmoke;
+    cursor: pointer;
+}
+
+.package-card:hover {
+    background: whitesmoke;
+    cursor: pointer;
+}

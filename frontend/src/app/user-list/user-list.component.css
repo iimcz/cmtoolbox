@@ -1,0 +1,16 @@
+table {
+    width: 100%;
+    padding: 1em;
+}
+
+.search-fields {
+    padding: 2em;
+}
+
+.search-box {
+    width: 100%;
+}
+
+tr.user-row:hover {
+    background: whitesmoke;
+}

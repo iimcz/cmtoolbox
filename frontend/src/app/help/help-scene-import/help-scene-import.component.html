@@ -1,0 +1,38 @@
+<h1 class="component-title">Konverze a import 3D Scény</h1>
+
+<mat-tab-group>
+    <mat-tab label="Unity">
+        <mat-tab-group>
+            <mat-tab label="2021.1.1f">
+                <p>
+                    Pro úspěšné nahrání je scény tvořené v této verzi enginu je třeba stáhnout následující
+                    balíček Unity, který obsahuje potřebné SDK pro převod scény. Po přidání balíčku jej lze
+                    použít, aby scéna plně podporovala exponáty podporované tímto systémem.
+                </p>
+                <p>
+                    Je potřeba učinit následující kroky:
+                </p>
+                <ol>
+                    <li>Nahradit objekt "hráče" příslušným objektem z SDK.</li>
+                    <li>Přidat požadované popisky do scény pomocí objektu z SDK.</li>
+                    <li>Podobně přidat místa, která modifikují interakci uživatele.</li>
+                </ol>
+                <p>
+                    Samotné SDK v tomto procesu pomůže pomocí editorového okna s podrobnějšími informacemi.
+                </p>
+                <p>
+                    <button mat-raised-button>Stažení SDK</button>
+                </p>
+                <p>
+                    <button mat-raised-button>Dokumentace API</button>
+                </p>
+            </mat-tab>
+            <mat-tab label="ostatní">
+
+            </mat-tab>
+        </mat-tab-group>
+    </mat-tab>
+    <mat-tab label="Unreal Engine">
+        Tento engine akktuálně není podporován. Využijte prosím engine Unity.
+    </mat-tab>
+</mat-tab-group>

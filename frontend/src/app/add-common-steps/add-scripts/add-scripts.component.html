@@ -1,0 +1,29 @@
+<div class="mat-elevation-z2 add-scripts-content">
+    <div class="padded-small">
+        <button mat-raised-button (click)="addScript()">Přidat skript</button>
+    </div>
+    <mat-table [dataSource]="scriptDataSource">
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Skript </mat-header-cell>
+            <mat-cell *matCellDef="let script">{{script.name}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="desc">
+            <mat-header-cell *matHeaderCellDef> Popis skriptu </mat-header-cell>
+            <mat-cell *matCellDef="let script">{{script.description}}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="header-align-right"> Akce </mat-header-cell>
+            <mat-cell *matCellDef="let script">
+                <button mat-icon-button (click)="openSettings(script)">
+                    <mat-icon>settings</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteScript(script)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="['name', 'desc', 'actions']"></mat-header-row>
+        <mat-row *matRowDef="let control; columns: ['name', 'desc', 'actions'];"></mat-row>
+    </mat-table>
+</div>

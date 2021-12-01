@@ -1,0 +1,82 @@
+<div class="add-metadata-content">
+    <mat-accordion multi>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>Základní metadata</mat-expansion-panel-header>
+            <div class="row">
+                <div class="column-left">
+                    <p class="wide-input">
+                        <mat-form-field class="wide-input">
+                            <mat-label>Název</mat-label>
+                            <input matInput required type="text">
+                        </mat-form-field>
+                    </p>
+                    <p class="wide-input">
+                        <mat-form-field class="wide-input">
+                            <mat-label>Popis</mat-label>
+                            <textarea matInput></textarea>
+                        </mat-form-field>
+                    </p>
+                    <p class="wide-input">
+                        <mat-form-field class="wide-input">
+                            <mat-label>Autor</mat-label>
+                            <input matInput type="text">
+                        </mat-form-field>
+                    </p>
+                    <p class="wide-input">
+                        <mat-form-field class="wide-input">
+                            <mat-label>Pro expozici/akci</mat-label>
+                            <input matInput type="text">
+                        </mat-form-field>
+                    </p>
+                </div>
+                <div class="column-right help-text">
+                    <mat-icon class="center-icon">help</mat-icon>
+                    <p>
+                        Informace, které slouží k identifikaci, kategorizaci a snadnému nalezení datového balíčku.
+                    </p>
+                    <p>
+                        Základní i dodatečná metadata lze načíst z XML souboru obsahující standartní MODS informace.
+                    </p>
+                </div>
+            </div>
+            <p>
+                <button mat-button>Načíst MODS soubor...</button>
+            </p>
+        </mat-expansion-panel>
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>Další metadata</mat-expansion-panel-header>
+            <div class="row">
+                <mat-form-field class="add-metadata-input">
+                    <mat-label>Název</mat-label>
+                    <input matInput type="text">
+                </mat-form-field>
+                <mat-form-field class="add-metadata-input">
+                    <mat-label>Hodnota</mat-label>
+                    <input matInput type="text">
+                </mat-form-field>
+                <button mat-button class="fix-button-height"><mat-icon>add</mat-icon>Přidat</button>
+            </div>
+            <table mat-table [dataSource]="testDataSource" class="full-width">
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef class="table-action-column"></th>
+                    <td mat-cell *matCellDef="let md">
+                        <mat-icon>delete</mat-icon>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="key">
+                    <th mat-header-cell *matHeaderCellDef> Název </th>
+                    <td mat-cell *matCellDef="let md"> {{md.key}} </td>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef> Hodnota </th>
+                    <td mat-cell *matCellDef="let md"> {{md.value}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row class="user-row" *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

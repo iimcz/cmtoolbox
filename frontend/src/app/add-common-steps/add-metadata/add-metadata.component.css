@@ -1,0 +1,45 @@
+.table-action-column {
+    width: 3em;
+}
+
+.add-metadata-input {
+    width: 30%;
+    margin: auto;
+}
+
+.add-metadata-content {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.row {
+    display: flex;
+}
+
+.column-left {
+    flex: 70%;
+}
+
+.column-right {
+    flex: 30%
+}
+
+.wide-input {
+    width: 85%;
+}
+
+.fix-button-height {
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 3em;
+}
+
+.help-text {
+    color: slategray;
+}
+
+.center-icon {
+    width: 100%;
+    text-align: center;
+}

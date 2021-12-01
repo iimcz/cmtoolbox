@@ -1,0 +1,35 @@
+.button-row {
+    margin-top: 2em;
+    display: flex;
+    justify-content: space-around;
+}
+
+.raised-box {
+    margin: 1em 0em 1em 0em;
+    padding: 2em;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.raised-box-padless {
+    margin: 1em 0em 1em 0em;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.raised-box h3 {
+    text-align: center;
+}
+
+.uploaded-box {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.uploaded-box .image-label {
+    position: absolute;
+    text-align: center;
+    outline: 4px black;
+    color: white;
+    width: 80%;
+}

@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Nastavení skriptu</h2>
+<mat-dialog-content class="dialog-content">
+    <p>
+        <mat-form-field>
+            <mat-label>Skript</mat-label>
+            <input matInput type="text">
+        </mat-form-field>
+    </p>
+    <mat-table [dataSource]="settingsDataSource" class="full-width">
+        <ng-container matColumnDef="key">
+            <mat-header-cell *matHeaderCellDef>Nastavení</mat-header-cell>
+            <mat-cell *matCellDef="let setting">
+                {{setting.key}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="value">
+            <mat-header-cell *matHeaderCellDef>Hodnota</mat-header-cell>
+            <mat-cell *matCellDef="let setting">
+                <mat-form-field>
+                    <input matInput type="text" [(ngModel)]="setting.value">
+                </mat-form-field>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="['key', 'value']">
+        </mat-header-row>
+        <mat-row *matRowDef="let setting; columns: ['key', 'value'];">
+        </mat-row>
+    </mat-table>
+    <mat-divider></mat-divider>
+    
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Zrušit</button>
+    <button mat-button [mat-dialog-close]="1">Uložit</button>
+</mat-dialog-actions>
