@@ -7,10 +7,8 @@ namespace backend.Models
     {
         Gallery,
         Video,
-        Multiresolution,
         Scene,
-        Model,
-        Quiz
+        Model
     }
 
     public class PresentationPackage

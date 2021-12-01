@@ -79,7 +79,7 @@ export class DeviceClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);
+        return _observableOf<any>(<any>null);;
     }
 
     getDeviceSensors(id: number) : Observable<DeviceSensor[]> {
@@ -137,7 +137,7 @@ export class DeviceClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);
+        return _observableOf<any>(<any>null);;
     }
 }
 
@@ -206,7 +206,7 @@ export class PackagesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);
+        return _observableOf<any>(<any>null);;
     }
 
     getPackage(id: number) : Observable<PresentationPackage> {
@@ -312,7 +312,7 @@ export class PackagesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);
+        return _observableOf<any>(<any>null);;
     }
 
     getUnfinishedPackage(id: number) : Observable<UnfinishedPackage> {
@@ -540,6 +540,7 @@ export interface IPresentationDevice {
 export class DeviceSensor implements IDeviceSensor {
     id?: number;
     type?: SensorType;
+    name?: string | undefined;
     deviceId?: number;
     device?: PresentationDevice | undefined;
 
@@ -556,6 +557,7 @@ export class DeviceSensor implements IDeviceSensor {
         if (_data) {
             this.id = _data["id"];
             this.type = _data["type"];
+            this.name = _data["name"];
             this.deviceId = _data["deviceId"];
             this.device = _data["device"] ? PresentationDevice.fromJS(_data["device"]) : <any>undefined;
         }
@@ -572,6 +574,7 @@ export class DeviceSensor implements IDeviceSensor {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["type"] = this.type;
+        data["name"] = this.name;
         data["deviceId"] = this.deviceId;
         data["device"] = this.device ? this.device.toJSON() : <any>undefined;
         return data; 
@@ -581,6 +584,7 @@ export class DeviceSensor implements IDeviceSensor {
 export interface IDeviceSensor {
     id?: number;
     type?: SensorType;
+    name?: string | undefined;
     deviceId?: number;
     device?: PresentationDevice | undefined;
 }
@@ -696,10 +700,8 @@ export interface IPresentationPackage {
 export enum PackageType {
     Gallery = 0,
     Video = 1,
-    Multiresolution = 2,
-    Scene = 3,
-    Model = 4,
-    Quiz = 5,
+    Scene = 2,
+    Model = 3,
 }
 
 export class IdentityUserOfString implements IIdentityUserOfString {

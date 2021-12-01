@@ -17,8 +17,9 @@ export class FileClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    upload(file: File) : Observable<FileResponse | UploadProgress> {
-        let url_ = this.baseUrl + "/File/upload/123";
+    upload(file: File, packageId: number) : Observable<FileResponse | UploadProgress> {
+        let url_ = this.baseUrl + "/File/upload/{packageId}";
+        url_ = url_.replace("{packageId}", encodeURIComponent("" + packageId));
         url_ = url_.replace(/[?&]$/, "");
 
         let formData = new FormData();

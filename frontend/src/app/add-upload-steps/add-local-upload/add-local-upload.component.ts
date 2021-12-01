@@ -10,6 +10,7 @@ import { FileClient, FileResponse, UploadProgress } from 'src/app/services/api';
 export class AddLocalUploadComponent implements OnInit {
   @Input() accept!: string;
   @Input() showPreview: boolean = false;
+  @Input() packageId!: number;
 
   uploadedFiles = TEST_UPLOADED;
 
@@ -27,7 +28,7 @@ export class AddLocalUploadComponent implements OnInit {
     const file = elem.files?.item(0);
     console.log("Sending file: " + file?.name);
     if (file) {
-      this.fileClient.upload(file).subscribe((value: FileResponse | UploadProgress) => {
+      this.fileClient.upload(file, this.packageId).subscribe((value: FileResponse | UploadProgress) => {
         if (value instanceof FileResponse) {
           this.uploadedFiles.push(
             {
@@ -38,7 +39,8 @@ export class AddLocalUploadComponent implements OnInit {
           )
         } else {
           let progress = value as UploadProgress;
-          console.log("Got progress: " + progress.uploaded / progress.total);
+          if (progress)
+            console.log("Got progress: " + progress.uploaded / progress.total);
         }
       })
     }

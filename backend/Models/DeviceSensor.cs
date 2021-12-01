@@ -13,6 +13,7 @@ namespace backend.Models
     {
         public int Id { get; set; }
         public SensorType Type { get; set; }
+        public string Name { get; set; }
 
         public int DeviceId { get; set; }
         public PresentationDevice Device { get; set; }

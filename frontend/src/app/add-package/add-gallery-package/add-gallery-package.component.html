@@ -1,7 +1,7 @@
 <mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
     <mat-step label="Nahrání dat">
         <div class="mat-elevation-z1 raised-box">
-            <app-add-local-upload accept="image/*" [showPreview]="true"></app-add-local-upload>
+            <app-add-local-upload accept="image/*" [showPreview]="true" [packageId]="package.id!"></app-add-local-upload>
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>

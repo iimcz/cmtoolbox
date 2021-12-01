@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -143,6 +144,8 @@ namespace backend.Controllers
                 section = await reader.ReadNextSectionAsync(cancellationToken);
             }
 
+            if (package.DataFiles == null)
+                package.DataFiles = new List<DataFile>();
             package.DataFiles.Add(new DataFile() { Path = uploadedFilename });
             await _dbContext.SaveChangesAsync();
             return Created(nameof(FileController), new PackageFile(Guid.Empty));

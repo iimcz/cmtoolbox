@@ -8,6 +8,7 @@ using backend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -36,7 +37,10 @@ namespace backend.Controllers
         [HttpGet("single/{id}")]
         public async Task<ActionResult<PresentationPackage>> GetPackage(int id)
         {
-            var package = await _dbContext.PresentationPackages.FindAsync(id);
+            var package = await _dbContext.PresentationPackages
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            
             if (package == null)
                 return NotFound();
             return Ok(package);
@@ -49,7 +53,10 @@ namespace backend.Controllers
         [HttpGet("unfinished/{id}")]
         public async Task<ActionResult<UnfinishedPackage>> GetUnfinishedPackage(int id)
         {
-            var package = await _dbContext.UnfinishedPackages.FindAsync(id);
+            var package = await _dbContext.UnfinishedPackages
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            
             if (package == null)
                 return NotFound();
             return Ok(package);
@@ -58,8 +65,14 @@ namespace backend.Controllers
         [HttpPost("new/{type}")]
         public async Task<ActionResult<CreatedUnfinishedPackage>> CreateNewPackage(PackageType type)
         {
-            UnfinishedPackage newPkg = new UnfinishedPackage();
-            newPkg.Type = type;
+            UnfinishedPackage newPkg = new UnfinishedPackage
+            {
+                Type = type,
+                Name = "Novy balicek",
+                Description = "Bez popisu",
+                IntendedDevices = new List<PresentationDevice>()
+            };
+            newPkg.IntendedDevices.Add(await _dbContext.PresentationDevices.FindAsync(1));
             _dbContext.UnfinishedPackages.Add(newPkg);
             await _dbContext.SaveChangesAsync();
 

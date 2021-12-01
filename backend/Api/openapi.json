@@ -1,5 +1,5 @@
 {
-  "x-generator": "NSwag v13.14.4.0 (NJsonSchema v10.5.2.0 (Newtonsoft.Json v9.0.0.0))",
+  "x-generator": "NSwag v13.14.4.0 (NJsonSchema v10.5.2.0 (Newtonsoft.Json v12.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "My Title",
@@ -283,6 +283,10 @@
           "type": {
             "$ref": "#/components/schemas/SensorType"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
           "deviceId": {
             "type": "integer",
             "format": "int32"
@@ -387,18 +391,14 @@
         "x-enumNames": [
           "Gallery",
           "Video",
-          "Multiresolution",
           "Scene",
-          "Model",
-          "Quiz"
+          "Model"
         ],
         "enum": [
           0,
           1,
           2,
-          3,
-          4,
-          5
+          3
         ]
       },
       "ToolboxUser": {

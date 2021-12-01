@@ -40,25 +40,29 @@ namespace backend.Models
                 {
                     Id = 1,
                     DeviceId = IPW.Id,
-                    Type = SensorType.Skeletal
+                    Type = SensorType.Skeletal,
+                    Name = "DepthCamera0"
                 },
                 new DeviceSensor
                 {
                     Id = 2,
                     DeviceId = IPW.Id,
-                    Type = SensorType.Pir
+                    Type = SensorType.Pir,
+                    Name = "PIR0"
                 },
                 new DeviceSensor
                 {
                     Id = 3,
                     DeviceId = IPW.Id,
-                    Type = SensorType.Light
+                    Type = SensorType.Light,
+                    Name = "Light0"
                 },
                 new DeviceSensor
                 {
                     Id = 4,
                     DeviceId = IPW.Id,
-                    Type = SensorType.Distance
+                    Type = SensorType.Distance,
+                    Name = "Distance0"
                 }
             };
 
