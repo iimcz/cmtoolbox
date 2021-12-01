@@ -16,7 +16,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 
 const routes: Routes = [
   { path: 'packages', component: PackageListComponent },
-  { path: 'package', component: PackageDetailComponent },
+  { path: 'package/:id', component: PackageDetailComponent },
   { path: 'users', component: UserListComponent },
   { path: 'user', component: UserProfileComponent },
   { path: 'scripts', component: ScriptListComponent },
@@ -24,12 +24,12 @@ const routes: Routes = [
 
   {
     path: 'add-package', children: [
-      { path: 'gallery', component: AddGalleryPackageComponent },
-      { path: 'video', component: AddVideoPackageComponent },
-      { path: 'map', component: AddMultiresPackageComponent },
-      { path: 'scene', component: AddScenePackageComponent },
-      { path: 'model', component: AddModelPackageComponent },
-      { path: 'quiz', component: AddQuizPackageComponent },
+      { path: 'gallery/:id', component: AddGalleryPackageComponent },
+      { path: 'video/:id', component: AddVideoPackageComponent },
+      { path: 'map/:id', component: AddMultiresPackageComponent },
+      { path: 'scene/:id', component: AddScenePackageComponent },
+      { path: 'model/:id', component: AddModelPackageComponent },
+      { path: 'quiz/:id', component: AddQuizPackageComponent },
     ]
   },
 

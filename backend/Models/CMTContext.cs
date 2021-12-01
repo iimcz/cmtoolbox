@@ -13,7 +13,6 @@ namespace backend.Models
 
         public CMTContext(DbContextOptions<CMTContext> options) : base(options)
         {
-            Database.EnsureDeleted();
             Database.EnsureCreated();
             Database.Migrate();
             // TODO: switch to migrations and a different provider
@@ -54,6 +53,12 @@ namespace backend.Models
                     Id = 3,
                     DeviceId = IPW.Id,
                     Type = SensorType.Light
+                },
+                new DeviceSensor
+                {
+                    Id = 4,
+                    DeviceId = IPW.Id,
+                    Type = SensorType.Distance
                 }
             };
 

@@ -87,6 +87,38 @@
         }
       }
     },
+    "/Packages/single/{id}": {
+      "get": {
+        "tags": [
+          "Packages"
+        ],
+        "operationId": "Packages_GetPackage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationPackage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Packages/unfinished": {
       "get": {
         "tags": [
@@ -110,20 +142,62 @@
         }
       }
     },
-    "/Packages/new": {
+    "/Packages/unfinished/{id}": {
+      "get": {
+        "tags": [
+          "Packages"
+        ],
+        "operationId": "Packages_GetUnfinishedPackage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnfinishedPackage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Packages/new/{type}": {
       "post": {
         "tags": [
           "Packages"
         ],
         "operationId": "Packages_CreateNewPackage",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PackageType"
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/CreatedUnfinishedPackage"
                 }
               }
             }
@@ -153,10 +227,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/FinishedPackage"
                 }
               }
             }
@@ -540,6 +613,26 @@
             }
           }
         ]
+      },
+      "CreatedUnfinishedPackage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "FinishedPackage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       }
     }
   }

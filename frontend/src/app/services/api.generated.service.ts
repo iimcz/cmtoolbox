@@ -209,6 +209,57 @@ export class PackagesClient {
         return _observableOf<any>(<any>null);
     }
 
+    getPackage(id: number) : Observable<PresentationPackage> {
+        let url_ = this.baseUrl + "/Packages/single/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPackage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPackage(<any>response_);
+                } catch (e) {
+                    return <Observable<PresentationPackage>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PresentationPackage>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPackage(response: HttpResponseBase): Observable<PresentationPackage> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PresentationPackage.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PresentationPackage>(<any>null);
+    }
+
     getUnfinishedPackages() : Observable<UnfinishedPackage[]> {
         let url_ = this.baseUrl + "/Packages/unfinished";
         url_ = url_.replace(/[?&]$/, "");
@@ -264,15 +315,69 @@ export class PackagesClient {
         return _observableOf<any>(<any>null);
     }
 
-    createNewPackage() : Observable<FileResponse> {
-        let url_ = this.baseUrl + "/Packages/new";
+    getUnfinishedPackage(id: number) : Observable<UnfinishedPackage> {
+        let url_ = this.baseUrl + "/Packages/unfinished/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUnfinishedPackage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUnfinishedPackage(<any>response_);
+                } catch (e) {
+                    return <Observable<UnfinishedPackage>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UnfinishedPackage>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetUnfinishedPackage(response: HttpResponseBase): Observable<UnfinishedPackage> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UnfinishedPackage.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UnfinishedPackage>(<any>null);
+    }
+
+    createNewPackage(type: PackageType) : Observable<CreatedUnfinishedPackage> {
+        let url_ = this.baseUrl + "/Packages/new/{type}";
+        if (type === undefined || type === null)
+            throw new Error("The parameter 'type' must be defined.");
+        url_ = url_.replace("{type}", encodeURIComponent("" + type));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -283,34 +388,36 @@ export class PackagesClient {
                 try {
                     return this.processCreateNewPackage(<any>response_);
                 } catch (e) {
-                    return <Observable<FileResponse>><any>_observableThrow(e);
+                    return <Observable<CreatedUnfinishedPackage>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<FileResponse>><any>_observableThrow(response_);
+                return <Observable<CreatedUnfinishedPackage>><any>_observableThrow(response_);
         }));
     }
 
-    protected processCreateNewPackage(response: HttpResponseBase): Observable<FileResponse> {
+    protected processCreateNewPackage(response: HttpResponseBase): Observable<CreatedUnfinishedPackage> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CreatedUnfinishedPackage.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<FileResponse>(<any>null);
+        return _observableOf<CreatedUnfinishedPackage>(<any>null);
     }
 
-    finishPackage(id: number) : Observable<FileResponse> {
+    finishPackage(id: number) : Observable<FinishedPackage> {
         let url_ = this.baseUrl + "/Packages/finish/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -321,7 +428,7 @@ export class PackagesClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
             })
         };
 
@@ -332,31 +439,33 @@ export class PackagesClient {
                 try {
                     return this.processFinishPackage(<any>response_);
                 } catch (e) {
-                    return <Observable<FileResponse>><any>_observableThrow(e);
+                    return <Observable<FinishedPackage>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<FileResponse>><any>_observableThrow(response_);
+                return <Observable<FinishedPackage>><any>_observableThrow(response_);
         }));
     }
 
-    protected processFinishPackage(response: HttpResponseBase): Observable<FileResponse> {
+    protected processFinishPackage(response: HttpResponseBase): Observable<FinishedPackage> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FinishedPackage.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<FileResponse>(<any>null);
+        return _observableOf<FinishedPackage>(<any>null);
     }
 }
 
@@ -1006,11 +1115,76 @@ export interface IUnfinishedPackage extends IPresentationPackage {
     dataFiles?: DataFile[] | undefined;
 }
 
-export interface FileResponse {
-    data: Blob;
-    status: number;
-    fileName?: string;
-    headers?: { [name: string]: any };
+export class CreatedUnfinishedPackage implements ICreatedUnfinishedPackage {
+    id?: number;
+
+    constructor(data?: ICreatedUnfinishedPackage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CreatedUnfinishedPackage {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatedUnfinishedPackage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data; 
+    }
+}
+
+export interface ICreatedUnfinishedPackage {
+    id?: number;
+}
+
+export class FinishedPackage implements IFinishedPackage {
+    id?: number;
+
+    constructor(data?: IFinishedPackage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): FinishedPackage {
+        data = typeof data === 'object' ? data : {};
+        let result = new FinishedPackage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data; 
+    }
+}
+
+export interface IFinishedPackage {
+    id?: number;
 }
 
 export class ApiException extends Error {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.Models;
 using backend.ViewModels;
+using backend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -30,17 +31,36 @@ namespace backend.Controllers
 
         [HttpGet("all")]
         public IEnumerable<PresentationPackage> GetPackages() =>
-            _dbContext.PresentationPackages.ToList();
+            _dbContext.PresentationPackages.OfOnlyType<PresentationPackage, PresentationPackage>().ToList();
+
+        [HttpGet("single/{id}")]
+        public async Task<ActionResult<PresentationPackage>> GetPackage(int id)
+        {
+            var package = await _dbContext.PresentationPackages.FindAsync(id);
+            if (package == null)
+                return NotFound();
+            return Ok(package);
+        }
 
         [HttpGet("unfinished")]
         public IEnumerable<UnfinishedPackage> GetUnfinishedPackages() =>
             _dbContext.UnfinishedPackages.ToList();
+
+        [HttpGet("unfinished/{id}")]
+        public async Task<ActionResult<UnfinishedPackage>> GetUnfinishedPackage(int id)
+        {
+            var package = await _dbContext.UnfinishedPackages.FindAsync(id);
+            if (package == null)
+                return NotFound();
+            return Ok(package);
+        }
         
-        [HttpPost("new")]
-        public async Task<IActionResult> CreateNewPackage()
+        [HttpPost("new/{type}")]
+        public async Task<ActionResult<CreatedUnfinishedPackage>> CreateNewPackage(PackageType type)
         {
             UnfinishedPackage newPkg = new UnfinishedPackage();
-            _dbContext.Add(newPkg);
+            newPkg.Type = type;
+            _dbContext.UnfinishedPackages.Add(newPkg);
             await _dbContext.SaveChangesAsync();
 
             newPkg.WorkDir = Path.Combine(_baseWorkDir, newPkg.Id.ToString());
@@ -52,7 +72,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("finish/{id}")]
-        public async Task<IActionResult> FinishPackage(int id)
+        public async Task<ActionResult<FinishedPackage>> FinishPackage(int id)
         {
             var unfinished = await _dbContext.UnfinishedPackages.FindAsync(id);
             if (unfinished == null)
@@ -62,8 +82,9 @@ namespace backend.Controllers
 
             var finished = unfinished.GenerateFinished();
             _dbContext.PresentationPackages.Add(finished);
+            _dbContext.UnfinishedPackages.Remove(unfinished);
             await _dbContext.SaveChangesAsync();
-            return Ok(finished.Id);
+            return Ok(new FinishedPackage(finished.Id));
         }
     }
 }

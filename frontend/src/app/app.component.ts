@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PackagesClient } from './services/api.generated.service';
+import { PackagesClient, PackageType } from './services/api.generated.service';
 
 @Component({
   selector: 'app-root',
@@ -23,27 +23,29 @@ export class AppComponent {
 
   addPackageImage()
   {
-    // this.packagesClient.createNewPackage()
-    //   .subscribe(
-    //     (resp) => {
-          
-    //   }
-    // )
-    this.router.navigate(["add-package", "gallery"]);
+    this.packagesClient.createNewPackage(PackageType.Gallery).subscribe(pkg => {
+      this.router.navigate(["add-package", "gallery", pkg.id]);
+    });
   }
 
   addPackageModel()
   {
-    this.router.navigate(["add-package", "model"]);
+    this.packagesClient.createNewPackage(PackageType.Model).subscribe(pkg => {
+      this.router.navigate(["add-package", "model", pkg.id]);
+    });
   }
 
   addPackageVideo()
   {
-    this.router.navigate(["add-package", "video"]);
+    this.packagesClient.createNewPackage(PackageType.Video).subscribe(pkg => {
+      this.router.navigate(["add-package", "video", pkg.id]);
+    });
   }
 
   addPackageScene()
   {
-    this.router.navigate(["add-package", "scene"]);
+    this.packagesClient.createNewPackage(PackageType.Scene).subscribe(pkg => {
+      this.router.navigate(["add-package", "scene", pkg.id]);
+    });
   }
 }

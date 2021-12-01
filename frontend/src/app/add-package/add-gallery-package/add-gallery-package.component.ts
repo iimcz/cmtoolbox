@@ -1,7 +1,9 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Observable, switchMap } from 'rxjs';
+import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-gallery-package',
@@ -9,6 +11,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./add-gallery-package.component.css']
 })
 export class AddGalleryPackageComponent implements OnInit {
+  unfinishedPackage$!: Observable<UnfinishedPackage>;
   galleryItemsDataSource = new MatTableDataSource(TEST_ITEMS);
   galleryCustomControls = new MatTableDataSource(TEST_CONTROLS);
 
@@ -22,13 +25,24 @@ export class AddGalleryPackageComponent implements OnInit {
     basicControls: 'grab-drag',
   }
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private packagesClient: PackagesClient
+  ) { }
 
   ngOnInit(): void {
+    this.unfinishedPackage$ = this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => this.packagesClient.getUnfinishedPackage(parseInt(params.get('id')!)))
+    );
   }
 
-  finishAddingPackage() {
-    this.router.navigate(['/packages']);
+  finishAddingPackage(id: number) {
+    this.packagesClient.finishPackage(id).subscribe(
+      (pkg) => {
+        this.router.navigate(['/package', pkg.id]);
+      }
+    );
   }
 
   onGalleryOrderListDropped(event: CdkDragDrop<GalleryItem[]>) {

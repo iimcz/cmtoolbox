@@ -13,8 +13,27 @@ namespace backend.Models
 
         public PresentationPackage GenerateFinished()
         {
-            var clone = MemberwiseClone() as PresentationPackage;
-            clone.Id = 0;
+            var clone = new PresentationPackage()
+            {
+                Name = this.Name,
+                Description = this.Description,
+                Created = this.Created,
+                Creator = this.Creator,
+                IntendedDevices = this.IntendedDevices,
+                LastEdited = this.LastEdited,
+                LastEditedBy = this.LastEditedBy,
+                Scripts = this.Scripts,
+                Type = this.Type
+            };
+            clone.Metadata = new List<PackageMetadata>();
+            if (Metadata != null)
+            {
+                foreach (var meta in Metadata)
+                {
+                    clone.Metadata.Add(new PackageMetadata { Key = meta.Key, Value = meta.Value });
+                }
+            }
+
             return clone;
         }
     }

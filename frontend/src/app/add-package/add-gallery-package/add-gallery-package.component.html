@@ -1,4 +1,4 @@
-<mat-horizontal-stepper [linear]="true">
+<mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
     <mat-step label="Nahrání dat">
         <div class="mat-elevation-z1 raised-box">
             <app-add-local-upload accept="image/*" [showPreview]="true"></app-add-local-upload>
@@ -315,7 +315,7 @@
         <app-add-metadata></app-add-metadata>
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button (click)="finishAddingPackage()">Uložit balíček</button>
+            <button mat-raised-button (click)="finishAddingPackage(package.id!)">Uložit balíček</button>
         </div>
     </mat-step>
 </mat-horizontal-stepper>

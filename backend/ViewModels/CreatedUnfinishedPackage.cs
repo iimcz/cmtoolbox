@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.ViewModels
 {
-    internal class CreatedUnfinishedPackage
+    public class CreatedUnfinishedPackage
     {
         public CreatedUnfinishedPackage(int iD)
         {
