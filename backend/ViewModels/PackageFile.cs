@@ -4,12 +4,15 @@ namespace backend.ViewModels
 {
     public class PackageFile
     {
-        public Guid ID { get; set; }
-        // package reference?
+        public int ID { get; set; }
+        public string Filename { get; set; }
+        public string Thumbnail { get; set; }
 
-        public PackageFile(Guid id)
+        public PackageFile(int id, string filename, string thumbnail)
         {
             ID = id;
+            Filename = filename;
+            Thumbnail = thumbnail;
         }
     }
 }

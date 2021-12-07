@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
+import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
 
 @Component({
@@ -11,13 +12,14 @@ import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generate
   styleUrls: ['./add-gallery-package.component.css']
 })
 export class AddGalleryPackageComponent implements OnInit {
+  @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
+
   unfinishedPackage$!: Observable<UnfinishedPackage>;
   galleryItemsDataSource = new MatTableDataSource(TEST_ITEMS);
   galleryCustomControls = new MatTableDataSource(TEST_CONTROLS);
 
   gallerySettings: GallerySettings = {
     columns: 3,
-    gapUnit: 'px',
     gap: 3,
     defaultContentFit: 'fill',
     backgroundColor: '#7CFF00',
@@ -63,6 +65,10 @@ export class AddGalleryPackageComponent implements OnInit {
   goBack() {
     history.back();
   }
+
+  triggerSaveMetadata() {
+    this.addMetadataComponent.saveAllData();
+  }
 }
 
 const TEST_ITEMS: GalleryItem[] = [
@@ -90,7 +96,6 @@ export interface GalleryItem {
 
 export interface GallerySettings {
   columns: number;
-  gapUnit: string;
   gap: number;
   defaultContentFit: string;
   backgroundColor: string;

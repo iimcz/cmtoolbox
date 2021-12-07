@@ -144,11 +144,12 @@ namespace backend.Controllers
                 section = await reader.ReadNextSectionAsync(cancellationToken);
             }
 
+            var datafile = new DataFile() { Path = uploadedFilename };
             if (package.DataFiles == null)
                 package.DataFiles = new List<DataFile>();
-            package.DataFiles.Add(new DataFile() { Path = uploadedFilename });
+            package.DataFiles.Add(datafile);
             await _dbContext.SaveChangesAsync();
-            return Created(nameof(FileController), new PackageFile(Guid.Empty));
+            return Created(nameof(FileController), new PackageFile(datafile.Id, Path.GetFileName(uploadedFilename), ""));
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -169,6 +170,22 @@ namespace backend.Controllers
             }
 
             return File(file.Path, "application/octet-stream");
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            // TODO: permission check
+            var datafile = await _dbContext.DataFiles.FindAsync(id);
+            if (datafile == null)
+                return NotFound();
+
+            _dbContext.DataFiles.Remove(datafile);
+            await _dbContext.SaveChangesAsync();
+
+            System.IO.File.Delete(datafile.Path);
+
+            return Ok();
         }
     }
 

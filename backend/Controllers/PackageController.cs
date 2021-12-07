@@ -99,5 +99,51 @@ namespace backend.Controllers
             await _dbContext.SaveChangesAsync();
             return Ok(new FinishedPackage(finished.Id));
         }
+
+        [HttpGet("metadata/get/{id}")]
+        public async Task<ActionResult<IEnumerable<MetadataRecord>>> GetMetadataForPackage(int id)
+        {
+            var package = await _dbContext.PresentationPackages
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            
+            if (package == null)
+                return NotFound();
+
+            return Ok(package.Metadata.Select((mtd, _) => new MetadataRecord { Key = mtd.Key, Value = mtd.Value }));
+        }
+
+        [HttpPost("metadata/save/{id}")]
+        public async Task<ActionResult> SaveMetadataForPackage(int id, [FromBody] IEnumerable<MetadataRecord> metadataRecords)
+        {
+            var package = await _dbContext.PresentationPackages
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            
+            if (package == null)
+                return NotFound();
+
+            package.Metadata.Clear();
+            foreach (var mtd in metadataRecords)
+                package.Metadata.Add(new PackageMetadata { Key = mtd.Key, Value = mtd.Value });
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost("properties/set/{id}")]
+        public async Task<ActionResult> SetPackageProperties(int id, [FromBody] PackageProperties properties)
+        {
+            var package = await _dbContext.PresentationPackages
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            
+            if (package == null)
+                return NotFound();
+
+            package.Name = properties.Name;
+            package.Description = properties.Description;
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

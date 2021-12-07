@@ -12,7 +12,7 @@ export class AddLocalUploadComponent implements OnInit {
   @Input() showPreview: boolean = false;
   @Input() packageId!: number;
 
-  uploadedFiles = TEST_UPLOADED;
+  uploadedFiles: UploadedFile[] = [];
 
   constructor(
     private fileClient: FileClient
@@ -32,8 +32,9 @@ export class AddLocalUploadComponent implements OnInit {
         if (value instanceof FileResponse) {
           this.uploadedFiles.push(
             {
-              thumbUrl: "https://picsum.photos/101/101",
-              filename: file?.name ?? "unknown",
+              id: value.id!,
+              thumbUrl: value.thumbnail!,
+              filename: value.filename!,
               uploadComplete: true
             }
           )
@@ -46,16 +47,15 @@ export class AddLocalUploadComponent implements OnInit {
     }
   }
 
+  deleteFile(file: UploadedFile) {
+    this.fileClient.delete(file.id).subscribe(() => {
+      const index = this.uploadedFiles.findIndex((val) => val === file);
+      this.uploadedFiles.splice(index, 1);
+    });
+  }
 }
-
-const TEST_UPLOADED: UploadedFile[] = [
-  { thumbUrl: "https://picsum.photos/100/100", filename: "img1.jpg", uploadComplete: true },
-  { thumbUrl: "https://picsum.photos/100/100", filename: "img1.jpg", uploadComplete: false }
-];
-
-
-
 export interface UploadedFile {
+  id: number;
   thumbUrl: string;
   filename: string;
   uploadComplete: boolean;

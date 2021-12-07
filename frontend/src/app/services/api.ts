@@ -78,7 +78,7 @@ export class FileClient {
                         result200!.push(FileResponse.fromJS(item));
                 }
                 else {
-                    result200 = <any>null;
+                    result200 = FileResponse.fromJS(resultData200);
                 }
                 return _observableOf(result200);
                 }));
@@ -89,14 +89,59 @@ export class FileClient {
         }
         return _observableOf<FileResponse>(<any>null);
     }
+
+    delete(id: number) : Observable<void> {
+        let url_ = this.baseUrl + "/File/delete/{id}";
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+        
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void>
+    {
+        const status = response.status;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return _observableOf(undefined);
+        } else if (status !== 200 && status !== 204) {
+            return throwException("An unexpected server error occurred.", status, "", _headers);
+        }
+        return _observableOf(undefined);
+    }
+
 }
 
 export interface IFileResponse {
-    id?: string;
+    id?: number;
+    filename?: string;
+    thumbnail?: string;
 }
 
 export class FileResponse implements IFileResponse {
-    id?: string;
+    id?: number;
+    filename?: string;
+    thumbnail?: string;
 
     constructor(data?: IFileResponse) {
         if (data) {
@@ -110,6 +155,8 @@ export class FileResponse implements IFileResponse {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.filename = _data["filename"];
+            this.thumbnail = _data["thumbnail"];
         }
     }
 
@@ -123,6 +170,8 @@ export class FileResponse implements IFileResponse {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["filename"] = this.filename;
+        data["thumbnail"] = this.thumbnail;
         return data; 
     }
 }

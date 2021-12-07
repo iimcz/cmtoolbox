@@ -7,25 +7,25 @@
                     <p class="wide-input">
                         <mat-form-field class="wide-input">
                             <mat-label>Název</mat-label>
-                            <input matInput required type="text">
+                            <input matInput required type="text" [(ngModel)]="package.name" (keyup)="propertiesChanged()">
                         </mat-form-field>
                     </p>
                     <p class="wide-input">
                         <mat-form-field class="wide-input">
                             <mat-label>Popis</mat-label>
-                            <textarea matInput></textarea>
+                            <textarea matInput [(ngModel)]="package.description" (keyup)="propertiesChanged()"></textarea>
                         </mat-form-field>
                     </p>
                     <p class="wide-input">
                         <mat-form-field class="wide-input">
                             <mat-label>Autor</mat-label>
-                            <input matInput type="text">
+                            <input matInput type="text" [(ngModel)]="metaAuthor" (keyup)="metadataChanged()">
                         </mat-form-field>
                     </p>
                     <p class="wide-input">
                         <mat-form-field class="wide-input">
                             <mat-label>Pro expozici/akci</mat-label>
-                            <input matInput type="text">
+                            <input matInput type="text" [(ngModel)]="metaExpo" (keyup)="metadataChanged()">
                         </mat-form-field>
                     </p>
                 </div>
@@ -48,19 +48,19 @@
             <div class="row">
                 <mat-form-field class="add-metadata-input">
                     <mat-label>Název</mat-label>
-                    <input matInput type="text">
+                    <input matInput type="text" #newMetadataKey>
                 </mat-form-field>
                 <mat-form-field class="add-metadata-input">
                     <mat-label>Hodnota</mat-label>
-                    <input matInput type="text">
+                    <input matInput type="text" #newMetadataValue>
                 </mat-form-field>
-                <button mat-button class="fix-button-height"><mat-icon>add</mat-icon>Přidat</button>
+                <button mat-button class="fix-button-height" (click)="addMetadata(newMetadataKey.value, newMetadataValue.value)"><mat-icon>add</mat-icon>Přidat</button>
             </div>
-            <table mat-table [dataSource]="testDataSource" class="full-width">
+            <table mat-table [dataSource]="tableDataSource" class="full-width">
                 <ng-container matColumnDef="action">
                     <th mat-header-cell *matHeaderCellDef class="table-action-column"></th>
-                    <td mat-cell *matCellDef="let md">
-                        <mat-icon>delete</mat-icon>
+                    <td mat-cell *matCellDef="let md; let i = index">
+                        <button mat-icon-button (click)="deleteMetadata(i)"><mat-icon>delete</mat-icon></button>
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="key">
