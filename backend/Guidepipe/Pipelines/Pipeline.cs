@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using guidepipe.Steps;
+using System.Threading.Tasks;
+using Guidepipe.Steps;
 
-namespace guidepipe.Pipelines
+namespace Guidepipe.Pipelines
 {
     public class PipelineStepWrapper<TIn, TOut>
     {
@@ -176,5 +177,42 @@ namespace guidepipe.Pipelines
             }
             (_pipelineSteps[_pipelineStopStepIndex] as PipelineGuidedStep).LoadConfig(stream);
         }
+
+#region Async support
+        public Task<TOut> ExecuteAsync(TIn input)
+        {
+            return new Task<TOut>(
+                () => Execute(input)
+            );
+        }
+
+        public Task<TOut> ExecuteUntilPreviewAsync(TIn input)
+        {
+            return new Task<TOut>(
+                () => ExecuteUntilPreview(input)
+            );
+        }
+
+        public Task<TOut> RenewPreviewAsync()
+        {
+            return new Task<TOut>(
+                () => RenewPreview()
+            );
+        }
+
+        public Task<TOut> ContinueUntilPreviewAsync()
+        {
+            return new Task<TOut>(
+                () => ContinueUntilPreview()
+            );
+        }
+
+        public Task<TOut> ContinueExecutionAsync()
+        {
+            return new Task<TOut>(
+                () => ContinueExecution()
+            );
+        }
+#endregion
     }
 }
