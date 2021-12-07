@@ -1,4 +1,4 @@
-namespace guidepipe.IO
+namespace Guidepipe.IO
 {
     public struct FilePath
     {

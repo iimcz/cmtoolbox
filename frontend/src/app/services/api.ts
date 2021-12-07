@@ -130,18 +130,19 @@ export class FileClient {
         return _observableOf(undefined);
     }
 
+    getThumbnailUrl(id: number): string {
+        return (this.baseUrl + "/File/thumbnail/{id}").replace("{id}", encodeURIComponent("" + id));
+    }
 }
 
 export interface IFileResponse {
     id?: number;
     filename?: string;
-    thumbnail?: string;
 }
 
 export class FileResponse implements IFileResponse {
     id?: number;
     filename?: string;
-    thumbnail?: string;
 
     constructor(data?: IFileResponse) {
         if (data) {
@@ -156,7 +157,6 @@ export class FileResponse implements IFileResponse {
         if (_data) {
             this.id = _data["id"];
             this.filename = _data["filename"];
-            this.thumbnail = _data["thumbnail"];
         }
     }
 
@@ -171,7 +171,6 @@ export class FileResponse implements IFileResponse {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["filename"] = this.filename;
-        data["thumbnail"] = this.thumbnail;
         return data; 
     }
 }

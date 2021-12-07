@@ -6,13 +6,11 @@ namespace backend.ViewModels
     {
         public int ID { get; set; }
         public string Filename { get; set; }
-        public string Thumbnail { get; set; }
 
-        public PackageFile(int id, string filename, string thumbnail)
+        public PackageFile(int id, string filename)
         {
             ID = id;
             Filename = filename;
-            Thumbnail = thumbnail;
         }
     }
 }

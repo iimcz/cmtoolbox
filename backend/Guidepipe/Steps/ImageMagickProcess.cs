@@ -2,15 +2,17 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
-using guidepipe.IO;
+using Guidepipe.IO;
 
-namespace guidepipe.Steps
+namespace Guidepipe.Steps
 {
     [Serializable]
     public class ImageMagickProcessConfig
     {
+        public string[] InputOptions { get; set; } = { };
         public string OutputDir { get; set; } = "";
         public string OutputPattern { get; set; } = "{0}.png";
+        public string[] OutputOptions { get; set; } = { };
         public string ImageMagickPath { get; set; } = null;
     }
 
@@ -43,7 +45,15 @@ namespace guidepipe.Steps
             ProcessStartInfo imStartInfo = new ProcessStartInfo();
             // TODO: multiplatform support?
             imStartInfo.FileName = _config.ImageMagickPath ?? "convert";
+            foreach (var option in _config.InputOptions)
+            {
+                imStartInfo.ArgumentList.Add(option);
+            }
             imStartInfo.ArgumentList.Add(input.Path);
+            foreach (var option in _config.OutputOptions)
+            {
+                imStartInfo.ArgumentList.Add(option);
+            }
             imStartInfo.ArgumentList.Add(output.Path);
 
             Process imProcess = Process.Start(imStartInfo);

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace guidepipe.Steps
+namespace Guidepipe.Steps
 {
     public interface IPipelineStep
     {

@@ -181,35 +181,35 @@ namespace Guidepipe.Pipelines
 #region Async support
         public Task<TOut> ExecuteAsync(TIn input)
         {
-            return new Task<TOut>(
+            return Task<TOut>.Run(
                 () => Execute(input)
             );
         }
 
         public Task<TOut> ExecuteUntilPreviewAsync(TIn input)
         {
-            return new Task<TOut>(
+            return Task<TOut>.Run(
                 () => ExecuteUntilPreview(input)
             );
         }
 
         public Task<TOut> RenewPreviewAsync()
         {
-            return new Task<TOut>(
+            return Task<TOut>.Run(
                 () => RenewPreview()
             );
         }
 
         public Task<TOut> ContinueUntilPreviewAsync()
         {
-            return new Task<TOut>(
+            return Task<TOut>.Run(
                 () => ContinueUntilPreview()
             );
         }
 
         public Task<TOut> ContinueExecutionAsync()
         {
-            return new Task<TOut>(
+            return Task<TOut>.Run(
                 () => ContinueExecution()
             );
         }

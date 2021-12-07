@@ -6,6 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Guidepipe.IO;
+using Guidepipe.Pipelines;
+using Guidepipe.Steps;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
@@ -265,6 +268,35 @@ namespace backend.Utilities
                 return signatures.Any(signature => 
                     headerBytes.Take(signature.Length).SequenceEqual(signature));
             }
+        }
+
+        public async static Task<string> GenerateThumbnail(string filepath, string outDir)
+        {
+            var pipeline = new Pipeline<FilePath, FilePath>();
+            var input = new FilePath(filepath);
+
+            switch (Path.GetExtension(filepath))
+            {
+                case ".jpg":
+                case ".png":
+                    input
+                        .AddStep(pipeline, new ImageMagickProcess(
+                            (config) =>
+                            {
+                                config.OutputDir = outDir;
+                                config.OutputPattern = "thumb-{0}.png";
+                                config.OutputOptions = new string[] {
+                                    "-resize",
+                                    "128x128"
+                                };
+                            }
+                        ));
+                    break;
+                case ".avi":
+                case ".mp4":
+                    throw new NotImplementedException();
+            }
+            return (await pipeline.ExecuteAsync(input)).Path;
         }
     }
 }

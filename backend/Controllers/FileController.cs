@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -26,6 +28,7 @@ namespace backend.Controllers
         private readonly long _fileSizeLimit;
         private readonly ILogger<FileController> _logger;
         private readonly string[] _permittedExtensions = { };
+        private readonly string[] _thumbnailExtensions = { ".png", ".jpg", ".avi", ".mp4" };
         private readonly string _targetFilePath;
 
         private readonly CMTContext _dbContext;
@@ -67,7 +70,9 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-            var targetDir = package.WorkDir;
+            var targetDir = Path.Combine(package.WorkDir, "upload");
+            Directory.CreateDirectory(targetDir);
+
             string uploadedFilename = null;
 
             var boundary = Request.GetMultipartBoundary();
@@ -148,8 +153,20 @@ namespace backend.Controllers
             if (package.DataFiles == null)
                 package.DataFiles = new List<DataFile>();
             package.DataFiles.Add(datafile);
+
+            if (_thumbnailExtensions.Any(s => s == Path.GetExtension(datafile.Path)))
+            {
+                var thumbnailDir = Path.Combine(package.WorkDir, "thumbnails");
+                Directory.CreateDirectory(thumbnailDir);
+                datafile.ThumbnailPath = await FileHelpers.GenerateThumbnail(
+                    datafile.Path,
+                    thumbnailDir
+                );
+            }
+
             await _dbContext.SaveChangesAsync();
-            return Created(nameof(FileController), new PackageFile(datafile.Id, Path.GetFileName(uploadedFilename), ""));
+            return Created(nameof(FileController), 
+                new PackageFile(datafile.Id, Path.GetFileName(uploadedFilename)));
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -186,6 +203,19 @@ namespace backend.Controllers
             System.IO.File.Delete(datafile.Path);
 
             return Ok();
+        }
+
+        [HttpGet("thumbnail/{id}")]
+        public async Task<IActionResult> DownloadThumbnail(int id)
+        {
+            var datafile = await _dbContext.DataFiles.FindAsync(id);
+            if (datafile == null)
+                return NotFound();
+
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+            contentTypeProvider.TryGetContentType(datafile.ThumbnailPath, out var contentType);
+            var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), datafile.ThumbnailPath), FileMode.Open);
+            return File(stream, contentType);
         }
     }
 

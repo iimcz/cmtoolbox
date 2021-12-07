@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using guidepipe.IO;
+using Guidepipe.IO;
 
-namespace guidepipe.Steps
+namespace Guidepipe.Steps
 {
     public class MoveFileConfig
     {

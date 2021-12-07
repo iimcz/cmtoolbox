@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
-using guidepipe.IO;
+using Guidepipe.IO;
 
-namespace guidepipe.Steps
+namespace Guidepipe.Steps
 {
     public class FfmpegProcessConfig
     {
