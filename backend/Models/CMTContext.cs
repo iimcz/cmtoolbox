@@ -23,8 +23,7 @@ namespace backend.Models
         {
             base.OnModelCreating(modelBuilder);
 
-
-            // dummy data
+            // seed data
             // TODO: proper init
             var IPW = new PresentationDevice()
             {

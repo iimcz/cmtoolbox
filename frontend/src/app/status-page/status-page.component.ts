@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ConfigurationClient } from '../services/api.generated.service';
 
 @Component({
   selector: 'app-status-page',
@@ -6,22 +7,28 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./status-page.component.css']
 })
 export class StatusPageComponent implements OnInit {
-  public toolList = TEST_TOOLS;
+  public toolList: ToolConfig[] = [];
 
-  constructor() { }
+  constructor(
+    private configClient: ConfigurationClient
+  ) { }
 
   ngOnInit(): void {
+    this.configClient.getConfiguration().subscribe((cfg) => {
+      this.toolList = [
+        { toolName: 'ffmpeg', settings: [
+          { name: 'path', type: 'string', value: cfg.ffmpegPath ?? 'System default' }
+        ]
+        },
+        {
+          toolName: 'imagemagick', settings: [
+          { name: 'path', type: 'string', value: cfg.imageMagickPath ?? 'System default' }
+        ]}
+      ]
+    });
   }
 
 }
-
-const TEST_TOOLS: ToolConfig[] = [
-  { toolName: 'ffmpeg', settings: [
-    { name: 'path', type: 'string', value: '/usr/bin/' },
-    { name: 'shouldBatch', type: 'bool', value: true },
-    { name: 'fallbackBitrate', type: 'number', value: 5000 },
-  ]},
-]
 
 export class ToolConfig {
   toolName: string = "";

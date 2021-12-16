@@ -5,7 +5,7 @@
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>
-            <button mat-raised-button matStepperNext>Pokračovat</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Metadata">
@@ -23,25 +23,13 @@
                     <div class="preview-ips" id="preview" [style.gap]="gallerySettings.gap + '%'"
                         [style.grid-template-columns]="'repeat('+gallerySettings.columns+',1fr)'"
                         [style.background-color]="gallerySettings.backgroundColor">
-                        <img src="https://picsum.photos/100/100">
-
-                        <img src="https://picsum.photos/100/100">
-
-                        <img src="https://picsum.photos/100/100">
-
-                        <img src="https://picsum.photos/100/100">
-
-                        <img src="https://picsum.photos/100/100">
-
-                        <img src="https://picsum.photos/100/100">
-
-                        <img src="https://picsum.photos/100/100">
+                        <img [src]="image.previewUrl" *ngFor="let image of galleryItemsDataSource.data">
                     </div>
                 </div>
             </div>
             <div fxLayout="column" fxLayoutAlign="center start" fxFlex
                 class="settings-pane mat-elevation-z2 raised-box">
-                <mat-tab-group>
+                <mat-tab-group class="full-width">
                     <mat-tab label="Rozložení">
                         <div class="setting" fxLayout="row">
                             <label fxFlex="80%">Počet sloupců:</label>
@@ -141,7 +129,7 @@
                             <div class="raised-box">
                                 <button mat-raised-button (click)="addCustomControl()">Přidat akci</button>
                             </div>
-                            <mat-table [dataSource]="galleryCustomControls">
+                            <mat-table [dataSource]="galleryCustomControls" class="full-width">
                                 <ng-container matColumnDef="action">
                                     <mat-header-cell *matHeaderCellDef> Akce </mat-header-cell>
                                     <mat-cell *matCellDef="let control">

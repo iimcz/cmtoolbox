@@ -8,16 +8,8 @@
             <button mat-raised-button matStepperNext>Pokračovat</button>
         </div>
     </mat-step>
-
-    <mat-step label="Přídavné skripty">
-        <app-add-scripts></app-add-scripts>
-        <div class="button-row">
-            <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button matStepperNext>Pokračovat</button>
-        </div>
-    </mat-step>
     <mat-step label="Metadata">
-        <app-add-metadata></app-add-metadata>
+        <app-add-metadata [package]="package" #addMetadataComponent></app-add-metadata>
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
             <button mat-raised-button (click)="finishAddingPackage(package.id!)">Uložit balíček</button>

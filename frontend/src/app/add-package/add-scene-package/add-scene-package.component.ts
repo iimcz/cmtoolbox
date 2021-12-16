@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
+import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
 
 @Component({
@@ -9,6 +10,7 @@ import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generate
   styleUrls: ['./add-scene-package.component.css']
 })
 export class AddScenePackageComponent implements OnInit {
+  @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
   unfinishedPackage$!: Observable<UnfinishedPackage>;
 
   constructor(
@@ -25,6 +27,7 @@ export class AddScenePackageComponent implements OnInit {
 
 
   finishAddingPackage(id: number) {
+    this.triggerSaveMetadata();
     this.packagesClient.finishPackage(id).subscribe(
       (pkg) => {
         this.router.navigate(['/package', pkg.id]);
@@ -34,5 +37,10 @@ export class AddScenePackageComponent implements OnInit {
 
   goBack() {
     history.back();
+  }
+
+
+  triggerSaveMetadata() {
+    this.addMetadataComponent.saveAllData();
   }
 }

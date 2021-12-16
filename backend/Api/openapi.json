@@ -6,6 +6,26 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/Configuration/current": {
+      "get": {
+        "tags": [
+          "Configuration"
+        ],
+        "operationId": "Configuration_GetConfiguration",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Device/all": {
       "get": {
         "tags": [
@@ -70,6 +90,39 @@
           "File"
         ],
         "operationId": "File_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/File/thumbnail/{id}": {
+      "get": {
+        "tags": [
+          "File"
+        ],
+        "operationId": "File_DownloadThumbnail",
         "parameters": [
           {
             "name": "id",
@@ -401,6 +454,20 @@
   },
   "components": {
     "schemas": {
+      "BackendConfiguration": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ffmpegPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageMagickPath": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "PresentationDevice": {
         "type": "object",
         "additionalProperties": false,
@@ -723,6 +790,10 @@
             "format": "int32"
           },
           "path": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailPath": {
             "type": "string",
             "nullable": true
           }

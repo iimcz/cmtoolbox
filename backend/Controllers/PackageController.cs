@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO.Compression;
 
 namespace backend.Controllers
 {
@@ -55,6 +57,8 @@ namespace backend.Controllers
         {
             var package = await _dbContext.UnfinishedPackages
                 .Include(p => p.Metadata)
+                .Include(p => p.DataFiles)
+                .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == id);
             
             if (package == null)
@@ -87,7 +91,11 @@ namespace backend.Controllers
         [HttpPost("finish/{id}")]
         public async Task<ActionResult<FinishedPackage>> FinishPackage(int id)
         {
-            var unfinished = await _dbContext.UnfinishedPackages.FindAsync(id);
+            var unfinished = await _dbContext.UnfinishedPackages
+                .Include(p => p.DataFiles)
+                .Include(p => p.Metadata)
+                .AsSplitQuery()
+                .SingleOrDefaultAsync(p => p.Id == id);
             if (unfinished == null)
             {
                 return NotFound();
@@ -95,9 +103,39 @@ namespace backend.Controllers
 
             var finished = unfinished.GenerateFinished();
             _dbContext.PresentationPackages.Add(finished);
+
+            FinalizePackageData(unfinished, finished);
+
+            // TODO: improve performance
+            foreach (var file in unfinished.DataFiles)
+                _dbContext.DataFiles.Remove(file);
+            unfinished.Metadata.Clear();
+            unfinished.DataFiles.Clear();
+            await _dbContext.SaveChangesAsync();
+
             _dbContext.UnfinishedPackages.Remove(unfinished);
             await _dbContext.SaveChangesAsync();
+
             return Ok(new FinishedPackage(finished.Id));
+        }
+
+        private void FinalizePackageData(UnfinishedPackage unfinished, PresentationPackage finished)
+        {
+            // TODO: launch final data processing
+
+            string pkgDir = Path.Combine(_basePackageDir, finished.Id.ToString());
+            Directory.CreateDirectory(pkgDir);
+
+            string pkgDataRoot = Path.Combine(pkgDir, "dataroot");
+            Directory.CreateDirectory(pkgDataRoot);
+            foreach (var file in unfinished.DataFiles)
+            {
+                System.IO.File.Move(file.Path, Path.Combine(pkgDataRoot, Path.GetFileName(file.Path)));
+                System.IO.File.Delete(file.ThumbnailPath);
+            }
+
+            // Final zip
+            ZipFile.CreateFromDirectory(pkgDir, Path.Combine(_basePackageDir, String.Format("{0}.zip", finished.Id)));
         }
 
         [HttpGet("metadata/get/{id}")]

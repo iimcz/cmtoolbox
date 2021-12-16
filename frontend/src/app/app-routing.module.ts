@@ -17,7 +17,7 @@ const routes: Routes = [
   { path: 'package/:id', component: PackageDetailComponent },
   { path: 'users', component: UserListComponent },
   { path: 'user', component: UserProfileComponent },
-  { path: 'scripts', component: ScriptListComponent },
+  // { path: 'scripts', component: ScriptListComponent },
   { path: 'status', component: StatusPageComponent },
 
   {

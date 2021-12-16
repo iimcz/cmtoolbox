@@ -2,8 +2,9 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
+import { map, merge, mergeWith, Observable, share, shareReplay, Subject, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
+import { FileClient } from 'src/app/services/api';
 import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
 
 @Component({
@@ -15,8 +16,12 @@ export class AddGalleryPackageComponent implements OnInit {
   @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
 
   unfinishedPackage$!: Observable<UnfinishedPackage>;
-  galleryItemsDataSource = new MatTableDataSource(TEST_ITEMS);
-  galleryCustomControls = new MatTableDataSource(TEST_CONTROLS);
+
+  notifyPackageUpdate$: Subject<number> = new Subject();
+  notifyRouteUpdate$!: Observable<number>;
+    
+  galleryItemsDataSource = new MatTableDataSource<GalleryItem>();
+  galleryCustomControls = new MatTableDataSource<CustomControl>();
 
   gallerySettings: GallerySettings = {
     columns: 3,
@@ -30,13 +35,21 @@ export class AddGalleryPackageComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private packagesClient: PackagesClient
+    private packagesClient: PackagesClient,
+    private fileClient: FileClient
   ) { }
 
   ngOnInit(): void {
-    this.unfinishedPackage$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => this.packagesClient.getUnfinishedPackage(parseInt(params.get('id')!)))
+    this.notifyRouteUpdate$ = this.route.paramMap.pipe(
+      map((params: ParamMap) => parseInt(params.get('id')!))
     );
+    this.unfinishedPackage$ = this.notifyRouteUpdate$.pipe(
+      mergeWith(this.notifyPackageUpdate$),
+      switchMap((id: number) => this.packagesClient.getUnfinishedPackage(id))
+    );
+    this.unfinishedPackage$.subscribe((pkg) => {
+      this.refreshGalleryItems(pkg);
+    });
   }
 
   finishAddingPackage(id: number) {
@@ -69,21 +82,25 @@ export class AddGalleryPackageComponent implements OnInit {
   triggerSaveMetadata() {
     this.addMetadataComponent.saveAllData();
   }
+
+  refreshGalleryItems(pkg: UnfinishedPackage) {
+    const newData: GalleryItem[] = [];
+    for (let file of pkg.dataFiles!) {
+      newData.push({
+        previewUrl: this.fileClient.getThumbnailUrl(file.id!),
+        filename: file.path!.substr(file.path?.lastIndexOf('/')! + 1), // TODO: implement on backend instead
+        canZoom: false,
+        hasLink: false,
+        link: ''
+      });
+    }
+    this.galleryItemsDataSource.data = newData;
+  }
+
+  refreshPackage(id: number) {
+    this.notifyPackageUpdate$.next(id);
+  }
 }
-
-const TEST_ITEMS: GalleryItem[] = [
-  { previewUrl: "https://picsum.photos/100/100", filename: "test1.png", canZoom: true, hasLink: false, link: '' },
-  { previewUrl: "https://picsum.photos/100/100", filename: "test2.png", canZoom: true, hasLink: false, link: '' },
-  { previewUrl: "https://picsum.photos/100/100", filename: "test3.png", canZoom: true, hasLink: false, link: '' },
-  { previewUrl: "https://picsum.photos/100/100", filename: "test4.png", canZoom: true, hasLink: false, link: '' },
-  { previewUrl: "https://picsum.photos/100/100", filename: "test5.png", canZoom: true, hasLink: false, link: '' },
-  { previewUrl: "https://picsum.photos/100/100", filename: "test6.png", canZoom: true, hasLink: false, link: '' },
-  { previewUrl: "https://picsum.photos/100/100", filename: "test7.png", canZoom: true, hasLink: false, link: '' }
-];
-
-const TEST_CONTROLS: CustomControl[] = [
-  { action: 'move-up', eventType: 'gesture', eventParams: 'swipe-up' },
-];
 
 export interface GalleryItem {
   previewUrl: string;

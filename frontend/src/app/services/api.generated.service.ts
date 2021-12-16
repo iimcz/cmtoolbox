@@ -17,6 +17,68 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 @Injectable({
     providedIn: 'root'
 })
+export class ConfigurationClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    getConfiguration() : Observable<BackendConfiguration> {
+        let url_ = this.baseUrl + "/Configuration/current";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetConfiguration(<any>response_);
+                } catch (e) {
+                    return <Observable<BackendConfiguration>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<BackendConfiguration>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetConfiguration(response: HttpResponseBase): Observable<BackendConfiguration> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BackendConfiguration.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BackendConfiguration>(<any>null);
+    }
+}
+
+@Injectable({
+    providedIn: 'root'
+})
 export class DeviceClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -79,7 +141,7 @@ export class DeviceClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);;
+        return _observableOf<any>(<any>null);
     }
 
     getDeviceSensors(id: number) : Observable<DeviceSensor[]> {
@@ -137,7 +199,7 @@ export class DeviceClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);;
+        return _observableOf<any>(<any>null);
     }
 }
 
@@ -184,6 +246,55 @@ export class FileClient {
     }
 
     protected processDelete(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+
+    downloadThumbnail(id: number) : Observable<FileResponse> {
+        let url_ = this.baseUrl + "/File/thumbnail/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDownloadThumbnail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDownloadThumbnail(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDownloadThumbnail(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -269,7 +380,7 @@ export class PackagesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);;
+        return _observableOf<any>(<any>null);
     }
 
     getPackage(id: number) : Observable<PresentationPackage> {
@@ -375,7 +486,7 @@ export class PackagesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);;
+        return _observableOf<any>(<any>null);
     }
 
     getUnfinishedPackage(id: number) : Observable<UnfinishedPackage> {
@@ -586,7 +697,7 @@ export class PackagesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<any>(<any>null);;
+        return _observableOf<any>(<any>null);
     }
 
     saveMetadataForPackage(id: number, metadataRecords: MetadataRecord[]) : Observable<FileResponse> {
@@ -694,6 +805,46 @@ export class PackagesClient {
         }
         return _observableOf<FileResponse>(<any>null);
     }
+}
+
+export class BackendConfiguration implements IBackendConfiguration {
+    ffmpegPath?: string | undefined;
+    imageMagickPath?: string | undefined;
+
+    constructor(data?: IBackendConfiguration) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.ffmpegPath = _data["ffmpegPath"];
+            this.imageMagickPath = _data["imageMagickPath"];
+        }
+    }
+
+    static fromJS(data: any): BackendConfiguration {
+        data = typeof data === 'object' ? data : {};
+        let result = new BackendConfiguration();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["ffmpegPath"] = this.ffmpegPath;
+        data["imageMagickPath"] = this.imageMagickPath;
+        return data; 
+    }
+}
+
+export interface IBackendConfiguration {
+    ffmpegPath?: string | undefined;
+    imageMagickPath?: string | undefined;
 }
 
 export class PresentationDevice implements IPresentationDevice {
@@ -1214,6 +1365,7 @@ export interface IPresentationScript {
 export class DataFile implements IDataFile {
     id?: number;
     path?: string | undefined;
+    thumbnailPath?: string | undefined;
 
     constructor(data?: IDataFile) {
         if (data) {
@@ -1228,6 +1380,7 @@ export class DataFile implements IDataFile {
         if (_data) {
             this.id = _data["id"];
             this.path = _data["path"];
+            this.thumbnailPath = _data["thumbnailPath"];
         }
     }
 
@@ -1242,6 +1395,7 @@ export class DataFile implements IDataFile {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["path"] = this.path;
+        data["thumbnailPath"] = this.thumbnailPath;
         return data; 
     }
 }
@@ -1249,6 +1403,7 @@ export class DataFile implements IDataFile {
 export interface IDataFile {
     id?: number;
     path?: string | undefined;
+    thumbnailPath?: string | undefined;
 }
 
 export class ScriptParameter implements IScriptParameter {

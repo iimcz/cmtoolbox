@@ -12,4 +12,8 @@ export class AddModelPackageComponent implements OnInit {
   ngOnInit(): void {
   }
 
+
+  triggerSaveMetadata() {
+    //this.addMetadataComponent.saveAllData();
+  }
 }

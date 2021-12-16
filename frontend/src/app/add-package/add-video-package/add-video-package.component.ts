@@ -1,7 +1,8 @@
 import { BaseCdkCell } from '@angular/cdk/table';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
+import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
 
 @Component({
@@ -10,6 +11,8 @@ import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generate
   styleUrls: ['./add-video-package.component.css']
 })
 export class AddVideoPackageComponent implements OnInit {
+  @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
+
   previewUrl: string = '';
   advancedConversionSettings: boolean = false;
   unfinishedPackage$!: Observable<UnfinishedPackage>;
@@ -45,5 +48,10 @@ export class AddVideoPackageComponent implements OnInit {
 
   applyAdvancedConversionParams() {
     
+  }
+
+
+  triggerSaveMetadata() {
+    this.addMetadataComponent.saveAllData();
   }
 }

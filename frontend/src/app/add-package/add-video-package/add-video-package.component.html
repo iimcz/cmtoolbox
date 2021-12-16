@@ -8,6 +8,13 @@
             <button mat-raised-button matStepperNext>Pokračovat</button>
         </div>
     </mat-step>
+    <mat-step label="Metadata">
+        <app-add-metadata [package]="package" #addMetadataComponent></app-add-metadata>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext (click)="triggerSaveMetadata()">Uložit balíček</button>
+        </div>
+    </mat-step>
     <mat-step label="Konverze">
         <div fxLayout="row" fxLayoutAlign="center start">
             <div fxFlex="40%">
@@ -79,7 +86,7 @@
             <button mat-raised-button matStepperNext>Pokračovat</button>
         </div>
     </mat-step>
-    <mat-step label="Ovládání a události videa">
+    <mat-step label="Nastavení videa">
         <div fxLayout="row" fxLayoutAlign="center start">
             <div fxFlex="40%">
                 <h3>Náhled videa</h3>
@@ -98,14 +105,7 @@
         <app-add-scripts></app-add-scripts>
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button matStepperNext>Pokračovat</button>
-        </div>
-    </mat-step>
-    <mat-step label="Metadata">
-        <app-add-metadata></app-add-metadata>
-        <div class="button-row">
-            <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button (click)="finishAddingPackage(package.id!)">Uložit balíček</button>
+            <button mat-raised-button (click)="finishAddingPackage(package.id!)">Pokračovat</button>
         </div>
     </mat-step>
 </mat-horizontal-stepper>
