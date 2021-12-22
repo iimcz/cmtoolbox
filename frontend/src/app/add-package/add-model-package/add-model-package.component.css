@@ -1,0 +1,97 @@
+.button-row {
+    margin-top: 2em;
+    display: flex;
+    justify-content: space-around;
+}
+
+.raised-box {
+    margin: 1em 0em 1em 0em;
+    padding: 2em;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.raised-box-padless {
+    margin: 1em 0em 1em 0em;
+    border-radius: 5px;
+    height: 100%;
+}
+
+.raised-box h3 {
+    text-align: center;
+}
+
+.uploaded-box {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.uploaded-box .image-label {
+    position: absolute;
+    text-align: center;
+    outline: 4px black;
+    color: white;
+    width: 80%;
+}
+
+/* Preview classes */
+.preview-panel {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.preview-ips {
+    width: 30em;
+    height: 15em;
+    border: solid black;
+    display: grid;
+    overflow: scroll;
+/*    gap: 10%; */
+    grid-template-columns: repeat(3, 1fr);
+    background: darkslategray;
+}
+
+.preview-ips img {
+    width: 100%;
+    object-fit: fill;
+}
+
+.settings-pane {
+    padding: 2em;
+}
+
+.settings-pane .controls-preview {
+    height: 10em;
+    object-fit: scale-down;
+    width: 50%;
+    align-self: center;
+}
+
+.settings-pane .setting label {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 2em;
+}
+
+.settings-pane .setting mat-slider {
+    width: 100%;
+}
+
+.settings-pane .preview-pic {
+    object-fit: scale-down;
+    max-height: 4em;
+}
+
+.settings-pane ::ng-deep .mat-expansion-panel-body {
+    padding: 0;
+}
+
+.checkbox-column {
+    padding-left: 2em;
+}
+
+.preview-3d {
+    width: 400;
+    height: 200;
+}

@@ -51,6 +51,11 @@ namespace backend.Utilities
                     new byte[] { 0x57, 0x69, 0x6E, 0x5A, 0x69, 0x70 },
                 }
             },
+            { ".webm", new List<byte[]>
+                {
+                    new byte[] { 0x1A, 0x45, 0xDF, 0xA3 }
+                }
+            }
         };
 
         // **WARNING!**
@@ -188,7 +193,7 @@ namespace backend.Utilities
             {
                 modelState.AddModelError("File",
                     "The upload failed. Please contact the Help Desk " +
-                    $" for support. Error: {ex.HResult}");
+                    $" for support. Error: {ex.ToString()}");
                 // Log the exception
             }
 

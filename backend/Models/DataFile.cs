@@ -5,5 +5,6 @@ namespace backend.Models
         public int Id { get; set; }
         public string Path { get; set; }
         public string ThumbnailPath { get; set; }
+        public string PreviewPath { get; set; }
     }
 }

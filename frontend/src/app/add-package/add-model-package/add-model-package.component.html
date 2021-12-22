@@ -1,1 +1,115 @@
-<p>add-model-package works!</p>
+<mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
+    <mat-step label="Nahrání dat">
+        <div class="mat-elevation-z1 raised-box">
+            <app-add-local-upload accept="model/*" [showPreview]="true" [packageId]="package.id!"></app-add-local-upload>
+        </div>
+        <div class="button-row">
+            <button mat-raised-button (click)="goBack()">Zrušit</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Metadata">
+        <app-add-metadata [package]="package"></app-add-metadata>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext (click)="triggerSaveMetadata()">Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Nastavení modelu">
+        <div fxLayout="row">
+            <div fxFlex="50%" class="raised-box">
+                <h3>Náhled</h3>
+                <canvas class="preview-3d" #preview3d></canvas>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxFlex
+                class="settings-pane mat-elevation-z2 raised-box">
+                <mat-tab-group class="full-width">
+                    <mat-tab label="Pohled">
+                        <div class="setting">
+                            <label>Barva pozadí:</label>
+                            <mat-form-field>
+                                <input matInput type="color" [(ngModel)]="modelSettings.backgroundColor">
+                            </mat-form-field>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Ovládání">
+                        <div class="setting full-width">
+                            <label>Ovádání modelu:</label>
+                            <mat-form-field>
+                                <select matNativeControl [(ngModel)]="modelSettings.basicControls">
+                                    <option value="grab-drag">Gesta tažení</option>
+                                    <option value="swipe-gestures">Swipe gesta</option>
+                                    <option value="custom">Vlastní nastavení (speciální)</option>
+                                </select>
+                            </mat-form-field>
+                        </div>
+                        <mat-table [dataSource]="modelCustomControls" class="full-width">
+                            <ng-container matColumnDef="action">
+                                <mat-header-cell *matHeaderCellDef> Akce </mat-header-cell>
+                                <mat-cell *matCellDef="let control">
+                                    <button mat-icon-button (click)="removeCustomControl(control)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                    <mat-form-field>
+                                        <select matNativeControl [(ngModel)]="control.action">
+                                            <option value="move-left">Posunout doleva</option>
+                                            <option value="move-right">Posunout doprava</option>
+                                            <option value="move-up">Posunout nahoru</option>
+                                            <option value="move-down">Posunout dolů</option>
+                                        </select>
+                                    </mat-form-field>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="event">
+                                <mat-header-cell *matHeaderCellDef> Událost ovládání </mat-header-cell>
+                                <mat-cell *matCellDef="let control">
+                                    <mat-form-field>
+                                        <select matNativeControl [(ngModel)]="control.eventType">
+                                            <option value="gesture">Gesto</option>
+                                            <option value="sensor-volume">Sensor hlasitosti (dB)</option>
+                                            <option value="sensor-distance">Senzor vzdálenosti (cm)</option>
+                                        </select>
+                                    </mat-form-field>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="event-detail">
+                                <mat-header-cell *matHeaderCellDef> Detail události </mat-header-cell>
+                                <mat-cell *matCellDef="let control">
+                                    <mat-form-field>
+                                        <select *ngIf="control.eventType === 'gesture'" matNativeControl
+                                            [(ngModel)]="control.eventParams">
+                                            <option value="swipe-up">Swipe nahoru</option>
+                                            <option value="swipe-down">Swipe dolů</option>
+                                            <option value="swipe-left">Swipe doleva</option>
+                                            <option value="swipe-right">Swipe doprava</option>
+                                        </select>
+                                        <div
+                                            *ngIf="control.eventType === 'sensor-volume' || control.eventType === 'sensor-distance'">
+                                            <mat-label>Hraniční hodnota</mat-label>
+                                            <input matInput type="number" [(ngModel)]="control.eventParams">
+                                        </div>
+                                    </mat-form-field>
+                                </mat-cell>
+                            </ng-container>
+    
+                            <mat-header-row *matHeaderRowDef="['action', 'event', 'event-detail']"></mat-header-row>
+                            <mat-row *matRowDef="let control; columns: ['action', 'event', 'event-detail'];"></mat-row>
+                        </mat-table>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext>Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Přídavné skripty">
+        <app-add-scripts></app-add-scripts>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button (click)="finishAddingPackage(package.id!)">Uložit balíček</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

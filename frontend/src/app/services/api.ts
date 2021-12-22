@@ -133,6 +133,10 @@ export class FileClient {
     getThumbnailUrl(id: number): string {
         return (this.baseUrl + "/File/thumbnail/{id}").replace("{id}", encodeURIComponent("" + id));
     }
+
+    getPreviewUrl(id: number): string {
+        return (this.baseUrl + "/File/preview/{id}").replace("{id}", encodeURIComponent("" + id));
+    }
 }
 
 export interface IFileResponse {

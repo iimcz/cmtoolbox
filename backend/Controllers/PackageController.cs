@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using backend.Models;
 using backend.ViewModels;
 using backend.Extensions;
+using backend.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Http;
 
 namespace backend.Controllers
 {
@@ -103,6 +105,7 @@ namespace backend.Controllers
 
             var finished = unfinished.GenerateFinished();
             _dbContext.PresentationPackages.Add(finished);
+            await _dbContext.SaveChangesAsync();
 
             FinalizePackageData(unfinished, finished);
 
@@ -131,14 +134,18 @@ namespace backend.Controllers
             foreach (var file in unfinished.DataFiles)
             {
                 System.IO.File.Move(file.Path, Path.Combine(pkgDataRoot, Path.GetFileName(file.Path)));
-                System.IO.File.Delete(file.ThumbnailPath);
+
+                if (file.ThumbnailPath != null)
+                    System.IO.File.Delete(file.ThumbnailPath);
+                if (file.PreviewPath != null)
+                    System.IO.File.Delete(file.PreviewPath);
             }
 
             // Final zip
             ZipFile.CreateFromDirectory(pkgDir, Path.Combine(_basePackageDir, String.Format("{0}.zip", finished.Id)));
         }
 
-        [HttpGet("metadata/get/{id}")]
+        [HttpGet("metadata/{id}")]
         public async Task<ActionResult<IEnumerable<MetadataRecord>>> GetMetadataForPackage(int id)
         {
             var package = await _dbContext.PresentationPackages
@@ -151,7 +158,7 @@ namespace backend.Controllers
             return Ok(package.Metadata.Select((mtd, _) => new MetadataRecord { Key = mtd.Key, Value = mtd.Value }));
         }
 
-        [HttpPost("metadata/save/{id}")]
+        [HttpPost("metadata/{id}")]
         public async Task<ActionResult> SaveMetadataForPackage(int id, [FromBody] IEnumerable<MetadataRecord> metadataRecords)
         {
             var package = await _dbContext.PresentationPackages
@@ -168,7 +175,36 @@ namespace backend.Controllers
             return Ok();
         }
 
-        [HttpPost("properties/set/{id}")]
+        [HttpPost("metapack/{id}/{format}")]
+        public async Task<ActionResult> ImportMetadataFile(int id, string format, [FromBody] IFormFile file)
+        {
+            var package = await _dbContext.PresentationPackages
+                .Include(p => p.Metadata)
+                .SingleOrDefaultAsync(p => p.Id == id);
+            
+            if (package == null)
+                return NotFound();
+
+            Dictionary<string, string> metadata;
+            switch (format)
+            {
+                default:
+                case "mods":
+                    metadata = MetadataHelpers.ParseMODSFile(file);
+                    break;
+                case "muzeion":
+                    metadata = MetadataHelpers.ParseMuzeionFile(file);
+                    break;
+            }
+
+            var newMetadata = metadata.Select(kv => new PackageMetadata { Key = kv.Key, Value = kv.Value }).Union(package.Metadata);
+            package.Metadata = newMetadata.ToList();
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost("properties/{id}")]
         public async Task<ActionResult> SetPackageProperties(int id, [FromBody] PackageProperties properties)
         {
             var package = await _dbContext.PresentationPackages
@@ -182,6 +218,21 @@ namespace backend.Controllers
             package.Description = properties.Description;
             await _dbContext.SaveChangesAsync();
             return Ok();
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("download/{id}")]
+        public async Task<ActionResult> DownloadPackage(int id)
+        {
+            var pkg = await _dbContext.PresentationPackages
+                .OfOnlyType<PresentationPackage, PresentationPackage>()
+                .SingleOrDefaultAsync(p => p.Id == id);
+            if (pkg == null)
+                return NotFound();
+
+            var zipPath = Path.Combine(_basePackageDir, String.Format("{0}.zip", pkg.Id));
+            var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), zipPath), FileMode.Open);
+            return File(stream, "application/zip");
         }
     }
 }

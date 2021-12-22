@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using backend.Extensions;
 using backend.Filters;
 using backend.Models;
 using backend.Utilities;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
@@ -29,7 +31,7 @@ namespace backend.Controllers
         private readonly ILogger<FileController> _logger;
         private readonly string[] _permittedExtensions = { };
         private readonly string[] _thumbnailExtensions = { ".png", ".jpg", ".avi", ".mp4" };
-        private readonly string _targetFilePath;
+        private readonly string[] _previewExtensions = { ".avi", ".mp4", ".webm" };
 
         private readonly CMTContext _dbContext;
 
@@ -37,14 +39,7 @@ namespace backend.Controllers
         {
             _logger = logger;
             _fileSizeLimit = config.GetSection("Files").GetValue<long>("SizeLimit");
-
-            // To save physical files to a path provided by configuration:
-            _targetFilePath = config.GetSection("Files").GetValue<string>("StoredPath");
-
             _permittedExtensions = config.GetSection("Files").GetSection("PermittedExtensions").Get<string[]>();
-
-            // To save physical files to the temporary files folder, use:
-            //_targetFilePath = Path.GetTempPath();
 
             _dbContext = dbContext;
         }
@@ -53,7 +48,7 @@ namespace backend.Controllers
         [HttpPost("upload/{packageId}")]
         [DisableFormValueModelBinding]
         //[ValidateAntiForgeryToken] TODO
-        public async Task<IActionResult> Upload(CancellationToken cancellationToken, int packageId)
+        public async Task<ActionResult> Upload(CancellationToken cancellationToken, int packageId)
         {
             if (string.IsNullOrEmpty(Request.ContentType)
                 || Request.ContentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) != 0)
@@ -163,6 +158,10 @@ namespace backend.Controllers
                     thumbnailDir
                 );
             }
+            if (_previewExtensions.Any(s => s == Path.GetExtension(datafile.Path)))
+            {
+                datafile.PreviewPath = datafile.Path;
+            }
 
             await _dbContext.SaveChangesAsync();
             return Created(nameof(FileController), 
@@ -170,25 +169,20 @@ namespace backend.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet("download/{id}")]
-        public async Task<IActionResult> Download(string id)
+        [HttpGet("preview/{id}")]
+        public async Task<ActionResult> DownloadPreview(int id)
         {
-            bool valid = Guid.TryParse(id, out var fid);
-
-            if (!valid)
-            {
-                return BadRequest();
-            }
-
-            DataFile file = await _dbContext.DataFiles.FindAsync(fid);
-            if (file == null)
-            {
+            var datafile = await _dbContext.DataFiles.FindAsync(id);
+            if (datafile == null)
                 return NotFound();
-            }
 
-            return File(file.Path, "application/octet-stream");
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+            contentTypeProvider.TryGetContentType(datafile.PreviewPath, out var contentType);
+            var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), datafile.PreviewPath), FileMode.Open);
+            return File(stream, contentType);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -205,8 +199,9 @@ namespace backend.Controllers
             return Ok();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("thumbnail/{id}")]
-        public async Task<IActionResult> DownloadThumbnail(int id)
+        public async Task<ActionResult> DownloadThumbnail(int id)
         {
             var datafile = await _dbContext.DataFiles.FindAsync(id);
             if (datafile == null)

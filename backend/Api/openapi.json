@@ -84,72 +84,6 @@
         }
       }
     },
-    "/File/delete/{id}": {
-      "delete": {
-        "tags": [
-          "File"
-        ],
-        "operationId": "File_Delete",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/File/thumbnail/{id}": {
-      "get": {
-        "tags": [
-          "File"
-        ],
-        "operationId": "File_DownloadThumbnail",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Packages/all": {
       "get": {
         "tags": [
@@ -323,7 +257,7 @@
         }
       }
     },
-    "/Packages/metadata/get/{id}": {
+    "/Packages/metadata/{id}": {
       "get": {
         "tags": [
           "Packages"
@@ -356,9 +290,7 @@
             }
           }
         }
-      }
-    },
-    "/Packages/metadata/save/{id}": {
+      },
       "post": {
         "tags": [
           "Packages"
@@ -406,7 +338,63 @@
         }
       }
     },
-    "/Packages/properties/set/{id}": {
+    "/Packages/metapack/{id}/{format}": {
+      "post": {
+        "tags": [
+          "Packages"
+        ],
+        "operationId": "Packages_ImportMetadataFile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "file",
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Packages/properties/{id}": {
       "post": {
         "tags": [
           "Packages"
@@ -794,6 +782,10 @@
             "nullable": true
           },
           "thumbnailPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "previewPath": {
             "type": "string",
             "nullable": true
           }
