@@ -1,6 +1,6 @@
 # Správce obsahu (Content Manager)
 
-Spr8vce obsahu (CM) je samostatná aplikace, jejímž účelem je poskytovat prostředí a nástroje pro konverzi
+Správce obsahu (CM) je samostatná aplikace, jejímž účelem je poskytovat prostředí a nástroje pro konverzi
 a přípravu vstupních multimediálních dat (zejména ale 3D modelů) určených pro prezentování návštěvníkům prostřednictvím
 kompatibilních zařízení (aktuálně viz [Interaktivní projekční stěna - IPS](https://github.com/iimcz/ipw-firmware)). Produktem Správce obsahu je
 tzv. prezentační balíček, který obsahuje vlastní data (např. 3D model) a další pomocné instrukce a popisné informace.
