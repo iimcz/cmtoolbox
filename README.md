@@ -22,4 +22,4 @@ Celková dokumentace Správce obsahu je dostupná zde:
 
 Dokumentace ke tvorbě balíčků typu 3D scéna:
 
-[Dokumentace 3D SDK](https://raw.githubusercontent.com/iimcz/cmtoolbox/master/docs/3D%20SDK%20Dokumentace.pdf)
+[Dokumentace 3D SDK](https://raw.githubusercontent.com/iimcz/cmtoolbox/master/docs/3D_SDK_Dokumentace.pdf)
