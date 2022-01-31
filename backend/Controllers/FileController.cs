@@ -60,7 +60,7 @@ namespace backend.Controllers
                 return BadRequest(ModelState);
             }
 
-            var package = await _dbContext.UnfinishedPackages.FindAsync(packageId);
+            var package = await _dbContext.PresentationPackages.FindAsync(packageId);
             if (package == null)
             {
                 return NotFound();

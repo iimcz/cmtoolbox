@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
+using Naki3D.Common.Json;
 
 namespace backend.Controllers
 {
@@ -36,7 +37,7 @@ namespace backend.Controllers
 
         [HttpGet("all")]
         public IEnumerable<PresentationPackage> GetPackages() =>
-            _dbContext.PresentationPackages.OfOnlyType<PresentationPackage, PresentationPackage>().ToList();
+            _dbContext.PresentationPackages.Where(p => p.State != PackageState.Unfinished).ToList();
 
         [HttpGet("single/{id}")]
         public async Task<ActionResult<PresentationPackage>> GetPackage(int id)
@@ -51,13 +52,14 @@ namespace backend.Controllers
         }
 
         [HttpGet("unfinished")]
-        public IEnumerable<UnfinishedPackage> GetUnfinishedPackages() =>
-            _dbContext.UnfinishedPackages.ToList();
+        public IEnumerable<PresentationPackage> GetUnfinishedPackages() =>
+            _dbContext.PresentationPackages.Where(p => p.State == PackageState.Unfinished).ToList();
 
         [HttpGet("unfinished/{id}")]
-        public async Task<ActionResult<UnfinishedPackage>> GetUnfinishedPackage(int id)
+        public async Task<ActionResult<PresentationPackage>> GetUnfinishedPackage(int id)
         {
-            var package = await _dbContext.UnfinishedPackages
+            var package = await _dbContext.PresentationPackages
+                .Where(p => p.State == PackageState.Unfinished)
                 .Include(p => p.Metadata)
                 .Include(p => p.DataFiles)
                 .AsSplitQuery()
@@ -71,15 +73,16 @@ namespace backend.Controllers
         [HttpPost("new/{type}")]
         public async Task<ActionResult<CreatedUnfinishedPackage>> CreateNewPackage(PackageType type)
         {
-            UnfinishedPackage newPkg = new UnfinishedPackage
+            PresentationPackage newPkg = new PresentationPackage
             {
                 Type = type,
                 Name = "Novy balicek",
                 Description = "Bez popisu",
+                State = PackageState.Unfinished,
                 IntendedDevices = new List<PresentationDevice>()
             };
             newPkg.IntendedDevices.Add(await _dbContext.PresentationDevices.FindAsync(1));
-            _dbContext.UnfinishedPackages.Add(newPkg);
+            _dbContext.PresentationPackages.Add(newPkg);
             await _dbContext.SaveChangesAsync();
 
             newPkg.WorkDir = Path.Combine(_baseWorkDir, newPkg.Id.ToString());
@@ -93,7 +96,8 @@ namespace backend.Controllers
         [HttpPost("finish/{id}")]
         public async Task<ActionResult<FinishedPackage>> FinishPackage(int id)
         {
-            var unfinished = await _dbContext.UnfinishedPackages
+            var unfinished = await _dbContext.PresentationPackages
+                .Where(p => p.State == PackageState.Unfinished)
                 .Include(p => p.DataFiles)
                 .Include(p => p.Metadata)
                 .AsSplitQuery()
@@ -102,47 +106,46 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-
-            var finished = unfinished.GenerateFinished();
-            _dbContext.PresentationPackages.Add(finished);
+            unfinished.State = PackageState.Processing;
             await _dbContext.SaveChangesAsync();
 
-            FinalizePackageData(unfinished, finished);
+            Response.OnCompleted(async () => {
+                await FinalizePackageData(unfinished);
 
-            // TODO: improve performance
-            foreach (var file in unfinished.DataFiles)
-                _dbContext.DataFiles.Remove(file);
-            unfinished.Metadata.Clear();
-            unfinished.DataFiles.Clear();
-            await _dbContext.SaveChangesAsync();
+                // TODO: improve performance
+                foreach (var file in unfinished.DataFiles)
+                    _dbContext.DataFiles.Remove(file);
+                unfinished.Metadata.Clear();
+                unfinished.DataFiles.Clear();
 
-            _dbContext.UnfinishedPackages.Remove(unfinished);
-            await _dbContext.SaveChangesAsync();
+                unfinished.State = PackageState.Finished;
+                await _dbContext.SaveChangesAsync();
+            });
 
-            return Ok(new FinishedPackage(finished.Id));
+            return Ok(new FinishedPackage(unfinished.Id));
         }
 
-        private void FinalizePackageData(UnfinishedPackage unfinished, PresentationPackage finished)
+        private async Task FinalizePackageData(PresentationPackage package)
         {
             // TODO: launch final data processing
 
-            string pkgDir = Path.Combine(_basePackageDir, finished.Id.ToString());
+            string pkgDir = Path.Combine(_basePackageDir, package.Id.ToString());
             Directory.CreateDirectory(pkgDir);
 
             string pkgDataRoot = Path.Combine(pkgDir, "dataroot");
             Directory.CreateDirectory(pkgDataRoot);
-            foreach (var file in unfinished.DataFiles)
+            foreach (var file in package.DataFiles)
             {
                 System.IO.File.Move(file.Path, Path.Combine(pkgDataRoot, Path.GetFileName(file.Path)));
 
-                if (file.ThumbnailPath != null)
+                if (file.ThumbnailPath != null && System.IO.File.Exists(file.ThumbnailPath))
                     System.IO.File.Delete(file.ThumbnailPath);
-                if (file.PreviewPath != null)
+                if (file.PreviewPath != null && System.IO.File.Exists(file.PreviewPath))
                     System.IO.File.Delete(file.PreviewPath);
             }
 
             // Final zip
-            ZipFile.CreateFromDirectory(pkgDir, Path.Combine(_basePackageDir, String.Format("{0}.zip", finished.Id)));
+            ZipFile.CreateFromDirectory(pkgDir, Path.Combine(_basePackageDir, String.Format("{0}.zip", package.Id)));
         }
 
         [HttpGet("metadata/{id}")]
@@ -220,6 +223,36 @@ namespace backend.Controllers
             return Ok();
         }
 
+        [HttpPost("parameters/{id}")]
+        public async Task<ActionResult> SetPackageParameters(int id, [FromBody] Parameters parameters)
+        {
+            var package = await _dbContext.PresentationPackages
+                .FindAsync(id);
+            
+            if (package == null)
+                return NotFound();
+
+            package.ParametersJson = Newtonsoft.Json.JsonConvert.SerializeObject(parameters, Naki3D.Common.Json.Converter.Settings);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost("inputs/{id}")]
+        public async Task<ActionResult> SetPackageInputs(int id, [FromBody] Naki3D.Common.Json.Action[] inputs)
+        {
+            var package = await _dbContext.PresentationPackages
+                .FindAsync(id);
+            
+            if (package == null)
+                return NotFound();
+
+            package.InputsJson = Newtonsoft.Json.JsonConvert.SerializeObject(inputs, Naki3D.Common.Json.Converter.Settings);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
+        }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("download/{id}")]
         public async Task<ActionResult> DownloadPackage(int id)
@@ -231,6 +264,9 @@ namespace backend.Controllers
                 return NotFound();
 
             var zipPath = Path.Combine(_basePackageDir, String.Format("{0}.zip", pkg.Id));
+            if (!System.IO.File.Exists(zipPath))
+                return NotFound(); // TODO: handle properly as this should not happen...
+
             var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), zipPath), FileMode.Open);
             return File(stream, "application/zip");
         }

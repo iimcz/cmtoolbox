@@ -84,6 +84,128 @@
         }
       }
     },
+    "/pending": {
+      "get": {
+        "tags": [
+          "Exhibit"
+        ],
+        "operationId": "Exhibit_GetPendingConnections",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/established": {
+      "get": {
+        "tags": [
+          "Exhibit"
+        ],
+        "operationId": "Exhibit_GetEstablishedConnections",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accept/{id}": {
+      "post": {
+        "tags": [
+          "Exhibit"
+        ],
+        "operationId": "Exhibit_AcceptConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/send/{exhibit_id}/{package_id}": {
+      "post": {
+        "tags": [
+          "Exhibit"
+        ],
+        "operationId": "Exhibit_SendPackage",
+        "parameters": [
+          {
+            "name": "exhibit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "package_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Packages/all": {
       "get": {
         "tags": [
@@ -153,7 +275,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UnfinishedPackage"
+                    "$ref": "#/components/schemas/PresentationPackage"
                   }
                 }
               }
@@ -186,7 +308,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnfinishedPackage"
+                  "$ref": "#/components/schemas/PresentationPackage"
                 }
               }
             }
@@ -438,6 +560,99 @@
           }
         }
       }
+    },
+    "/Packages/parameters/{id}": {
+      "post": {
+        "tags": [
+          "Packages"
+        ],
+        "operationId": "Packages_SetPackageParameters",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "parameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Parameters"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Packages/inputs/{id}": {
+      "post": {
+        "tags": [
+          "Packages"
+        ],
+        "operationId": "Packages_SetPackageInputs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "inputs",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Action"
+                }
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -578,6 +793,33 @@
             "type": "string",
             "format": "date-time"
           },
+          "parametersJson": {
+            "type": "string",
+            "nullable": true
+          },
+          "inputsJson": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/PackageState"
+          },
+          "pipelineState": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "workDir": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataFiles": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DataFile"
+            }
+          },
           "metadata": {
             "type": "array",
             "nullable": true,
@@ -712,6 +954,42 @@
           }
         }
       },
+      "PackageState": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Unfinished",
+          "Processing",
+          "Finished"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "DataFile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "path": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnailPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "previewPath": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "PackageMetadata": {
         "type": "object",
         "additionalProperties": false,
@@ -769,28 +1047,6 @@
           }
         }
       },
-      "DataFile": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "path": {
-            "type": "string",
-            "nullable": true
-          },
-          "thumbnailPath": {
-            "type": "string",
-            "nullable": true
-          },
-          "previewPath": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "ScriptParameter": {
         "type": "object",
         "additionalProperties": false,
@@ -808,35 +1064,6 @@
             "nullable": true
           }
         }
-      },
-      "UnfinishedPackage": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PresentationPackage"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "pipelineState": {
-                "type": "string",
-                "format": "byte",
-                "nullable": true
-              },
-              "workDir": {
-                "type": "string",
-                "nullable": true
-              },
-              "dataFiles": {
-                "type": "array",
-                "nullable": true,
-                "items": {
-                  "$ref": "#/components/schemas/DataFile"
-                }
-              }
-            }
-          }
-        ]
       },
       "CreatedUnfinishedPackage": {
         "type": "object",
@@ -885,6 +1112,481 @@
             "nullable": true
           }
         }
+      },
+      "Parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "displayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "settings": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Settings"
+              }
+            ]
+          }
+        }
+      },
+      "Settings": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "backgroundColor": {
+            "type": "string",
+            "nullable": true
+          },
+          "layout": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Layout"
+              }
+            ]
+          },
+          "layoutType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/LayoutType"
+              }
+            ]
+          },
+          "padding": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Vector2"
+              }
+            ]
+          },
+          "scrollDelay": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "slideAnimationLength": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cameraAnimation": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CameraAnimation"
+              }
+            ]
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "flagInteraction": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FlagInteraction"
+              }
+            ]
+          },
+          "flags": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/ModelFlag"
+            }
+          },
+          "skybox": {
+            "type": "string",
+            "nullable": true
+          },
+          "skyboxTint": {
+            "type": "string",
+            "nullable": true
+          },
+          "aspectRatio": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AspectRatio"
+              }
+            ]
+          },
+          "autoStart": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "loop": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "videoEvents": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/VideoEvent"
+            }
+          }
+        }
+      },
+      "Layout": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "height": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "horizontalSpacing": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "images": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/GalleryImage"
+            }
+          },
+          "verticalSpacing": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "width": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "spacing": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "visibleImages": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "GalleryImage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "activatedAction": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "selectedAction": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LayoutType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Grid",
+          "List"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "Vector2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "CameraAnimation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "distance": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "lookAt": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelCameraTarget"
+              }
+            ]
+          },
+          "origin": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelCameraTarget"
+              }
+            ]
+          },
+          "revolutionTime": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "ModelCameraTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "objectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "offset": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Vector3"
+              }
+            ]
+          }
+        }
+      },
+      "Vector3": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "z": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "FlagInteraction": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Point",
+          "Swipe"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "ModelFlag": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "activatedAction": {
+            "type": "string",
+            "nullable": true
+          },
+          "backgroundColor": {
+            "type": "string",
+            "nullable": true
+          },
+          "canSelect": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "foregroundColor": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Vector3"
+              }
+            ]
+          },
+          "selectedAction": {
+            "type": "string",
+            "nullable": true
+          },
+          "stalkColor": {
+            "type": "string",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AspectRatio": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "FitInside",
+          "FitOutside",
+          "Stretch"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "VideoEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "nullable": true
+          },
+          "timestamp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "Action": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mapping": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Mapping"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEnum"
+          }
+        }
+      },
+      "Mapping": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "gestureName": {
+            "type": "string",
+            "nullable": true
+          },
+          "condition": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Condition"
+              }
+            ]
+          },
+          "threshold": {
+            "type": "string",
+            "nullable": true
+          },
+          "thresholdType": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ThresholdType"
+              }
+            ]
+          }
+        }
+      },
+      "Condition": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Above",
+          "AboveOrEquals",
+          "Below",
+          "BelowOrEquals",
+          "Equals"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "ThresholdType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Float",
+          "Integer"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "TypeEnum": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Event",
+          "Gesture",
+          "GestureDrag",
+          "Value",
+          "ValueTrigger"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
       }
     }
   }

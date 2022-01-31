@@ -8,7 +8,6 @@ namespace backend.Models
         public DbSet<PresentationDevice> PresentationDevices { get; set; }
         public DbSet<DeviceSensor> DeviceSensors { get; set; }
         public DbSet<PresentationPackage> PresentationPackages { get; set; }
-        public DbSet<UnfinishedPackage> UnfinishedPackages { get; set; }
         public DbSet<DataFile> DataFiles { get; set; }
 
         public CMTContext(DbContextOptions<CMTContext> options) : base(options)
