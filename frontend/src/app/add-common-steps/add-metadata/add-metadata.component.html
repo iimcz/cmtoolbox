@@ -40,7 +40,11 @@
                 </div>
             </div>
             <p>
-                <button mat-button>Načíst MODS soubor...</button>
+                <input type="file" hidden #modsFileInput accept="application/xml" (change)="handleModsMetadata($event)">
+                <button mat-button (click)="modsFileInput.click()">Načíst MODS soubor...</button>
+
+                <input type="file" hidden #muzeionFileInput accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" (change)="handleMuzeionMetadata($event)">
+                <button mat-button (click)="muzeionFileInput.click()">Načíst XLSX (Museion) soubor...</button>
             </p>
         </mat-expansion-panel>
         <mat-expansion-panel expanded>

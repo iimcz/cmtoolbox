@@ -1,11 +1,11 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 // import { OrbitControls } from '@three-ts/orbit-controls'; TODO: resolve optimization bailout
 import { map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { FileClient } from 'src/app/services/api';
-import { DataFile, PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
+import { DataFile, PackagesClient, PresentationPackage } from 'src/app/services/api.generated.service';
 
 import * as THREE from 'three';
 
@@ -16,9 +16,10 @@ import * as THREE from 'three';
 })
 export class AddModelPackageComponent implements OnInit, AfterViewInit {
   @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
-  @ViewChild('preview3d') canvas!: HTMLCanvasElement;
+  @ViewChildren('preview3d') canvasList!: QueryList<ElementRef<HTMLCanvasElement>>;
+  canvas!: HTMLCanvasElement;
 
-  unfinishedPackage$!: Observable<UnfinishedPackage>;
+  unfinishedPackage$!: Observable<PresentationPackage>;
 
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
@@ -58,16 +59,19 @@ export class AddModelPackageComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.camera.position.z = 3;
-    this.scene.background = new THREE.Color(0, 0, 0);
+    this.scene.background = new THREE.Color(0, 255, 0);
     this.scene.add(this.camera);
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas
+
+    this.canvasList.changes.subscribe((cv: QueryList<ElementRef<HTMLCanvasElement>>) => {
+      this.canvas = cv.first.nativeElement;
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas
+      });
+      this.renderer.setSize(this.canvas.width, this.canvas.height);
+      //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      //this.controls.enablePan = false;
+      this.renderPreview();
     });
-    this.renderer.setSize(this.canvas.width, this.canvas.height);
-    this.renderer.setClearColor(new THREE.Color(0, 255, 0));
-    //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    //this.controls.enablePan = false;
-    this.renderPreview();
   }
 
   renderPreview() {
@@ -105,7 +109,7 @@ export class AddModelPackageComponent implements OnInit, AfterViewInit {
   }
 
   refresh3DScene(file: DataFile[]) {
-    this.scene.remove
+    //this.scene.remove
   }
 }
 

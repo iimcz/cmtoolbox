@@ -137,6 +137,11 @@ export class FileClient {
     getPreviewUrl(id: number): string {
         return (this.baseUrl + "/File/preview/{id}").replace("{id}", encodeURIComponent("" + id));
     }
+
+    // TODO: Consider moving this elsewhere
+    getPackageDownloadUrl(id: number): string {
+        return (this.baseUrl + "/Packages/download/{id}").replace("{id}", encodeURIComponent("" + id));
+    }
 }
 
 export interface IFileResponse {

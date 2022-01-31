@@ -99,25 +99,33 @@
                 class="settings-pane mat-elevation-z2 raised-box">
                 <mat-tab-group class="full-width">
                     <mat-tab label="Rozložení">
-                        <div class="setting">
-                            <label>Typ škálování videa:</label>
-                            <mat-form-field>
-                                <select matNativeControl [(ngModel)]="videoSettings.defaultContentFit">
-                                    <option value="fill">Vyplnit</option>
-                                    <option value="fit-width">Přizpůsobit na šířku</option>
-                                    <option value="fit-height">Přizpůsobit na výšku</option>
+                        <div class="setting" fxLayout="row">
+                            <label fxFlex="60%">Typ škálování videa:</label>
+                            <mat-form-field fxFlex="40%">
+                                <select matNativeControl [(ngModel)]="videoSettings.aspectRatio">
+                                    <option value="fitInside">Vyplnit s rámečkem</option>
+                                    <option value="fitOutside">Vyplnit obraz</option>
                                     <option value="stretch">Roztáhnout (nezachová poměry stran)</option>
                                 </select>
                             </mat-form-field>
                         </div>
-                        <div class="setting">
-                            <label>Barva pozadí:</label>
-                            <mat-form-field>
+                        <div class="setting" fxLayout="row">
+                            <label fxFlex="60%">Opakovat:</label>
+                            <mat-checkbox fxFlex="40%" [(ngModel)]="videoSettings.loop"></mat-checkbox>
+                        </div>
+                        <div class="setting" fxLayout="row">
+                            <label fxFlex="60%">Spustit ihned:</label>
+                            <mat-checkbox fxFlex="40%" [(ngModel)]="videoSettings.autoStart"></mat-checkbox>
+                        </div>
+                        <div class="setting" fxLayout="row">
+                            <label fxFlex="60%">Barva pozadí:</label>
+                            <mat-form-field fxFlex="40%">
                                 <input matInput type="color" [(ngModel)]="videoSettings.backgroundColor">
                             </mat-form-field>
                         </div>
                     </mat-tab>
                     <mat-tab label="Ovládání">
+                        <!--
                         <div class="setting full-width">
                             <mat-form-field>
                                 <mat-label>Mód spuštění videa:</mat-label>
@@ -128,6 +136,7 @@
                                 </mat-select>
                             </mat-form-field>
                         </div>
+                        -->
                         <div class="full-width">
                             <div class="raised-box">
                                 <button mat-raised-button (click)="addCustomControl()">Přidat akci</button>
@@ -195,7 +204,7 @@
 
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button matStepperNext>Pokračovat</button>
+            <button mat-raised-button matStepperNext (click)="saveParametersAndInputs(package.id!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Přídavné skripty">

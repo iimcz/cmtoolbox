@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, shareReplay, switchMap } from 'rxjs';
+import { FileClient } from '../services/api';
 import { MetadataRecord, PackageMetadata, PackagesClient, PresentationPackage } from '../services/api.generated.service';
 
 @Component({
@@ -15,6 +16,7 @@ export class PackageDetailComponent implements OnInit {
 
   constructor(
     private packagesClient: PackagesClient,
+    private filesClient: FileClient,
     private route: ActivatedRoute
   ) { }
 
@@ -31,6 +33,9 @@ export class PackageDetailComponent implements OnInit {
     )
   }
 
+  getPackageDownloadUrl(id: number) {
+    return this.filesClient.getPackageDownloadUrl(id);
+  }
 }
 
 export interface PackageDetailData {

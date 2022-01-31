@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
-import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
+import { PackagesClient, PresentationPackage } from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-scene-package',
@@ -11,7 +11,7 @@ import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generate
 })
 export class AddScenePackageComponent implements OnInit {
   @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
-  unfinishedPackage$!: Observable<UnfinishedPackage>;
+  unfinishedPackage$!: Observable<PresentationPackage>;
 
   constructor(
     private router: Router,

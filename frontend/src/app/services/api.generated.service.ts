@@ -206,6 +206,231 @@ export class DeviceClient {
 @Injectable({
     providedIn: 'root'
 })
+export class ExhibitClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    getPendingConnections() : Observable<string[]> {
+        let url_ = this.baseUrl + "/pending";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPendingConnections(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPendingConnections(<any>response_);
+                } catch (e) {
+                    return <Observable<string[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<string[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPendingConnections(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<any>(<any>null);
+    }
+
+    getEstablishedConnections() : Observable<string[]> {
+        let url_ = this.baseUrl + "/established";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEstablishedConnections(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEstablishedConnections(<any>response_);
+                } catch (e) {
+                    return <Observable<string[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<string[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetEstablishedConnections(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<any>(<any>null);
+    }
+
+    acceptConnection(id: string | null) : Observable<FileResponse> {
+        let url_ = this.baseUrl + "/accept/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAcceptConnection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAcceptConnection(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processAcceptConnection(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+
+    sendPackage(exhibit_id: string | null, package_id: number) : Observable<FileResponse> {
+        let url_ = this.baseUrl + "/send/{exhibit_id}/{package_id}";
+        if (exhibit_id === undefined || exhibit_id === null)
+            throw new Error("The parameter 'exhibit_id' must be defined.");
+        url_ = url_.replace("{exhibit_id}", encodeURIComponent("" + exhibit_id));
+        if (package_id === undefined || package_id === null)
+            throw new Error("The parameter 'package_id' must be defined.");
+        url_ = url_.replace("{package_id}", encodeURIComponent("" + package_id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendPackage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendPackage(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processSendPackage(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+}
+
+@Injectable({
+    providedIn: 'root'
+})
 export class PackagesClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -322,7 +547,7 @@ export class PackagesClient {
         return _observableOf<PresentationPackage>(<any>null);
     }
 
-    getUnfinishedPackages() : Observable<UnfinishedPackage[]> {
+    getUnfinishedPackages() : Observable<PresentationPackage[]> {
         let url_ = this.baseUrl + "/Packages/unfinished";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -341,14 +566,14 @@ export class PackagesClient {
                 try {
                     return this.processGetUnfinishedPackages(<any>response_);
                 } catch (e) {
-                    return <Observable<UnfinishedPackage[]>><any>_observableThrow(e);
+                    return <Observable<PresentationPackage[]>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<UnfinishedPackage[]>><any>_observableThrow(response_);
+                return <Observable<PresentationPackage[]>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetUnfinishedPackages(response: HttpResponseBase): Observable<UnfinishedPackage[]> {
+    protected processGetUnfinishedPackages(response: HttpResponseBase): Observable<PresentationPackage[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -362,7 +587,7 @@ export class PackagesClient {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(UnfinishedPackage.fromJS(item));
+                    result200!.push(PresentationPackage.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -377,7 +602,7 @@ export class PackagesClient {
         return _observableOf<any>(<any>null);
     }
 
-    getUnfinishedPackage(id: number) : Observable<UnfinishedPackage> {
+    getUnfinishedPackage(id: number) : Observable<PresentationPackage> {
         let url_ = this.baseUrl + "/Packages/unfinished/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -399,14 +624,14 @@ export class PackagesClient {
                 try {
                     return this.processGetUnfinishedPackage(<any>response_);
                 } catch (e) {
-                    return <Observable<UnfinishedPackage>><any>_observableThrow(e);
+                    return <Observable<PresentationPackage>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<UnfinishedPackage>><any>_observableThrow(response_);
+                return <Observable<PresentationPackage>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetUnfinishedPackage(response: HttpResponseBase): Observable<UnfinishedPackage> {
+    protected processGetUnfinishedPackage(response: HttpResponseBase): Observable<PresentationPackage> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -417,7 +642,7 @@ export class PackagesClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UnfinishedPackage.fromJS(resultData200);
+            result200 = PresentationPackage.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -425,7 +650,7 @@ export class PackagesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<UnfinishedPackage>(<any>null);
+        return _observableOf<PresentationPackage>(<any>null);
     }
 
     createNewPackage(type: PackageType) : Observable<CreatedUnfinishedPackage> {
@@ -749,6 +974,112 @@ export class PackagesClient {
         }
         return _observableOf<FileResponse>(<any>null);
     }
+
+    setPackageParameters(id: number, parameters: Parameters) : Observable<FileResponse> {
+        let url_ = this.baseUrl + "/Packages/parameters/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(parameters);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetPackageParameters(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetPackageParameters(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processSetPackageParameters(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+
+    setPackageInputs(id: number, inputs: Action[]) : Observable<FileResponse> {
+        let url_ = this.baseUrl + "/Packages/inputs/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(inputs);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetPackageInputs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetPackageInputs(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processSetPackageInputs(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
 }
 
 export class BackendConfiguration implements IBackendConfiguration {
@@ -928,6 +1259,12 @@ export class PresentationPackage implements IPresentationPackage {
     lastEditedBy?: ToolboxUser | undefined;
     created?: Date;
     lastEdited?: Date;
+    parametersJson?: string | undefined;
+    inputsJson?: string | undefined;
+    state?: PackageState;
+    pipelineState?: string | undefined;
+    workDir?: string | undefined;
+    dataFiles?: DataFile[] | undefined;
     metadata?: PackageMetadata[] | undefined;
     intendedDevices?: PresentationDevice[] | undefined;
     scripts?: PresentationScript[] | undefined;
@@ -951,6 +1288,16 @@ export class PresentationPackage implements IPresentationPackage {
             this.lastEditedBy = _data["lastEditedBy"] ? ToolboxUser.fromJS(_data["lastEditedBy"]) : <any>undefined;
             this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
             this.lastEdited = _data["lastEdited"] ? new Date(_data["lastEdited"].toString()) : <any>undefined;
+            this.parametersJson = _data["parametersJson"];
+            this.inputsJson = _data["inputsJson"];
+            this.state = _data["state"];
+            this.pipelineState = _data["pipelineState"];
+            this.workDir = _data["workDir"];
+            if (Array.isArray(_data["dataFiles"])) {
+                this.dataFiles = [] as any;
+                for (let item of _data["dataFiles"])
+                    this.dataFiles!.push(DataFile.fromJS(item));
+            }
             if (Array.isArray(_data["metadata"])) {
                 this.metadata = [] as any;
                 for (let item of _data["metadata"])
@@ -986,6 +1333,16 @@ export class PresentationPackage implements IPresentationPackage {
         data["lastEditedBy"] = this.lastEditedBy ? this.lastEditedBy.toJSON() : <any>undefined;
         data["created"] = this.created ? this.created.toISOString() : <any>undefined;
         data["lastEdited"] = this.lastEdited ? this.lastEdited.toISOString() : <any>undefined;
+        data["parametersJson"] = this.parametersJson;
+        data["inputsJson"] = this.inputsJson;
+        data["state"] = this.state;
+        data["pipelineState"] = this.pipelineState;
+        data["workDir"] = this.workDir;
+        if (Array.isArray(this.dataFiles)) {
+            data["dataFiles"] = [];
+            for (let item of this.dataFiles)
+                data["dataFiles"].push(item.toJSON());
+        }
         if (Array.isArray(this.metadata)) {
             data["metadata"] = [];
             for (let item of this.metadata)
@@ -1014,6 +1371,12 @@ export interface IPresentationPackage {
     lastEditedBy?: ToolboxUser | undefined;
     created?: Date;
     lastEdited?: Date;
+    parametersJson?: string | undefined;
+    inputsJson?: string | undefined;
+    state?: PackageState;
+    pipelineState?: string | undefined;
+    workDir?: string | undefined;
+    dataFiles?: DataFile[] | undefined;
     metadata?: PackageMetadata[] | undefined;
     intendedDevices?: PresentationDevice[] | undefined;
     scripts?: PresentationScript[] | undefined;
@@ -1182,6 +1545,60 @@ export interface IToolboxUser extends IIdentityUser {
     lastName?: string | undefined;
 }
 
+export enum PackageState {
+    Unfinished = 0,
+    Processing = 1,
+    Finished = 2,
+}
+
+export class DataFile implements IDataFile {
+    id?: number;
+    path?: string | undefined;
+    thumbnailPath?: string | undefined;
+    previewPath?: string | undefined;
+
+    constructor(data?: IDataFile) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.path = _data["path"];
+            this.thumbnailPath = _data["thumbnailPath"];
+            this.previewPath = _data["previewPath"];
+        }
+    }
+
+    static fromJS(data: any): DataFile {
+        data = typeof data === 'object' ? data : {};
+        let result = new DataFile();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["path"] = this.path;
+        data["thumbnailPath"] = this.thumbnailPath;
+        data["previewPath"] = this.previewPath;
+        return data; 
+    }
+}
+
+export interface IDataFile {
+    id?: number;
+    path?: string | undefined;
+    thumbnailPath?: string | undefined;
+    previewPath?: string | undefined;
+}
+
 export class PackageMetadata implements IPackageMetadata {
     id?: number;
     key?: string | undefined;
@@ -1306,54 +1723,6 @@ export interface IPresentationScript {
     parameters?: ScriptParameter[] | undefined;
 }
 
-export class DataFile implements IDataFile {
-    id?: number;
-    path?: string | undefined;
-    thumbnailPath?: string | undefined;
-    previewPath?: string | undefined;
-
-    constructor(data?: IDataFile) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.path = _data["path"];
-            this.thumbnailPath = _data["thumbnailPath"];
-            this.previewPath = _data["previewPath"];
-        }
-    }
-
-    static fromJS(data: any): DataFile {
-        data = typeof data === 'object' ? data : {};
-        let result = new DataFile();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["path"] = this.path;
-        data["thumbnailPath"] = this.thumbnailPath;
-        data["previewPath"] = this.previewPath;
-        return data; 
-    }
-}
-
-export interface IDataFile {
-    id?: number;
-    path?: string | undefined;
-    thumbnailPath?: string | undefined;
-    previewPath?: string | undefined;
-}
-
 export class ScriptParameter implements IScriptParameter {
     id?: number;
     key?: string | undefined;
@@ -1396,55 +1765,6 @@ export interface IScriptParameter {
     id?: number;
     key?: string | undefined;
     defaultValue?: string | undefined;
-}
-
-export class UnfinishedPackage extends PresentationPackage implements IUnfinishedPackage {
-    pipelineState?: string | undefined;
-    workDir?: string | undefined;
-    dataFiles?: DataFile[] | undefined;
-
-    constructor(data?: IUnfinishedPackage) {
-        super(data);
-    }
-
-    init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            this.pipelineState = _data["pipelineState"];
-            this.workDir = _data["workDir"];
-            if (Array.isArray(_data["dataFiles"])) {
-                this.dataFiles = [] as any;
-                for (let item of _data["dataFiles"])
-                    this.dataFiles!.push(DataFile.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): UnfinishedPackage {
-        data = typeof data === 'object' ? data : {};
-        let result = new UnfinishedPackage();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["pipelineState"] = this.pipelineState;
-        data["workDir"] = this.workDir;
-        if (Array.isArray(this.dataFiles)) {
-            data["dataFiles"] = [];
-            for (let item of this.dataFiles)
-                data["dataFiles"].push(item.toJSON());
-        }
-        super.toJSON(data);
-        return data; 
-    }
-}
-
-export interface IUnfinishedPackage extends IPresentationPackage {
-    pipelineState?: string | undefined;
-    workDir?: string | undefined;
-    dataFiles?: DataFile[] | undefined;
 }
 
 export class CreatedUnfinishedPackage implements ICreatedUnfinishedPackage {
@@ -1597,6 +1917,687 @@ export class PackageProperties implements IPackageProperties {
 export interface IPackageProperties {
     name?: string | undefined;
     description?: string | undefined;
+}
+
+export class Parameters implements IParameters {
+    displayType?: string | undefined;
+    settings?: Settings | undefined;
+
+    constructor(data?: IParameters) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.displayType = _data["displayType"];
+            this.settings = _data["settings"] ? Settings.fromJS(_data["settings"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): Parameters {
+        data = typeof data === 'object' ? data : {};
+        let result = new Parameters();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["displayType"] = this.displayType;
+        data["settings"] = this.settings ? this.settings.toJSON() : <any>undefined;
+        return data; 
+    }
+}
+
+export interface IParameters {
+    displayType?: string | undefined;
+    settings?: Settings | undefined;
+}
+
+export class Settings implements ISettings {
+    backgroundColor?: string | undefined;
+    layout?: Layout | undefined;
+    layoutType?: LayoutType | undefined;
+    padding?: Vector2 | undefined;
+    scrollDelay?: number | undefined;
+    slideAnimationLength?: number | undefined;
+    cameraAnimation?: CameraAnimation | undefined;
+    fileName?: string | undefined;
+    flagInteraction?: FlagInteraction | undefined;
+    flags?: ModelFlag[] | undefined;
+    skybox?: string | undefined;
+    skyboxTint?: string | undefined;
+    aspectRatio?: AspectRatio | undefined;
+    autoStart?: boolean | undefined;
+    loop?: boolean | undefined;
+    videoEvents?: VideoEvent[] | undefined;
+
+    constructor(data?: ISettings) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.backgroundColor = _data["backgroundColor"];
+            this.layout = _data["layout"] ? Layout.fromJS(_data["layout"]) : <any>undefined;
+            this.layoutType = _data["layoutType"];
+            this.padding = _data["padding"] ? Vector2.fromJS(_data["padding"]) : <any>undefined;
+            this.scrollDelay = _data["scrollDelay"];
+            this.slideAnimationLength = _data["slideAnimationLength"];
+            this.cameraAnimation = _data["cameraAnimation"] ? CameraAnimation.fromJS(_data["cameraAnimation"]) : <any>undefined;
+            this.fileName = _data["fileName"];
+            this.flagInteraction = _data["flagInteraction"];
+            if (Array.isArray(_data["flags"])) {
+                this.flags = [] as any;
+                for (let item of _data["flags"])
+                    this.flags!.push(ModelFlag.fromJS(item));
+            }
+            this.skybox = _data["skybox"];
+            this.skyboxTint = _data["skyboxTint"];
+            this.aspectRatio = _data["aspectRatio"];
+            this.autoStart = _data["autoStart"];
+            this.loop = _data["loop"];
+            if (Array.isArray(_data["videoEvents"])) {
+                this.videoEvents = [] as any;
+                for (let item of _data["videoEvents"])
+                    this.videoEvents!.push(VideoEvent.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Settings {
+        data = typeof data === 'object' ? data : {};
+        let result = new Settings();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["backgroundColor"] = this.backgroundColor;
+        data["layout"] = this.layout ? this.layout.toJSON() : <any>undefined;
+        data["layoutType"] = this.layoutType;
+        data["padding"] = this.padding ? this.padding.toJSON() : <any>undefined;
+        data["scrollDelay"] = this.scrollDelay;
+        data["slideAnimationLength"] = this.slideAnimationLength;
+        data["cameraAnimation"] = this.cameraAnimation ? this.cameraAnimation.toJSON() : <any>undefined;
+        data["fileName"] = this.fileName;
+        data["flagInteraction"] = this.flagInteraction;
+        if (Array.isArray(this.flags)) {
+            data["flags"] = [];
+            for (let item of this.flags)
+                data["flags"].push(item.toJSON());
+        }
+        data["skybox"] = this.skybox;
+        data["skyboxTint"] = this.skyboxTint;
+        data["aspectRatio"] = this.aspectRatio;
+        data["autoStart"] = this.autoStart;
+        data["loop"] = this.loop;
+        if (Array.isArray(this.videoEvents)) {
+            data["videoEvents"] = [];
+            for (let item of this.videoEvents)
+                data["videoEvents"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface ISettings {
+    backgroundColor?: string | undefined;
+    layout?: Layout | undefined;
+    layoutType?: LayoutType | undefined;
+    padding?: Vector2 | undefined;
+    scrollDelay?: number | undefined;
+    slideAnimationLength?: number | undefined;
+    cameraAnimation?: CameraAnimation | undefined;
+    fileName?: string | undefined;
+    flagInteraction?: FlagInteraction | undefined;
+    flags?: ModelFlag[] | undefined;
+    skybox?: string | undefined;
+    skyboxTint?: string | undefined;
+    aspectRatio?: AspectRatio | undefined;
+    autoStart?: boolean | undefined;
+    loop?: boolean | undefined;
+    videoEvents?: VideoEvent[] | undefined;
+}
+
+export class Layout implements ILayout {
+    height?: number | undefined;
+    horizontalSpacing?: number | undefined;
+    images?: GalleryImage[] | undefined;
+    verticalSpacing?: number | undefined;
+    width?: number | undefined;
+    spacing?: number | undefined;
+    visibleImages?: number | undefined;
+
+    constructor(data?: ILayout) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.height = _data["height"];
+            this.horizontalSpacing = _data["horizontalSpacing"];
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(GalleryImage.fromJS(item));
+            }
+            this.verticalSpacing = _data["verticalSpacing"];
+            this.width = _data["width"];
+            this.spacing = _data["spacing"];
+            this.visibleImages = _data["visibleImages"];
+        }
+    }
+
+    static fromJS(data: any): Layout {
+        data = typeof data === 'object' ? data : {};
+        let result = new Layout();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["height"] = this.height;
+        data["horizontalSpacing"] = this.horizontalSpacing;
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item.toJSON());
+        }
+        data["verticalSpacing"] = this.verticalSpacing;
+        data["width"] = this.width;
+        data["spacing"] = this.spacing;
+        data["visibleImages"] = this.visibleImages;
+        return data; 
+    }
+}
+
+export interface ILayout {
+    height?: number | undefined;
+    horizontalSpacing?: number | undefined;
+    images?: GalleryImage[] | undefined;
+    verticalSpacing?: number | undefined;
+    width?: number | undefined;
+    spacing?: number | undefined;
+    visibleImages?: number | undefined;
+}
+
+export class GalleryImage implements IGalleryImage {
+    activatedAction?: string | undefined;
+    fileName?: string | undefined;
+    selectedAction?: string | undefined;
+
+    constructor(data?: IGalleryImage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.activatedAction = _data["activatedAction"];
+            this.fileName = _data["fileName"];
+            this.selectedAction = _data["selectedAction"];
+        }
+    }
+
+    static fromJS(data: any): GalleryImage {
+        data = typeof data === 'object' ? data : {};
+        let result = new GalleryImage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["activatedAction"] = this.activatedAction;
+        data["fileName"] = this.fileName;
+        data["selectedAction"] = this.selectedAction;
+        return data; 
+    }
+}
+
+export interface IGalleryImage {
+    activatedAction?: string | undefined;
+    fileName?: string | undefined;
+    selectedAction?: string | undefined;
+}
+
+export enum LayoutType {
+    Grid = 0,
+    List = 1,
+}
+
+export class Vector2 implements IVector2 {
+    x?: number | undefined;
+    y?: number | undefined;
+
+    constructor(data?: IVector2) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.x = _data["x"];
+            this.y = _data["y"];
+        }
+    }
+
+    static fromJS(data: any): Vector2 {
+        data = typeof data === 'object' ? data : {};
+        let result = new Vector2();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["x"] = this.x;
+        data["y"] = this.y;
+        return data; 
+    }
+}
+
+export interface IVector2 {
+    x?: number | undefined;
+    y?: number | undefined;
+}
+
+export class CameraAnimation implements ICameraAnimation {
+    distance?: number | undefined;
+    height?: number | undefined;
+    lookAt?: ModelCameraTarget | undefined;
+    origin?: ModelCameraTarget | undefined;
+    revolutionTime?: number | undefined;
+
+    constructor(data?: ICameraAnimation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.distance = _data["distance"];
+            this.height = _data["height"];
+            this.lookAt = _data["lookAt"] ? ModelCameraTarget.fromJS(_data["lookAt"]) : <any>undefined;
+            this.origin = _data["origin"] ? ModelCameraTarget.fromJS(_data["origin"]) : <any>undefined;
+            this.revolutionTime = _data["revolutionTime"];
+        }
+    }
+
+    static fromJS(data: any): CameraAnimation {
+        data = typeof data === 'object' ? data : {};
+        let result = new CameraAnimation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["distance"] = this.distance;
+        data["height"] = this.height;
+        data["lookAt"] = this.lookAt ? this.lookAt.toJSON() : <any>undefined;
+        data["origin"] = this.origin ? this.origin.toJSON() : <any>undefined;
+        data["revolutionTime"] = this.revolutionTime;
+        return data; 
+    }
+}
+
+export interface ICameraAnimation {
+    distance?: number | undefined;
+    height?: number | undefined;
+    lookAt?: ModelCameraTarget | undefined;
+    origin?: ModelCameraTarget | undefined;
+    revolutionTime?: number | undefined;
+}
+
+export class ModelCameraTarget implements IModelCameraTarget {
+    objectName?: string | undefined;
+    offset?: Vector3 | undefined;
+
+    constructor(data?: IModelCameraTarget) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.objectName = _data["objectName"];
+            this.offset = _data["offset"] ? Vector3.fromJS(_data["offset"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ModelCameraTarget {
+        data = typeof data === 'object' ? data : {};
+        let result = new ModelCameraTarget();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["objectName"] = this.objectName;
+        data["offset"] = this.offset ? this.offset.toJSON() : <any>undefined;
+        return data; 
+    }
+}
+
+export interface IModelCameraTarget {
+    objectName?: string | undefined;
+    offset?: Vector3 | undefined;
+}
+
+export class Vector3 implements IVector3 {
+    x?: number | undefined;
+    y?: number | undefined;
+    z?: number | undefined;
+
+    constructor(data?: IVector3) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.x = _data["x"];
+            this.y = _data["y"];
+            this.z = _data["z"];
+        }
+    }
+
+    static fromJS(data: any): Vector3 {
+        data = typeof data === 'object' ? data : {};
+        let result = new Vector3();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["x"] = this.x;
+        data["y"] = this.y;
+        data["z"] = this.z;
+        return data; 
+    }
+}
+
+export interface IVector3 {
+    x?: number | undefined;
+    y?: number | undefined;
+    z?: number | undefined;
+}
+
+export enum FlagInteraction {
+    Point = 0,
+    Swipe = 1,
+}
+
+export class ModelFlag implements IModelFlag {
+    activatedAction?: string | undefined;
+    backgroundColor?: string | undefined;
+    canSelect?: boolean | undefined;
+    foregroundColor?: string | undefined;
+    location?: Vector3 | undefined;
+    selectedAction?: string | undefined;
+    stalkColor?: string | undefined;
+    text?: string | undefined;
+
+    constructor(data?: IModelFlag) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.activatedAction = _data["activatedAction"];
+            this.backgroundColor = _data["backgroundColor"];
+            this.canSelect = _data["canSelect"];
+            this.foregroundColor = _data["foregroundColor"];
+            this.location = _data["location"] ? Vector3.fromJS(_data["location"]) : <any>undefined;
+            this.selectedAction = _data["selectedAction"];
+            this.stalkColor = _data["stalkColor"];
+            this.text = _data["text"];
+        }
+    }
+
+    static fromJS(data: any): ModelFlag {
+        data = typeof data === 'object' ? data : {};
+        let result = new ModelFlag();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["activatedAction"] = this.activatedAction;
+        data["backgroundColor"] = this.backgroundColor;
+        data["canSelect"] = this.canSelect;
+        data["foregroundColor"] = this.foregroundColor;
+        data["location"] = this.location ? this.location.toJSON() : <any>undefined;
+        data["selectedAction"] = this.selectedAction;
+        data["stalkColor"] = this.stalkColor;
+        data["text"] = this.text;
+        return data; 
+    }
+}
+
+export interface IModelFlag {
+    activatedAction?: string | undefined;
+    backgroundColor?: string | undefined;
+    canSelect?: boolean | undefined;
+    foregroundColor?: string | undefined;
+    location?: Vector3 | undefined;
+    selectedAction?: string | undefined;
+    stalkColor?: string | undefined;
+    text?: string | undefined;
+}
+
+export enum AspectRatio {
+    FitInside = 0,
+    FitOutside = 1,
+    Stretch = 2,
+}
+
+export class VideoEvent implements IVideoEvent {
+    eventName?: string | undefined;
+    timestamp?: number | undefined;
+
+    constructor(data?: IVideoEvent) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.eventName = _data["eventName"];
+            this.timestamp = _data["timestamp"];
+        }
+    }
+
+    static fromJS(data: any): VideoEvent {
+        data = typeof data === 'object' ? data : {};
+        let result = new VideoEvent();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["eventName"] = this.eventName;
+        data["timestamp"] = this.timestamp;
+        return data; 
+    }
+}
+
+export interface IVideoEvent {
+    eventName?: string | undefined;
+    timestamp?: number | undefined;
+}
+
+export class Action implements IAction {
+    mapping?: Mapping | undefined;
+    name?: string | undefined;
+    type?: TypeEnum;
+
+    constructor(data?: IAction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.mapping = _data["mapping"] ? Mapping.fromJS(_data["mapping"]) : <any>undefined;
+            this.name = _data["name"];
+            this.type = _data["type"];
+        }
+    }
+
+    static fromJS(data: any): Action {
+        data = typeof data === 'object' ? data : {};
+        let result = new Action();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["mapping"] = this.mapping ? this.mapping.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        data["type"] = this.type;
+        return data; 
+    }
+}
+
+export interface IAction {
+    mapping?: Mapping | undefined;
+    name?: string | undefined;
+    type?: TypeEnum;
+}
+
+export class Mapping implements IMapping {
+    eventName?: string | undefined;
+    source?: string | undefined;
+    gestureName?: string | undefined;
+    condition?: Condition | undefined;
+    threshold?: string | undefined;
+    thresholdType?: ThresholdType | undefined;
+
+    constructor(data?: IMapping) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.eventName = _data["eventName"];
+            this.source = _data["source"];
+            this.gestureName = _data["gestureName"];
+            this.condition = _data["condition"];
+            this.threshold = _data["threshold"];
+            this.thresholdType = _data["thresholdType"];
+        }
+    }
+
+    static fromJS(data: any): Mapping {
+        data = typeof data === 'object' ? data : {};
+        let result = new Mapping();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["eventName"] = this.eventName;
+        data["source"] = this.source;
+        data["gestureName"] = this.gestureName;
+        data["condition"] = this.condition;
+        data["threshold"] = this.threshold;
+        data["thresholdType"] = this.thresholdType;
+        return data; 
+    }
+}
+
+export interface IMapping {
+    eventName?: string | undefined;
+    source?: string | undefined;
+    gestureName?: string | undefined;
+    condition?: Condition | undefined;
+    threshold?: string | undefined;
+    thresholdType?: ThresholdType | undefined;
+}
+
+export enum Condition {
+    Above = 0,
+    AboveOrEquals = 1,
+    Below = 2,
+    BelowOrEquals = 3,
+    Equals = 4,
+}
+
+export enum ThresholdType {
+    Float = 0,
+    Integer = 1,
+}
+
+export enum TypeEnum {
+    Event = 0,
+    Gesture = 1,
+    GestureDrag = 2,
+    Value = 3,
+    ValueTrigger = 4,
 }
 
 export interface FileParameter {

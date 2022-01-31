@@ -36,25 +36,7 @@
 
 /* Preview classes */
 .preview-panel {
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.preview-ips {
-    width: 30em;
-    height: 15em;
-    border: solid black;
-    display: grid;
-    overflow: scroll;
-/*    gap: 10%; */
-    grid-template-columns: repeat(3, 1fr);
-    background: darkslategray;
-}
-
-.preview-ips img {
-    width: 100%;
-    object-fit: fill;
+    text-align: center;
 }
 
 .settings-pane {
@@ -92,6 +74,6 @@
 }
 
 .preview-3d {
-    width: 400;
-    height: 200;
+    width: 400px;
+    height: 200px;
 }

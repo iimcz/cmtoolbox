@@ -4,8 +4,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
+import { AspectRatio, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
+import { ISettings, PackagesClient, PresentationPackage } from 'src/app/services/api.generated.service';
+import { Parameters as ApiParameters, Settings as ApiSettings, AspectRatio as ApiAspectRatio } from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-video-package',
@@ -17,12 +19,14 @@ export class AddVideoPackageComponent implements OnInit {
 
   previewUrl: string = '';
   advancedConversionSettings: boolean = false;
-  unfinishedPackage$!: Observable<UnfinishedPackage>;
+  unfinishedPackage$!: Observable<PresentationPackage>;
 
-  videoSettings: VideoSettings = {
-    defaultContentFit: 'fill',
+  videoSettings: Settings = {
+    loop: true,
+    autoStart: true,
+    aspectRatio: AspectRatio.FitOutside,
     backgroundColor: '#000000',
-    launchOption: 'immediately'
+    videoEvents: []
   };
 
   videoCustomControls = new MatTableDataSource<CustomControl>();
@@ -66,7 +70,7 @@ export class AddVideoPackageComponent implements OnInit {
     this.addMetadataComponent.saveAllData();
   }
 
-  initiatePreview(pkg: UnfinishedPackage) {
+  initiatePreview(pkg: PresentationPackage) {
     this.previewUrl = this.fileClient.getPreviewUrl(pkg.dataFiles![0].id!);
   }
 
@@ -78,12 +82,29 @@ export class AddVideoPackageComponent implements OnInit {
   removeCustomControl(control: CustomControl) {
     this.videoCustomControls.data = this.videoCustomControls.data.filter((el) => el !== control);
   }
-}
 
-export interface VideoSettings {
-  defaultContentFit: string,
-  backgroundColor: string,
-  launchOption: string
+  saveParametersAndInputs(id: number) {
+    let settings = new ApiSettings(this.videoSettings as ISettings);
+    let params = new ApiParameters({ displayType: 'video', settings: settings });
+    settings.aspectRatio = this.mapAspectRatio(this.videoSettings.aspectRatio!);
+
+    this.packagesClient.setPackageParameters(id, params)
+      .subscribe(
+        // TODO: handle
+      );
+  }
+
+  mapAspectRatio(arIn: AspectRatio): ApiAspectRatio {
+    switch (arIn)
+    {
+      case AspectRatio.FitInside:
+        return ApiAspectRatio.FitInside;
+      case AspectRatio.FitOutside:
+        return ApiAspectRatio.FitOutside;
+      case AspectRatio.Stretch:
+        return ApiAspectRatio.Stretch;
+    }
+  }
 }
 
 export interface CustomControl {

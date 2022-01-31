@@ -1,9 +1,10 @@
+import { FullscreenOverlayContainer } from '@angular/cdk/overlay';
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { debounceTime, Subject } from 'rxjs';
-import { MetadataRecord, PackageProperties, PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
+import { MetadataRecord, PackageProperties, PackagesClient, PresentationPackage } from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-metadata',
@@ -11,7 +12,7 @@ import { MetadataRecord, PackageProperties, PackagesClient, UnfinishedPackage } 
   styleUrls: ['./add-metadata.component.css']
 })
 export class AddMetadataComponent implements AfterViewInit {
-  @Input() package!: UnfinishedPackage;
+  @Input() package!: PresentationPackage;
 
   displayedColumns: string[] = ['action', 'key', 'value'];
   tableDataSource = new MatTableDataSource<MetadataRecord>();
@@ -106,7 +107,47 @@ export class AddMetadataComponent implements AfterViewInit {
       name: this.package.name,
       description: this.package.description
     })).subscribe(
-      // Do nothind.
+      // Do nothing.
     );
+  }
+
+  getFile(event: Event) {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const elem = event.target as HTMLInputElement;
+
+    if (!elem.files || elem.files.length < 1)
+      return null;
+    const file = elem.files?.item(0);
+    return file;
+  }
+
+  handleModsMetadata(event: Event) {
+    var file = this.getFile(event);
+    if (!file)
+      return;
+
+    this.packagesClient.importMetadataFile(this.package.id!, 'mods', file!).subscribe(() => {
+      this.reloadPackageMetadata();
+    });
+  }
+
+  handleMuzeionMetadata(event: Event) {
+    var file = this.getFile(event);
+    if (!file)
+      return;
+
+    this.packagesClient.importMetadataFile(this.package.id!, 'muzeion', file!).subscribe(() => {
+      this.reloadPackageMetadata();
+    });
+  }
+
+  reloadPackageMetadata() {
+    this.packagesClient.getMetadataForPackage(this.package.id!).subscribe((metadata) => {
+      this.metaAuthor = metadata.find(r => r.key === 'author')?.value!;
+      this.metaExpo = metadata.find(r => r.key === 'expo')?.value!;
+      this.tableDataSource.data = metadata.filter(
+        r => r.key !== 'expo' && r.key !== 'author'
+      );
+    });
   }
 }

@@ -4,7 +4,7 @@
             <mat-icon style="width: 400px; height: 400px; font-size: 10cm;">image</mat-icon>
             <div>
                 <button mat-raised-button>Nahrát na zařízení</button>
-                <button mat-raised-button>Exportovat</button>
+                <a [href]="getPackageDownloadUrl(package.id!)" ><button mat-raised-button>Exportovat</button></a>
             </div>
         </div>
     </div>

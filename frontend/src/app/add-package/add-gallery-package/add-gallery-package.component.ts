@@ -4,8 +4,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { map, merge, mergeWith, Observable, share, shareReplay, Subject, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
+import { Action, GalleryImage, LayoutType, Parameters, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generated.service';
+import { ILayout, IParameters, ISettings, IVector2, PackagesClient, PresentationPackage, Vector2 } from 'src/app/services/api.generated.service';
+import { Settings as ApiSettings, Parameters as ApiParameters, Layout as ApiLayout, LayoutType as ApiLayoutType} from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-gallery-package',
@@ -15,7 +17,7 @@ import { PackagesClient, UnfinishedPackage } from 'src/app/services/api.generate
 export class AddGalleryPackageComponent implements OnInit {
   @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
 
-  unfinishedPackage$!: Observable<UnfinishedPackage>;
+  unfinishedPackage$!: Observable<PresentationPackage>;
 
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
@@ -23,14 +25,26 @@ export class AddGalleryPackageComponent implements OnInit {
   galleryItemsDataSource = new MatTableDataSource<GalleryItem>();
   galleryCustomControls = new MatTableDataSource<CustomControl>();
 
-  gallerySettings: GallerySettings = {
-    columns: 3,
-    gap: 3,
-    defaultContentFit: 'fill',
-    backgroundColor: '#7CFF00',
+  gallerySettings: Settings = {
+    layoutType: LayoutType.Grid,
+    layout: {
+      width: 3,
+      height: 3,
+      verticalSpacing: 0,
+      horizontalSpacing: 0,
 
-    basicControls: 'grab-drag',
-  }
+      visibleImages: 3,
+      spacing: 0
+    },
+
+    padding: {
+      X: 0,
+      Y: 0
+    },
+    scrollDelay: 5,
+    slideAnimationLength: 1,
+    backgroundColor: "#000000"
+  };
 
   constructor(
     private router: Router,
@@ -83,15 +97,29 @@ export class AddGalleryPackageComponent implements OnInit {
     this.addMetadataComponent.saveAllData();
   }
 
-  refreshGalleryItems(pkg: UnfinishedPackage) {
+  saveParametersAndInputs(id: number) {
+    let inputs: Action[] = []; // TODO: fill
+
+    let settings = new ApiSettings(this.gallerySettings as ISettings);
+    let layout = new ApiLayout(this.gallerySettings.layout as ILayout);
+    let padding = new Vector2(this.gallerySettings.padding as IVector2);
+    let params = new ApiParameters({ displayType: 'gallery', settings: settings });
+    settings.layout = layout;
+    settings.padding = padding;
+    settings.layoutType = this.mapLayoutType(this.gallerySettings.layoutType!);
+
+    this.packagesClient.setPackageParameters(id, params)
+      .subscribe(
+        // TODO: handle
+      );
+  }
+
+  refreshGalleryItems(pkg: PresentationPackage) {
     const newData: GalleryItem[] = [];
     for (let file of pkg.dataFiles!) {
       newData.push({
         previewUrl: this.fileClient.getThumbnailUrl(file.id!),
-        filename: file.path!.substr(file.path?.lastIndexOf('/')! + 1), // TODO: implement on backend instead
-        canZoom: false,
-        hasLink: false,
-        link: ''
+        fileName: file.path!.substring(file.path?.lastIndexOf('/')! + 1), // TODO: implement on backend instead
       });
     }
     this.galleryItemsDataSource.data = newData;
@@ -100,24 +128,19 @@ export class AddGalleryPackageComponent implements OnInit {
   refreshPackage(id: number) {
     this.notifyPackageUpdate$.next(id);
   }
+
+  mapLayoutType(lt: LayoutType): ApiLayoutType {
+    switch (lt) {
+      case LayoutType.Grid:
+        return ApiLayoutType.Grid;
+      case LayoutType.List:
+        return ApiLayoutType.List;
+    }
+  }
 }
 
-export interface GalleryItem {
+export interface GalleryItem extends GalleryImage {
   previewUrl: string;
-  filename: string;
-
-  canZoom: boolean;
-  hasLink: boolean;
-  link: string;
-}
-
-export interface GallerySettings {
-  columns: number;
-  gap: number;
-  defaultContentFit: string;
-  backgroundColor: string;
-
-  basicControls: string;
 }
 
 export interface CustomControl {
