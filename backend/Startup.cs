@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using backend.Middleware;
+using backend.Communication;
 
 namespace backend
 {
@@ -29,6 +31,11 @@ namespace backend
             services.AddDbContext<CMTContext>(
                 options => options.UseSqlite("Filename=cmt.db")
             );
+
+            services.AddSingleton<ExhibitConnectionManager>();
+            services.AddHostedService(provider => provider.GetService<ExhibitConnectionManager>());
+
+            services.AddMyHttpContextAccessor();
 
             services.AddCors();
         }
