@@ -13,13 +13,13 @@ namespace backend.Controllers
     [ApiController]
     public class EventSocketController : ControllerBase
     {
-        private readonly ILogger<EventSocketController> logger;
-        private ExhibitConnectionManager exhibitionConnectionManager;
+        private readonly ILogger<EventSocketController> _logger;
+        private ExhibitConnectionManager _exhibitionConnectionManager;
 
         public EventSocketController(ILogger<EventSocketController> logger, ExhibitConnectionManager exhibitConnectionManager)
         {
-            this.logger = logger;
-            this.exhibitionConnectionManager = exhibitConnectionManager;
+            _logger = logger;
+            _exhibitionConnectionManager = exhibitConnectionManager;
         }
 
         [HttpGet("/events")]
@@ -29,12 +29,12 @@ namespace backend.Controllers
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                logger.LogInformation("Received new WebSocket connection for server events.");
+                _logger.LogInformation("Received new WebSocket connection for server events.");
                 await SendEvents(webSocket);
             }
             else
             {
-                logger.LogWarning("Received non-WebSocket connection on a WebSocket path.");
+                _logger.LogWarning("Received non-WebSocket connection on a WebSocket path.");
                 HttpContext.Response.StatusCode = 400;
             }
         }
@@ -48,21 +48,21 @@ namespace backend.Controllers
                 var data = JsonSerializer.SerializeToUtf8Bytes(new EventMessage { Type = EventType.ConnectionsUpdated } );
                 await webSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None); 
             };
-            exhibitionConnectionManager.OnIncomingConnectionEvent += incomingConnectionHandler;
+            _exhibitionConnectionManager.OnIncomingConnectionEvent += incomingConnectionHandler;
 
             var buffer = new byte[4];
             var result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
             while (!result.CloseStatus.HasValue)
             {
                 // Ignore all incoming messages.
-                logger.LogInformation("Received a message on EventSocket, ignoring...");
+                _logger.LogInformation("Received a message on EventSocket, ignoring...");
                 result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
             }
 
             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             
             // Unregister forwarded events
-            exhibitionConnectionManager.OnIncomingConnectionEvent -= incomingConnectionHandler;
+            _exhibitionConnectionManager.OnIncomingConnectionEvent -= incomingConnectionHandler;
         }
     }
 }

@@ -60,6 +60,7 @@ namespace backend
 
             app.UseAuthorization();
             app.UseHttpContext();
+            app.UseWebSockets();
 
             app.UseEndpoints(endpoints =>
             {
