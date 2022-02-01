@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Models;
+using Guidepipe.IO;
+using Guidepipe.Pipelines;
+using Guidepipe.Steps;
 using Naki3D.Common.Json;
 
 namespace backend.Utilities
@@ -12,6 +15,29 @@ namespace backend.Utilities
     {
         // TODO: proper schema location
         private static readonly string PACKAGE_DESCRIPTOR_SCHEMA = "https://www.iim.cz/package-schema.json";
+
+        public static async Task FinishProcessingVideoPackage(PresentationPackage package, string dataDir)
+        {
+            var videoFile = package.DataFiles.FirstOrDefault();
+            if (videoFile == null)
+                return;
+
+            var videoFilePath = new FilePath(videoFile.Path);
+            var videoPipeline = new Pipeline<FilePath, FilePath>();
+
+            videoFilePath
+                .AddStep(videoPipeline, new FfmpegProcess(
+                    (config) =>
+                    {
+                        config.AudioCodec = "libvorbis";
+                        config.VideoCodec = "vp8";
+                        config.OutputDir = dataDir;
+                        config.OutputPattern = "{0}.webm";
+                    }
+                ));
+
+            await videoPipeline.ExecuteAsync(videoFilePath);
+        }
 
         public static async Task WritePackageJsonAsync(PresentationPackage package, TextWriter writer, string packageFilePath, string packageUrl)
         {

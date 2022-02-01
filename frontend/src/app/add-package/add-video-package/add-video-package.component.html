@@ -204,7 +204,7 @@
 
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button matStepperNext (click)="saveParametersAndInputs(package.id!)">Pokračovat</button>
+            <button mat-raised-button matStepperNext (click)="saveParametersAndInputs(package.id!, package.dataFiles![0].path!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Přídavné skripty">

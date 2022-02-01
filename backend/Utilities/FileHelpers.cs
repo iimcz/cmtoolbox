@@ -55,6 +55,11 @@ namespace backend.Utilities
                 {
                     new byte[] { 0x1A, 0x45, 0xDF, 0xA3 }
                 }
+            },
+            { ".mp4", new List<byte[]>
+                {
+                    new byte[] { 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D }
+                }
             }
         };
 
@@ -255,12 +260,12 @@ namespace backend.Utilities
                 // for files (when possible) for all file types you intend
                 // to allow on the system and perform the file signature
                 // check.
-                /*
-                if (!_fileSignature.ContainsKey(ext))
+                // TODO: for development, later do better check
+                // (mp4 files do not have a simple signature...)
+                if (_fileSignature.ContainsKey(ext))
                 {
                     return true;
                 }
-                */
 
                 // File signature check
                 // --------------------
@@ -299,7 +304,8 @@ namespace backend.Utilities
                     break;
                 case ".avi":
                 case ".mp4":
-                    throw new NotImplementedException();
+                    //throw new NotImplementedException();
+                    return ""; // TODO: implement
             }
             return (await pipeline.ExecuteAsync(input)).Path;
         }

@@ -5,7 +5,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, shareReplay, switchMap } from 'rxjs';
 import { ExhibitUploadDialogComponent } from '../dialogs/exhibit-upload-dialog/exhibit-upload-dialog.component';
 import { FileClient } from '../services/api';
-import { MetadataRecord, PackageMetadata, PackagesClient, PresentationPackage } from '../services/api.generated.service';
+import { PackageState, PackageMetadata, PackagesClient, PresentationPackage } from '../services/api.generated.service';
 
 @Component({
   selector: 'app-package-detail',
@@ -13,6 +13,8 @@ import { MetadataRecord, PackageMetadata, PackagesClient, PresentationPackage } 
   styleUrls: ['./package-detail.component.css']
 })
 export class PackageDetailComponent implements OnInit {
+  public PackageState = PackageState;
+  
   presentationPackage$!: Observable<PresentationPackage>;
   metadataDataSource = new MatTableDataSource<PackageMetadata>();
 

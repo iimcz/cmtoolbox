@@ -47,6 +47,7 @@ namespace backend.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("upload/{packageId}")]
         [DisableFormValueModelBinding]
+        [DisableRequestSizeLimit]
         //[ValidateAntiForgeryToken] TODO
         public async Task<ActionResult> Upload(CancellationToken cancellationToken, int packageId)
         {

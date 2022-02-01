@@ -38,7 +38,7 @@ namespace Guidepipe.Steps
             FilePath output = new FilePath();
             output.Path = Path.Combine(
                 _config.OutputDir,
-                String.Format(_config.OutputPattern, Path.GetFileName(input.Path))
+                String.Format(_config.OutputPattern, Path.GetFileNameWithoutExtension(input.Path))
             );
 
             ProcessStartInfo ffmpegStartInfo = new ProcessStartInfo();

@@ -82,10 +82,11 @@ export class AddVideoPackageComponent implements OnInit {
     this.videoCustomControls.data = this.videoCustomControls.data.filter((el) => el !== control);
   }
 
-  saveParametersAndInputs(id: number) {
+  saveParametersAndInputs(id: number, filename: string) {
     let settings = new ApiSettings(this.videoSettings as ISettings);
     let params = new ApiParameters({ displayType: 'video', settings: settings });
     settings.aspectRatio = this.mapAspectRatio(this.videoSettings.aspectRatio!);
+    settings.fileName = filename.substring(filename.lastIndexOf('/') + 1, filename.lastIndexOf('.')) + ".webm";
 
     this.packagesClient.setPackageParameters(id, params)
       .subscribe(

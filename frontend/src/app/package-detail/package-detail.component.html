@@ -1,34 +1,45 @@
-<div fxLayout="row" fxLayoutAlign="center start" *ngIf="presentationPackage$ | async as package">
-    <div fxFlex="30%">
-        <div fxLayout="column" fxLayoutAlign="start center">
-            <mat-icon style="width: 400px; height: 400px; font-size: 10cm;">image</mat-icon>
-            <div>
-                <button mat-raised-button (click)="openUploadDialog(package)">Nahrát na zařízení</button>
-                <a [href]="getPackageDownloadUrl(package.id!)" ><button mat-raised-button>Exportovat</button></a>
+<div *ngIf="presentationPackage$ | async as package">
+    <mat-toolbar color="warn" *ngIf="package.state !== PackageState.Finished">
+        Balíček je stále zpracováván...
+    </mat-toolbar>
+    <div fxLayout="row" fxLayoutAlign="center start">
+        <div fxFlex="30%">
+            <div fxLayout="column" fxLayoutAlign="start center">
+                <mat-icon style="width: 400px; height: 400px; font-size: 10cm;">image</mat-icon>
+                <div>
+                    <button mat-raised-button (click)="openUploadDialog(package)"
+                        [disabled]="package.state !== PackageState.Finished">Nahrát na zařízení</button>
+
+                    <a [href]="getPackageDownloadUrl(package.id!)"
+                        *ngIf="package.state === PackageState.Finished"><button
+                            mat-raised-button>Exportovat</button></a>
+                    <button mat-raised-button disabled="true"
+                        *ngIf="package.state !== PackageState.Finished">Exportovat</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div fxFlex="50%" class="raised-box mat-elevation-z2">
-        <h1>{{package.name}}</h1>
-        <h4>{{package.description}}</h4>
-        <h5>Další metadata:</h5>
-        <mat-table [dataSource]="metadataDataSource" class="full-width">
-            <ng-container matColumnDef="key">
-                <mat-header-cell *matHeaderCellDef> Název </mat-header-cell>
-                <mat-cell *matCellDef="let metadata">
-                    {{metadata.key}}
-                </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="value">
-                <mat-header-cell *matHeaderCellDef> Hodnota </mat-header-cell>
-                <mat-cell *matCellDef="let metadata">
-                    {{metadata.value}}
-                </mat-cell>
-            </ng-container>
+        <div fxFlex="50%" class="raised-box mat-elevation-z2">
+            <h1>{{package.name}}</h1>
+            <h4>{{package.description}}</h4>
+            <h5>Další metadata:</h5>
+            <mat-table [dataSource]="metadataDataSource" class="full-width">
+                <ng-container matColumnDef="key">
+                    <mat-header-cell *matHeaderCellDef> Název </mat-header-cell>
+                    <mat-cell *matCellDef="let metadata">
+                        {{metadata.key}}
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                    <mat-header-cell *matHeaderCellDef> Hodnota </mat-header-cell>
+                    <mat-cell *matCellDef="let metadata">
+                        {{metadata.value}}
+                    </mat-cell>
+                </ng-container>
 
-            <mat-header-row *matHeaderRowDef="['key', 'value']"></mat-header-row>
-            <mat-row *matRowDef="let control; columns: ['key', 'value'];">
-            </mat-row>
-        </mat-table>
+                <mat-header-row *matHeaderRowDef="['key', 'value']"></mat-header-row>
+                <mat-row *matRowDef="let control; columns: ['key', 'value'];">
+                </mat-row>
+            </mat-table>
+        </div>
     </div>
 </div>

@@ -108,6 +108,7 @@ namespace backend.Controllers
             }
             unfinished.State = PackageState.Processing;
             await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Finalizing package {0}...", unfinished.Id);
 
             Response.OnCompleted(async () => {
                 await FinalizePackageData(unfinished);
@@ -120,6 +121,7 @@ namespace backend.Controllers
 
                 unfinished.State = PackageState.Finished;
                 await _dbContext.SaveChangesAsync();
+                _logger.LogInformation("Package {0} finalized.", unfinished.Id);
             });
 
             return Ok(new FinishedPackage(unfinished.Id));
@@ -134,9 +136,20 @@ namespace backend.Controllers
 
             string pkgDataRoot = Path.Combine(pkgDir, "dataroot");
             Directory.CreateDirectory(pkgDataRoot);
+
+            switch (package.Type)
+            {
+                case PackageType.Video:
+                    await PackageUtils.FinishProcessingVideoPackage(package, pkgDataRoot);
+                    break;
+                default: // TODO: handle other cases
+                    break;
+            }
+
             foreach (var file in package.DataFiles)
             {
-                System.IO.File.Move(file.Path, Path.Combine(pkgDataRoot, Path.GetFileName(file.Path)));
+                // TODO: this should be handled individually according to the package type
+                //System.IO.File.Move(file.Path, Path.Combine(pkgDataRoot, Path.GetFileName(file.Path)));
 
                 if (file.ThumbnailPath != null && System.IO.File.Exists(file.ThumbnailPath))
                     System.IO.File.Delete(file.ThumbnailPath);
