@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using Naki3D.Common.Json;
 
 namespace backend.Communication
 {
@@ -69,12 +68,12 @@ namespace backend.Communication
             }
         }
 
-        public void LoadPackage(string connId, PackageDescriptor packageDescriptor)
+        public void LoadPackage(string connId, string packageDescriptor)
         {
             ExhibitConnection conn;
             if (establishedConnections.TryGetValue(connId, out conn))
             {
-                conn.LoadPackage(false, packageDescriptor.ToJson());
+                conn.LoadPackage(false, packageDescriptor);
             }
         }
 

@@ -144,8 +144,16 @@ namespace backend.Controllers
                     System.IO.File.Delete(file.PreviewPath);
             }
 
+            // TODO: make "package.json" a constant somewhere
+            using (var packageDotJson = new StreamWriter(Path.Combine(pkgDir, "package.json"), false, System.Text.Encoding.UTF8))
+            {
+                await PackageUtils.WritePackageJsonAsync(package, packageDotJson, null, null);
+            }
+
             // Final zip
-            ZipFile.CreateFromDirectory(pkgDir, Path.Combine(_basePackageDir, String.Format("{0}.zip", package.Id)));
+            await Task.Run(
+                () => ZipFile.CreateFromDirectory(pkgDir, Path.Combine(_basePackageDir, String.Format("{0}.zip", package.Id)))
+            );
         }
 
         [HttpGet("metadata/{id}")]

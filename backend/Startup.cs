@@ -59,6 +59,7 @@ namespace backend
                     .AllowAnyMethod());
 
             app.UseAuthorization();
+            app.UseHttpContext();
 
             app.UseEndpoints(endpoints =>
             {
