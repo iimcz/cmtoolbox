@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, shareReplay, switchMap } from 'rxjs';
+import { ExhibitUploadDialogComponent } from '../dialogs/exhibit-upload-dialog/exhibit-upload-dialog.component';
 import { FileClient } from '../services/api';
 import { MetadataRecord, PackageMetadata, PackagesClient, PresentationPackage } from '../services/api.generated.service';
 
@@ -17,7 +19,8 @@ export class PackageDetailComponent implements OnInit {
   constructor(
     private packagesClient: PackagesClient,
     private filesClient: FileClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -27,7 +30,6 @@ export class PackageDetailComponent implements OnInit {
     );
     this.presentationPackage$.subscribe(
       (pkg) => {
-        console.log(pkg.metadata!);
         this.metadataDataSource.data = pkg.metadata!;
       }
     )
@@ -35,6 +37,14 @@ export class PackageDetailComponent implements OnInit {
 
   getPackageDownloadUrl(id: number) {
     return this.filesClient.getPackageDownloadUrl(id);
+  }
+
+  openUploadDialog(pkg: PresentationPackage) {
+    this.dialog.open(ExhibitUploadDialogComponent, {
+      data: {
+        package_id: pkg.id!
+      }
+    });
   }
 }
 

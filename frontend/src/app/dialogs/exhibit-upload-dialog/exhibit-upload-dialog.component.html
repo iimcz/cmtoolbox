@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>Nahrání balíčku</h2>
+<div mat-dialog-content class="dialog-content">
+    <mat-list>
+        <div mat-subheader>Připojená zařízení</div>
+        <mat-list-item *ngFor="let connid of acceptedDevices">
+            {{connid}}
+            <div fxFlex></div>
+            <button mat-raised-button (click)="sendPackage(connid)">Načíst balíček</button>
+        </mat-list-item>
+        <div mat-subheader>Neschválená zařízení</div>
+        <mat-list-item *ngFor="let connid of pendingDevices">
+            {{connid}}
+            <div fxFlex></div>
+            <button mat-raised-button (click)="acceptConnection(connid)">Příjmout připojení</button>
+        </mat-list-item>
+    </mat-list>
+</div>
+<div mat-dialog-actions>
+    <button mat-raised-button matDialogClose>Zavřít</button>
+</div>

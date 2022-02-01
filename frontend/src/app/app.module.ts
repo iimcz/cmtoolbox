@@ -54,6 +54,8 @@ import { HelpScriptsComponent } from './help/help-scripts/help-scripts.component
 import { HttpClientModule } from '@angular/common/http';
 import { API_BASE_URL } from './services/api.generated.service';
 import { environment } from 'src/environments/environment';
+import { ExhibitUploadDialogComponent } from './dialogs/exhibit-upload-dialog/exhibit-upload-dialog.component';
+import { WS_BASE_URL } from './services/event-socket.service';
 
 @NgModule({
   declarations: [
@@ -75,7 +77,8 @@ import { environment } from 'src/environments/environment';
     ScriptSetupDialogComponent,
     AddLocalUploadComponent,
     HelpSceneImportComponent,
-    HelpScriptsComponent
+    HelpScriptsComponent,
+    ExhibitUploadDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -113,6 +116,10 @@ import { environment } from 'src/environments/environment';
     {
       provide: API_BASE_URL,
       useValue: environment.apiRoot
+    },
+    {
+      provide: WS_BASE_URL,
+      useValue: environment.wsRoot
     }
   ],
   bootstrap: [AppComponent]
