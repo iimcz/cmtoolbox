@@ -28,6 +28,7 @@ namespace backend.Models
         public ToolboxUser LastEditedBy { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastEdited { get; set; }
+        public int DescriptorVersion { get; set; }
         public string ParametersJson { get; set; }
         public string InputsJson { get; set; }
 
