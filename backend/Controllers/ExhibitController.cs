@@ -59,7 +59,7 @@ namespace backend.Controllers
                 .SingleOrDefaultAsync(p => p.Id == package_id);
             if (package == null)
                 return NotFound();
-            
+
             if (package.State != PackageState.Finished)
                 return BadRequest();
 

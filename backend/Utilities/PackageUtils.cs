@@ -26,8 +26,8 @@ namespace backend.Utilities
 
             packageDescriptor.Metadata = new Metadata
             {
-                Author = package.Metadata.FirstOrDefault(m => m.Key == "author").Value,
-                Exposition = package.Metadata.FirstOrDefault(m => m.Key == "expo").Value,
+                Author = package.Metadata.FirstOrDefault(m => m.Key == "author")?.Value,
+                Exposition = package.Metadata.FirstOrDefault(m => m.Key == "expo")?.Value,
                 Other = package.Metadata.Where(m => m.Key != "author" && m.Key != "expo")
                     .Select(m => new Other { Key = m.Key, Value = m.Value }).ToList()
             };

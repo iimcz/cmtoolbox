@@ -7,7 +7,7 @@ import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-
 import { Action, GalleryImage, LayoutType, Parameters, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
 import { ILayout, IParameters, ISettings, IVector2, PackagesClient, PresentationPackage, Vector2 } from 'src/app/services/api.generated.service';
-import { Settings as ApiSettings, Parameters as ApiParameters, Layout as ApiLayout, LayoutType as ApiLayoutType} from 'src/app/services/api.generated.service';
+import { Settings as ApiSettings, Parameters as ApiParameters, Layout as ApiLayout, LayoutType as ApiLayoutType } from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-gallery-package',
@@ -21,7 +21,7 @@ export class AddGalleryPackageComponent implements OnInit {
 
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
-    
+
   galleryItemsDataSource = new MatTableDataSource<GalleryItem>();
   galleryCustomControls = new MatTableDataSource<CustomControl>();
 
@@ -81,7 +81,7 @@ export class AddGalleryPackageComponent implements OnInit {
   }
 
   addCustomControl() {
-    this.galleryCustomControls.data.push({action: '', eventParams: '', eventType: ''});
+    this.galleryCustomControls.data.push({ action: '', eventParams: '', eventType: '' });
     this.galleryCustomControls.data = this.galleryCustomControls.data.slice();
   }
 
@@ -109,6 +109,10 @@ export class AddGalleryPackageComponent implements OnInit {
     settings.layoutType = this.mapLayoutType(this.gallerySettings.layoutType!);
 
     this.packagesClient.setPackageParameters(id, params)
+      .subscribe(
+        // TODO: handle
+      );
+    this.packagesClient.setPackageInputs(id, []) // TODO: fill with actual data
       .subscribe(
         // TODO: handle
       );

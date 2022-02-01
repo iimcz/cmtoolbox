@@ -1,4 +1,3 @@
-import { BaseCdkCell } from '@angular/cdk/table';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -62,7 +61,7 @@ export class AddVideoPackageComponent implements OnInit {
   }
 
   applyAdvancedConversionParams() {
-    
+
   }
 
 
@@ -75,7 +74,7 @@ export class AddVideoPackageComponent implements OnInit {
   }
 
   addCustomControl() {
-    this.videoCustomControls.data.push({action: '', eventParams: '', eventType: ''});
+    this.videoCustomControls.data.push({ action: '', eventParams: '', eventType: '' });
     this.videoCustomControls.data = this.videoCustomControls.data.slice();
   }
 
@@ -92,11 +91,14 @@ export class AddVideoPackageComponent implements OnInit {
       .subscribe(
         // TODO: handle
       );
+    this.packagesClient.setPackageInputs(id, []) // TODO: fill with actual data
+      .subscribe(
+        // TODO: handle
+      );
   }
 
   mapAspectRatio(arIn: AspectRatio): ApiAspectRatio {
-    switch (arIn)
-    {
+    switch (arIn) {
       case AspectRatio.FitInside:
         return ApiAspectRatio.FitInside;
       case AspectRatio.FitOutside:
