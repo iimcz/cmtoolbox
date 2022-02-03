@@ -6,7 +6,7 @@
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>
-            <button mat-raised-button matStepperNext>Pokračovat</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Metadata">

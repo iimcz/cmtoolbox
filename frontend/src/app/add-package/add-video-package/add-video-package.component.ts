@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
+import { map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { AspectRatio, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
@@ -19,6 +19,9 @@ export class AddVideoPackageComponent implements OnInit {
   previewUrl: string = '';
   advancedConversionSettings: boolean = false;
   unfinishedPackage$!: Observable<PresentationPackage>;
+
+  notifyPackageUpdate$: Subject<number> = new Subject();
+  notifyRouteUpdate$!: Observable<number>;
 
   videoSettings: Settings = {
     loop: true,
@@ -38,9 +41,12 @@ export class AddVideoPackageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.unfinishedPackage$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this.packagesClient.getUnfinishedPackage(parseInt(params.get('id')!)))
+    this.notifyRouteUpdate$ = this.route.paramMap.pipe(
+      map((params: ParamMap) => parseInt(params.get('id')!))
+    );
+    this.unfinishedPackage$ = this.notifyRouteUpdate$.pipe(
+      mergeWith(this.notifyPackageUpdate$),
+      switchMap((id: number) => this.packagesClient.getUnfinishedPackage(id))
     );
   }
 
@@ -64,6 +70,9 @@ export class AddVideoPackageComponent implements OnInit {
 
   }
 
+  refreshPackage(id: number) {
+    this.notifyPackageUpdate$.next(id);
+  }
 
   triggerSaveMetadata() {
     this.addMetadataComponent.saveAllData();
