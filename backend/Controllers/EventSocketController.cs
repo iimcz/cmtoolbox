@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using backend.Communication;
+using backend.Utilities;
 using backend.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,11 +16,13 @@ namespace backend.Controllers
     {
         private readonly ILogger<EventSocketController> _logger;
         private ExhibitConnectionManager _exhibitionConnectionManager;
+        private readonly EventBus _eventBus;
 
-        public EventSocketController(ILogger<EventSocketController> logger, ExhibitConnectionManager exhibitConnectionManager)
+        public EventSocketController(ILogger<EventSocketController> logger, ExhibitConnectionManager exhibitConnectionManager, EventBus eventBus)
         {
             _logger = logger;
             _exhibitionConnectionManager = exhibitConnectionManager;
+            _eventBus = eventBus;
         }
 
         [HttpGet("/events")]
@@ -44,11 +47,29 @@ namespace backend.Controllers
             // 1. register callbacks in appropriate places (so far con manager)
             // 2. forward events as messages through the websocket
             // 3. close when send fails / on disconnect
-            Action incomingConnectionHandler = async () => {
-                var data = JsonSerializer.SerializeToUtf8Bytes(new EventMessage { Type = EventType.ConnectionsUpdated } );
-                await webSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None); 
+            Action incomingConnectionHandler = async () =>
+            {
+                var data = JsonSerializer.SerializeToUtf8Bytes(new EventMessage { Type = EventType.ConnectionsUpdated });
+                await webSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
             };
             _exhibitionConnectionManager.OnIncomingConnectionEvent += incomingConnectionHandler;
+
+            Action<BusEventType> incomingEvent = async (ev) =>
+            {
+                var msg = new EventMessage();
+                switch (ev)
+                {
+                    case BusEventType.PackagePreviewUpdated:
+                        msg.Type = EventType.PackagePreviewUpdated;
+                        break;
+                    case BusEventType.PackageProcessed:
+                        msg.Type = EventType.PackageProcessed;
+                        break;
+                }
+                var data = JsonSerializer.SerializeToUtf8Bytes(msg);
+                await webSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+            };
+            _eventBus.OnEvent += incomingEvent;
 
             var buffer = new byte[4];
             var result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
@@ -60,9 +81,10 @@ namespace backend.Controllers
             }
 
             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-            
+
             // Unregister forwarded events
             _exhibitionConnectionManager.OnIncomingConnectionEvent -= incomingConnectionHandler;
+            _eventBus.OnEvent -= incomingEvent;
         }
     }
 }

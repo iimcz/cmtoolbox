@@ -33,5 +33,7 @@ export class EventMessage {
 }
 
 export enum EventType {
-  ConnectionsUpdated
+  ConnectionsUpdated,
+  PackageProcessed,
+  PackagePreviewUpdated
 }

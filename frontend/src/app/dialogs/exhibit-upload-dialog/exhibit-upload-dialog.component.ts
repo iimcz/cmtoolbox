@@ -19,7 +19,9 @@ export class ExhibitUploadDialogComponent implements OnInit {
     private eventSocket: EventSocketService
   ) {
     this.updateDeviceLists();
-    this.eventSocket.subscribeEvent(EventType.ConnectionsUpdated).subscribe();
+    this.eventSocket.subscribeEvent(EventType.ConnectionsUpdated).subscribe(() => {
+      this.updateDeviceLists();
+    });
   }
 
   ngOnInit(): void {

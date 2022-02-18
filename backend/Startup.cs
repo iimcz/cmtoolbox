@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using backend.Middleware;
 using backend.Communication;
+using backend.Utilities;
 
 namespace backend
 {
@@ -33,7 +34,9 @@ namespace backend
             );
 
             services.AddSingleton<ExhibitConnectionManager>();
+            services.AddSingleton<EventBus>();
             services.AddHostedService(provider => provider.GetService<ExhibitConnectionManager>());
+            services.AddHostedService(provider => provider.GetService<EventBus>());
 
             services.AddMyHttpContextAccessor();
 
@@ -50,7 +53,10 @@ namespace backend
                 app.UseSwaggerUi3();
             }
 
-            app.UseHttpsRedirection();
+            // HACK: temporarily disable https redirection
+            // to get around missing CA issues on presentation
+            // devices
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
             app.UseCors(builder =>

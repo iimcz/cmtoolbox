@@ -7,6 +7,8 @@ namespace backend.ViewModels
 
     public enum EventType
     {
-        ConnectionsUpdated
+        ConnectionsUpdated,
+        PackageProcessed,
+        PackagePreviewUpdated
     }
 }
