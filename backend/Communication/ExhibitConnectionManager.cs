@@ -16,52 +16,52 @@ namespace backend.Communication
 
         // TODO: Configurable port
         private const int ServerListenPort = 3917;
-        private ILogger<ExhibitConnectionManager> logger;
+        private ILogger<ExhibitConnectionManager> _logger;
 
-        private TcpListener incomingListener;
-        private IAsyncResult incomingAsyncAccept;
+        private TcpListener _incomingListener;
+        private IAsyncResult _incomingAsyncAccept;
 
-        private ConcurrentDictionary<string, ExhibitConnection> pendingConnections;
-        private ConcurrentDictionary<string, ExhibitConnection> establishedConnections;
+        private ConcurrentDictionary<string, ExhibitConnection> _pendingConnections;
+        private ConcurrentDictionary<string, ExhibitConnection> _establishedConnections;
 
         private ExhibitConnection _dummy;
 
         public ExhibitConnectionManager(ILogger<ExhibitConnectionManager> logger)
         {
-            this.logger = logger;
+            this._logger = logger;
 
-            pendingConnections = new ConcurrentDictionary<string, ExhibitConnection>();
-            establishedConnections = new ConcurrentDictionary<string, ExhibitConnection>();
+            _pendingConnections = new ConcurrentDictionary<string, ExhibitConnection>();
+            _establishedConnections = new ConcurrentDictionary<string, ExhibitConnection>();
         }
 
         public List<string> GetPendingConnections()
         {
             cleanupConnections();
-            return new List<string>(pendingConnections.Keys);
+            return new List<string>(_pendingConnections.Keys);
         }
 
         public List<string> GetEstablishedConnections()
         {
             cleanupConnections();
-            return new List<string>(establishedConnections.Keys);
+            return new List<string>(_establishedConnections.Keys);
         }
 
         public void AcceptPendingConnection(string connId)
         {
             ExhibitConnection conn;
-            if (pendingConnections.TryGetValue(connId, out conn))
+            if (_pendingConnections.TryGetValue(connId, out conn))
             {
                 // TODO: thread safety
                 conn.AcceptConnection();
-                establishedConnections.TryAdd(connId, conn);
-                pendingConnections.TryRemove(connId, out _dummy);
+                _establishedConnections.TryAdd(connId, conn);
+                _pendingConnections.TryRemove(connId, out _dummy);
             }
         }
 
         public void ClearPackage(string connId)
         {
             ExhibitConnection conn;
-            if (establishedConnections.TryGetValue(connId, out conn))
+            if (_establishedConnections.TryGetValue(connId, out conn))
             {
                 // TODO: for now always purge.
                 conn.ClearPackage(true);
@@ -71,7 +71,7 @@ namespace backend.Communication
         public void LoadPackage(string connId, string packageDescriptor)
         {
             ExhibitConnection conn;
-            if (establishedConnections.TryGetValue(connId, out conn))
+            if (_establishedConnections.TryGetValue(connId, out conn))
             {
                 conn.LoadPackage(false, packageDescriptor);
             }
@@ -81,38 +81,38 @@ namespace backend.Communication
         {
             cleanupConnections();
             // FIXME: possible race condition between IsBound and EndAcceptTcpClient
-            if (incomingListener.Server.IsBound)
+            if (_incomingListener.Server.IsBound)
             {
-                var client = incomingListener.EndAcceptTcpClient(ar);
+                var client = _incomingListener.EndAcceptTcpClient(ar);
 
-                logger.LogInformation("Processing new incoming connection from {}", client.Client.RemoteEndPoint);
+                _logger.LogInformation("Processing new incoming connection from {}", client.Client.RemoteEndPoint);
                 var excon = new ExhibitConnection(client);
                 subscribeToEvents(excon);
                 excon.ReceiveConnectionRequest();
 
                 if (excon.IsConnected)
                 {
-                    if (pendingConnections.ContainsKey(excon.ConnectionId))
+                    if (_pendingConnections.ContainsKey(excon.ConnectionId))
                     {
-                        logger.LogWarning("Received pending connection with duplicate ID ({}). Removing the old one.", excon.ConnectionId);
-                        pendingConnections.TryRemove(excon.ConnectionId, out _dummy);
+                        _logger.LogWarning("Received pending connection with duplicate ID ({}). Removing the old one.", excon.ConnectionId);
+                        _pendingConnections.TryRemove(excon.ConnectionId, out _dummy);
                     }
-                    if (establishedConnections.ContainsKey(excon.ConnectionId))
+                    if (_establishedConnections.ContainsKey(excon.ConnectionId))
                     {
-                        logger.LogWarning("Received pending connection which is already connected ID: {}", excon.ConnectionId);
+                        _logger.LogWarning("Received pending connection which is already connected ID: {}", excon.ConnectionId);
                     }
-                    pendingConnections.TryAdd(excon.ConnectionId, excon);
+                    _pendingConnections.TryAdd(excon.ConnectionId, excon);
                     
                     OnIncomingConnectionEvent?.Invoke();
 
-                    logger.LogInformation("Received connection ID: {}", excon.ConnectionId);
+                    _logger.LogInformation("Received connection ID: {}", excon.ConnectionId);
                 }
                 else
                 {
-                    logger.LogWarning("Received connection was invalid.");
+                    _logger.LogWarning("Received connection was invalid.");
                 }
 
-                incomingListener.BeginAcceptTcpClient(IncomingConnectionCallback, null);
+                _incomingListener.BeginAcceptTcpClient(IncomingConnectionCallback, null);
             }
         }
 
@@ -126,10 +126,10 @@ namespace backend.Communication
             excon.ExhibitTimedOut += (object obj, EventArgs e) => {
                 ExhibitConnection sender = (ExhibitConnection) obj;
                 ExhibitConnection _dummy;
-                establishedConnections.TryRemove(sender.ConnectionId, out _dummy);
-                pendingConnections.TryRemove(sender.ConnectionId, out _dummy);
+                _establishedConnections.TryRemove(sender.ConnectionId, out _dummy);
+                _pendingConnections.TryRemove(sender.ConnectionId, out _dummy);
 
-                logger.LogWarning("Exhibit (ID: {0}) timed out.", sender.ConnectionId);
+                _logger.LogWarning("Exhibit (ID: {0}) timed out.", sender.ConnectionId);
             };
         }
 
@@ -137,11 +137,11 @@ namespace backend.Communication
         {
             return Task.Run(() =>
             {
-                incomingListener = new TcpListener(IPAddress.Any, ServerListenPort);
-                incomingListener.Start();
+                _incomingListener = new TcpListener(IPAddress.Any, ServerListenPort);
+                _incomingListener.Start();
 
-                logger.LogInformation("Starting to listen for incoming TCP connections on port {}", ServerListenPort);
-                incomingAsyncAccept = incomingListener.BeginAcceptTcpClient(IncomingConnectionCallback, null);
+                _logger.LogInformation("Starting to listen for incoming TCP connections on port {}", ServerListenPort);
+                _incomingAsyncAccept = _incomingListener.BeginAcceptTcpClient(IncomingConnectionCallback, null);
             });
         }
 
@@ -149,18 +149,18 @@ namespace backend.Communication
         {
             return Task.Run(() =>
             {
-                foreach (var conn in pendingConnections)
+                foreach (var conn in _pendingConnections)
                 {
                     conn.Value.Dispose();
                 }
 
-                foreach (var conn in establishedConnections)
+                foreach (var conn in _establishedConnections)
                 {
                     conn.Value.Dispose();
                 }
 
 
-                incomingListener.Stop();
+                _incomingListener.Stop();
             });
         }
 
