@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
@@ -12,10 +13,11 @@ namespace Guidepipe.Steps
         public string OutputPattern { get; set; } = "{0}.webm";
         public string VideoCodec { get; set; } = "vp8";
         public string AudioCodec { get; set; } = "libopus";
+        public List<string> AdditionalArgs { get; set; } = null;
         public string FfmpegPath { get; set; } = null;
     }
 
-    public class FfmpegProcess : IPipelineGuidedStep<FilePath, FilePath>
+    public class FfmpegProcess : IPipelineGuidedStep<FilePath, FilePath>, IPipelineConfigurableStep<FfmpegProcessConfig>
     {
         public bool SinkToPreview { get; set; } = false;
 
@@ -36,23 +38,41 @@ namespace Guidepipe.Steps
             _cachedInput = input;
 
             FilePath output = new FilePath();
-            output.Path = Path.Combine(
-                _config.OutputDir,
-                String.Format(_config.OutputPattern, Path.GetFileNameWithoutExtension(input.Path))
-            );
+            if (SinkToPreview)
+            {
+                output.Path = Path.Combine(
+                    Path.GetTempPath(),
+                    String.Format(_config.OutputPattern, Path.GetRandomFileName())
+                );
+            }
+            else
+            {
+                output.Path = Path.Combine(
+                    _config.OutputDir,
+                    String.Format(_config.OutputPattern, Path.GetFileNameWithoutExtension(input.Path))
+                );
+            }
 
             ProcessStartInfo ffmpegStartInfo = new ProcessStartInfo();
-            // TODO: multiplatform support?
             ffmpegStartInfo.FileName = _config.FfmpegPath ?? "ffmpeg";
             ffmpegStartInfo.ArgumentList.Add("-y");
             ffmpegStartInfo.ArgumentList.Add("-i");
             ffmpegStartInfo.ArgumentList.Add(input.Path);
+
+            if (_config.AdditionalArgs != null)
+            {
+                foreach (string arg in _config.AdditionalArgs)
+                {
+                    ffmpegStartInfo.ArgumentList.Add(arg);
+                }
+            }
+
+
             if (SinkToPreview)
             {
                 ffmpegStartInfo.ArgumentList.Add("-t");
                 ffmpegStartInfo.ArgumentList.Add("10");
             }
-
             // Codec setup
             ffmpegStartInfo.ArgumentList.Add("-c:v");
             ffmpegStartInfo.ArgumentList.Add(_config.VideoCodec);
@@ -95,6 +115,11 @@ namespace Guidepipe.Steps
         public void SetSink(Action<FilePath> sink)
         {
             _sink = sink;
+        }
+
+        public void Configure(Action<FfmpegProcessConfig> configure)
+        {
+            configure(_config);
         }
     }
 }

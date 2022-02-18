@@ -13,6 +13,11 @@ namespace Guidepipe.Steps
         bool IsGuided { get; }
     }
 
+    public interface IPipelineConfigurableStep<TConf>
+    {
+        void Configure(Action<TConf> configure);
+    }
+
     public interface PipelineGuidedStep
     {
         void SaveConfig(Stream stream);
