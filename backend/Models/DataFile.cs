@@ -6,5 +6,7 @@ namespace backend.Models
         public string Path { get; set; }
         public string ThumbnailPath { get; set; }
         public string PreviewPath { get; set; }
+
+        public PresentationPackage Package { get; set; }
     }
 }
