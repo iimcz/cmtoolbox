@@ -5,7 +5,7 @@ import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } fro
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { AspectRatio, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { ConversionClient, ISettings, PackagesClient, Parameters, PresentationPackage, Preset, VideoConversionParams } from 'src/app/services/api.generated.service';
+import { Action, ConversionClient, ISettings, Mapping, PackagesClient, Parameters, PresentationPackage, Preset, TypeEnum, VideoConversionParams } from 'src/app/services/api.generated.service';
 import { Parameters as ApiParameters, Settings as ApiSettings, AspectRatio as ApiAspectRatio } from 'src/app/services/api.generated.service';
 import { EventSocketService, EventType } from 'src/app/services/event-socket.service';
 
@@ -54,7 +54,6 @@ export class AddVideoPackageComponent implements OnInit {
     this.unfinishedPackage$.pipe(
       combineLatestWith(this.eventSocket.subscribeEvent(EventType.PackagePreviewUpdated))
     ).subscribe((arr) => {
-      console.log(this.fileClient.getPreviewUrl(arr[0].dataFiles![0].id!));
       this.initiatePreview(arr[0]);
     })
   }
@@ -121,7 +120,35 @@ export class AddVideoPackageComponent implements OnInit {
       .subscribe(
         // TODO: handle
       );
-    this.packagesClient.setPackageInputs(id, []) // TODO: fill with actual data
+    this.packagesClient.setPackageInputs(id, [
+      new Action({
+        effect: 'stop',
+        mapping: new Mapping({
+          source: 'depthcam1',
+          eventName: 'swipeUp'
+        }),
+        type: TypeEnum.Event
+      }),
+      new Action({
+        effect: 'start',
+        mapping: new Mapping({
+          source: 'depthcam1',
+          eventName: 'swipeDown'
+        }),
+        type: TypeEnum.Event
+      }),
+      new Action({
+        effect: 'setVolume',
+        mapping: new Mapping({
+          source: 'lightsensor1',
+          inMin: 0,
+          inMax: 1,
+          outMin: 0,
+          outMax: 1
+        }),
+        type: TypeEnum.Value
+      })
+    ]) // TODO: fill with actual data
       .subscribe(
         // TODO: handle
       );

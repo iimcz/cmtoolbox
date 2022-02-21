@@ -36,7 +36,7 @@ export class PackageDetailComponent implements OnInit {
       map((params: ParamMap) => parseInt(params.get('id')!))
     );
     this.presentationPackage$ = this.notifyRouteUpdate$.pipe(
-      mergeWith(this.notifyRouteUpdate$),
+      mergeWith(this.notifyProcessedEvent$),
       switchMap((id: number) => this.packagesClient.getPackage(id)),
       shareReplay()
     );

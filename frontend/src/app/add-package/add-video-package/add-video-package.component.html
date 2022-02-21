@@ -6,7 +6,7 @@
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>
-            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)" (click)="applySimpleConversionParams(package)">Pokračovat</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Metadata">
@@ -14,7 +14,7 @@
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
             <button mat-raised-button matStepperNext
-                (click)="triggerSaveMetadata(); initiatePreview(package);">Pokračovat</button>
+                (click)="triggerSaveMetadata(); applySimpleConversionParams(package);">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Konverze">

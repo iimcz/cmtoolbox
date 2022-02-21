@@ -5,18 +5,15 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using backend.Extensions;
 using backend.Filters;
 using backend.Models;
 using backend.Utilities;
 using backend.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
@@ -178,6 +175,8 @@ namespace backend.Controllers
             var datafile = await _dbContext.DataFiles.FindAsync(id);
             if (datafile == null)
                 return NotFound();
+            if (!System.IO.File.Exists(datafile.PreviewPath))
+                return NotFound();
 
             var contentTypeProvider = new FileExtensionContentTypeProvider();
             contentTypeProvider.TryGetContentType(datafile.PreviewPath, out var contentType);
@@ -193,6 +192,11 @@ namespace backend.Controllers
             var datafile = await _dbContext.DataFiles.FindAsync(id);
             if (datafile == null)
                 return NotFound();
+            if (!System.IO.File.Exists(datafile.Path))
+            {
+                _logger.LogWarning("Database contains a non-existent data file: {0}", datafile.Path);
+                return NotFound();
+            }
 
             _dbContext.DataFiles.Remove(datafile);
             await _dbContext.SaveChangesAsync();
@@ -208,6 +212,8 @@ namespace backend.Controllers
         {
             var datafile = await _dbContext.DataFiles.FindAsync(id);
             if (datafile == null)
+                return NotFound();
+            if (!System.IO.File.Exists(datafile.ThumbnailPath))
                 return NotFound();
 
             var contentTypeProvider = new FileExtensionContentTypeProvider();
