@@ -2316,9 +2316,9 @@ export interface ILayout {
 }
 
 export class GalleryImage implements IGalleryImage {
-    activatedAction?: string | undefined;
+    activatedEvent?: string | undefined;
     fileName?: string | undefined;
-    selectedAction?: string | undefined;
+    selectedEvent?: string | undefined;
 
     constructor(data?: IGalleryImage) {
         if (data) {
@@ -2331,9 +2331,9 @@ export class GalleryImage implements IGalleryImage {
 
     init(_data?: any) {
         if (_data) {
-            this.activatedAction = _data["activatedAction"];
+            this.activatedEvent = _data["activatedEvent"];
             this.fileName = _data["fileName"];
-            this.selectedAction = _data["selectedAction"];
+            this.selectedEvent = _data["selectedEvent"];
         }
     }
 
@@ -2346,17 +2346,17 @@ export class GalleryImage implements IGalleryImage {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["activatedAction"] = this.activatedAction;
+        data["activatedEvent"] = this.activatedEvent;
         data["fileName"] = this.fileName;
-        data["selectedAction"] = this.selectedAction;
+        data["selectedEvent"] = this.selectedEvent;
         return data; 
     }
 }
 
 export interface IGalleryImage {
-    activatedAction?: string | undefined;
+    activatedEvent?: string | undefined;
     fileName?: string | undefined;
-    selectedAction?: string | undefined;
+    selectedEvent?: string | undefined;
 }
 
 export enum LayoutType {
@@ -2656,8 +2656,8 @@ export interface IVideoEvent {
 }
 
 export class Action implements IAction {
+    effect?: string | undefined;
     mapping?: Mapping | undefined;
-    name?: string | undefined;
     type?: TypeEnum;
 
     constructor(data?: IAction) {
@@ -2671,8 +2671,8 @@ export class Action implements IAction {
 
     init(_data?: any) {
         if (_data) {
+            this.effect = _data["effect"];
             this.mapping = _data["mapping"] ? Mapping.fromJS(_data["mapping"]) : <any>undefined;
-            this.name = _data["name"];
             this.type = _data["type"];
         }
     }
@@ -2686,26 +2686,29 @@ export class Action implements IAction {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["effect"] = this.effect;
         data["mapping"] = this.mapping ? this.mapping.toJSON() : <any>undefined;
-        data["name"] = this.name;
         data["type"] = this.type;
         return data; 
     }
 }
 
 export interface IAction {
+    effect?: string | undefined;
     mapping?: Mapping | undefined;
-    name?: string | undefined;
     type?: TypeEnum;
 }
 
 export class Mapping implements IMapping {
     eventName?: string | undefined;
     source?: string | undefined;
-    gestureName?: string | undefined;
     condition?: Condition | undefined;
     threshold?: string | undefined;
     thresholdType?: ThresholdType | undefined;
+    inMax?: number | undefined;
+    inMin?: number | undefined;
+    outMax?: number | undefined;
+    outMin?: number | undefined;
 
     constructor(data?: IMapping) {
         if (data) {
@@ -2720,10 +2723,13 @@ export class Mapping implements IMapping {
         if (_data) {
             this.eventName = _data["eventName"];
             this.source = _data["source"];
-            this.gestureName = _data["gestureName"];
             this.condition = _data["condition"];
             this.threshold = _data["threshold"];
             this.thresholdType = _data["thresholdType"];
+            this.inMax = _data["inMax"];
+            this.inMin = _data["inMin"];
+            this.outMax = _data["outMax"];
+            this.outMin = _data["outMin"];
         }
     }
 
@@ -2738,10 +2744,13 @@ export class Mapping implements IMapping {
         data = typeof data === 'object' ? data : {};
         data["eventName"] = this.eventName;
         data["source"] = this.source;
-        data["gestureName"] = this.gestureName;
         data["condition"] = this.condition;
         data["threshold"] = this.threshold;
         data["thresholdType"] = this.thresholdType;
+        data["inMax"] = this.inMax;
+        data["inMin"] = this.inMin;
+        data["outMax"] = this.outMax;
+        data["outMin"] = this.outMin;
         return data; 
     }
 }
@@ -2749,10 +2758,13 @@ export class Mapping implements IMapping {
 export interface IMapping {
     eventName?: string | undefined;
     source?: string | undefined;
-    gestureName?: string | undefined;
     condition?: Condition | undefined;
     threshold?: string | undefined;
     thresholdType?: ThresholdType | undefined;
+    inMax?: number | undefined;
+    inMin?: number | undefined;
+    outMax?: number | undefined;
+    outMin?: number | undefined;
 }
 
 export enum Condition {
@@ -2770,10 +2782,8 @@ export enum ThresholdType {
 
 export enum TypeEnum {
     Event = 0,
-    Gesture = 1,
-    GestureDrag = 2,
-    Value = 3,
-    ValueTrigger = 4,
+    Value = 1,
+    ValueTrigger = 2,
 }
 
 export interface FileParameter {

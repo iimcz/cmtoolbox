@@ -1410,7 +1410,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "activatedAction": {
+          "activatedEvent": {
             "type": "string",
             "nullable": true
           },
@@ -1418,7 +1418,7 @@
             "type": "string",
             "nullable": true
           },
-          "selectedAction": {
+          "selectedEvent": {
             "type": "string",
             "nullable": true
           }
@@ -1615,6 +1615,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "effect": {
+            "type": "string",
+            "nullable": true
+          },
           "mapping": {
             "nullable": true,
             "oneOf": [
@@ -1622,10 +1626,6 @@
                 "$ref": "#/components/schemas/Mapping"
               }
             ]
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
           },
           "type": {
             "$ref": "#/components/schemas/TypeEnum"
@@ -1641,10 +1641,6 @@
             "nullable": true
           },
           "source": {
-            "type": "string",
-            "nullable": true
-          },
-          "gestureName": {
             "type": "string",
             "nullable": true
           },
@@ -1667,6 +1663,26 @@
                 "$ref": "#/components/schemas/ThresholdType"
               }
             ]
+          },
+          "inMax": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "inMin": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "outMax": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "outMin": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -1705,17 +1721,13 @@
         "description": "",
         "x-enumNames": [
           "Event",
-          "Gesture",
-          "GestureDrag",
           "Value",
           "ValueTrigger"
         ],
         "enum": [
           0,
           1,
-          2,
-          3,
-          4
+          2
         ]
       }
     }
