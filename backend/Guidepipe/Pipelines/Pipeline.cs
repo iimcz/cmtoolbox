@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Guidepipe.Steps;
 
@@ -160,7 +161,7 @@ namespace Guidepipe.Pipelines
 
         public void SaveState(Stream stream)
         {
-            using (var writer = new BinaryWriter(stream))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8, true))
             {
                 writer.Write(((byte)_currentState));
                 writer.Write(_pipelineStopStepIndex);
@@ -170,7 +171,7 @@ namespace Guidepipe.Pipelines
 
         public void LoadState(Stream stream)
         {
-            using (var reader = new BinaryReader(stream))
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
             {
                 _currentState = (PipelineState)reader.ReadByte();
                 _pipelineStopStepIndex = reader.ReadInt32();

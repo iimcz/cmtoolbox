@@ -41,9 +41,9 @@ namespace backend.Utilities
                     new byte[] { 0xFF, 0xD8, 0xFF, 0xE8 },
                 }
             },
-            { ".zip", new List<byte[]> 
+            { ".zip", new List<byte[]>
                 {
-                    new byte[] { 0x50, 0x4B, 0x03, 0x04 }, 
+                    new byte[] { 0x50, 0x4B, 0x03, 0x04 },
                     new byte[] { 0x50, 0x4B, 0x4C, 0x49, 0x54, 0x45 },
                     new byte[] { 0x50, 0x4B, 0x53, 0x70, 0x58 },
                     new byte[] { 0x50, 0x4B, 0x05, 0x06 },
@@ -70,8 +70,8 @@ namespace backend.Utilities
         // systems. For more information, see the topic that accompanies this sample
         // app.
 
-        public static async Task<byte[]> ProcessFormFile<T>(IFormFile formFile, 
-            ModelStateDictionary modelState, string[] permittedExtensions, 
+        public static async Task<byte[]> ProcessFormFile<T>(IFormFile formFile,
+            ModelStateDictionary modelState, string[] permittedExtensions,
             long sizeLimit)
         {
             var fieldDisplayName = string.Empty;
@@ -103,12 +103,12 @@ namespace backend.Utilities
             // a BOM as their content.
             if (formFile.Length == 0)
             {
-                modelState.AddModelError(formFile.Name, 
+                modelState.AddModelError(formFile.Name,
                     $"{fieldDisplayName}({trustedFileNameForDisplay}) is empty.");
 
                 return Array.Empty<byte>();
             }
-            
+
             if (formFile.Length > sizeLimit)
             {
                 var megabyteSizeLimit = sizeLimit / 1048576;
@@ -160,7 +160,7 @@ namespace backend.Utilities
         }
 
         public static async Task<byte[]> ProcessStreamedFile(
-            MultipartSection section, ContentDispositionHeaderValue contentDisposition, 
+            MultipartSection section, ContentDispositionHeaderValue contentDisposition,
             ModelStateDictionary modelState, string[] permittedExtensions, long sizeLimit)
         {
             try
@@ -181,7 +181,7 @@ namespace backend.Utilities
                         $"The file exceeds {megabyteSizeLimit:N1} MB.");
                     }
                     else if (!IsValidFileExtensionAndSignature(
-                        contentDisposition.FileName.Value, memoryStream, 
+                        contentDisposition.FileName.Value, memoryStream,
                         permittedExtensions))
                     {
                         modelState.AddModelError("File",
@@ -262,21 +262,25 @@ namespace backend.Utilities
                 // check.
                 // TODO: for development, later do better check
                 // (mp4 files do not have a simple signature...)
-                if (_fileSignature.ContainsKey(ext))
-                {
-                    return true;
-                }
+                // if (_fileSignature.ContainsKey(ext))
+                // {
+                //     return true;
+                // }
 
                 // File signature check
                 // --------------------
                 // With the file signatures provided in the _fileSignature
                 // dictionary, the following code tests the input content's
                 // file signature.
-                var signatures = _fileSignature[ext];
-                var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
+                // var signatures = _fileSignature[ext];
+                // var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
 
-                return signatures.Any(signature => 
-                    headerBytes.Take(signature.Length).SequenceEqual(signature));
+                // return signatures.Any(signature =>
+                //     headerBytes.Take(signature.Length).SequenceEqual(signature));
+
+                // TODO: For now, skip signature check entirely - only allow based
+                // permitted extensions.
+                return true;
             }
         }
 
@@ -285,27 +289,35 @@ namespace backend.Utilities
             var pipeline = new Pipeline<FilePath, FilePath>();
             var input = new FilePath(filepath);
 
+            Action<ImageMagickProcessConfig> imagickConfig = (config) =>
+            {
+                config.OutputDir = outDir;
+                config.OutputPattern = "thumb-{0}.png";
+                config.OutputOptions = new string[] {
+                    "-resize",
+                    "128x128"
+                };
+            };
+
             switch (Path.GetExtension(filepath))
             {
                 case ".jpg":
                 case ".png":
                     input
-                        .AddStep(pipeline, new ImageMagickProcess(
-                            (config) =>
-                            {
-                                config.OutputDir = outDir;
-                                config.OutputPattern = "thumb-{0}.png";
-                                config.OutputOptions = new string[] {
-                                    "-resize",
-                                    "128x128"
-                                };
-                            }
-                        ));
+                        .AddStep(pipeline, new ImageMagickProcess(imagickConfig));
                     break;
                 case ".avi":
                 case ".mp4":
-                    //throw new NotImplementedException();
-                    return ""; // TODO: implement
+                case ".webm":
+                    input
+                        .AddStep(pipeline, new FfmpegExtractFrame(
+                            (config) =>
+                            {
+                                config.OutputDir = outDir;
+                                config.OutputPattern = "thumb-v-{0}.png";
+                            }
+                        )).AddStep(pipeline, new ImageMagickProcess(imagickConfig));
+                    break;
             }
             return (await pipeline.ExecuteAsync(input)).Path;
         }

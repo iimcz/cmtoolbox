@@ -6,7 +6,7 @@
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>
-            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)" (click)="applySimpleConversionParams(package)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Metadata">
@@ -40,7 +40,7 @@
                         <mat-label>Kvalita zvuku</mat-label>
                         <mat-select value="2">
                             <mat-option value="2">Nejvyšší</mat-option>
-                            <mat-option value="1">Vysokoká (lepší poměr kvalita/velikost)</mat-option>
+                            <mat-option value="1">Vysoká (lepší poměr kvalita/velikost)</mat-option>
                             <mat-option value="0">Kompatibilní (nižší pro méně výkonná zařízení)</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -48,7 +48,7 @@
                         <mat-label>Počet snímků za sekundu</mat-label>
                         <input matInput type="number" value="60">
                     </mat-form-field>
-                    <button mat-raised-button (click)="applySimpleConversionParams()">Aplikovat nastavení</button>
+                    <button mat-raised-button (click)="applySimpleConversionParams(package)">Aplikovat nastavení</button>
                 </div>
                 <div fxLayout="column" *ngIf="advancedConversionSettings">
                     <mat-form-field>
@@ -65,22 +65,18 @@
                     </mat-form-field>
                     <h4>Video úpravy</h4>
                     <mat-form-field>
-                        <mat-label>Barva</mat-label>
-                        <input matInput type="color" value="#FFFFFF">
-                    </mat-form-field>
-                    <mat-form-field>
                         <mat-label>Kontrast</mat-label>
-                        <input matInput type="number" value="50">
+                        <input matInput type="number" value="1.0" step="0.1">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Světlost</mat-label>
-                        <input matInput type="number" value="50">
+                        <input matInput type="number" value="1.0" step="0.1">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Vlastní parametry pro převaděč (FFMPEG)</mat-label>
                         <input matInput type="text" value="">
                     </mat-form-field>
-                    <button mat-raised-button (click)="applyAdvancedConversionParams()">Aplikovat parametry</button>
+                    <button mat-raised-button (click)="applyAdvancedConversionParams(package)">Aplikovat parametry</button>
                 </div>
             </div>
         </div>

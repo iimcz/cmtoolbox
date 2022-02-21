@@ -26,6 +26,51 @@
         }
       }
     },
+    "/Conversion/params/video/{fileId}": {
+      "post": {
+        "tags": [
+          "Conversion"
+        ],
+        "operationId": "Conversion_ApplyVideoConversionParams",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "param",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoConversionParams"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Device/all": {
       "get": {
         "tags": [
@@ -671,6 +716,87 @@
           }
         }
       },
+      "VideoConversionParams": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ConversionParams"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "usePreset": {
+                "type": "boolean"
+              },
+              "qualityPreset": {
+                "nullable": true,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Preset"
+                  }
+                ]
+              },
+              "videoBitrate": {
+                "type": "integer",
+                "format": "int32",
+                "nullable": true
+              },
+              "audioBitrate": {
+                "type": "integer",
+                "format": "int32",
+                "nullable": true
+              },
+              "fps": {
+                "type": "integer",
+                "format": "int32",
+                "nullable": true
+              },
+              "brightness": {
+                "type": "number",
+                "format": "float",
+                "nullable": true
+              },
+              "contrast": {
+                "type": "number",
+                "format": "float",
+                "nullable": true
+              },
+              "saturation": {
+                "type": "number",
+                "format": "float",
+                "nullable": true
+              },
+              "gamma": {
+                "type": "number",
+                "format": "float",
+                "nullable": true
+              },
+              "customParams": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "Preset": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "High",
+          "Medium",
+          "Low"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "ConversionParams": {
+        "type": "object",
+        "additionalProperties": false
+      },
       "PresentationDevice": {
         "type": "object",
         "additionalProperties": false,
@@ -792,6 +918,10 @@
           "lastEdited": {
             "type": "string",
             "format": "date-time"
+          },
+          "descriptorVersion": {
+            "type": "integer",
+            "format": "int32"
           },
           "parametersJson": {
             "type": "string",

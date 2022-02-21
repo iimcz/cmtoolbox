@@ -23,13 +23,17 @@ namespace backend.Controllers
     {
         ILogger<PackagesController> _logger;
         CMTContext _dbContext;
+        EventBus _eventBus;
+        IConfiguration _config;
         string _baseWorkDir;
         string _basePackageDir;
 
-        public PackagesController(ILogger<PackagesController> logger, CMTContext dbContext, IConfiguration config)
+        public PackagesController(ILogger<PackagesController> logger, CMTContext dbContext, IConfiguration config, EventBus eventBus)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _eventBus = eventBus;
+            _config = config;
 
             _baseWorkDir = config.GetSection("UnfinishedPackages").GetValue<string>("BaseWorkDir");
             _basePackageDir = config.GetSection("Packages").GetValue<string>("BaseStorageDir");
@@ -122,6 +126,7 @@ namespace backend.Controllers
                 unfinished.State = PackageState.Finished;
                 await _dbContext.SaveChangesAsync();
                 _logger.LogInformation("Package {0} finalized.", unfinished.Id);
+                _eventBus.PushEvent(BusEventType.PackageProcessed);
             });
 
             return Ok(new FinishedPackage(unfinished.Id));
@@ -140,7 +145,7 @@ namespace backend.Controllers
             switch (package.Type)
             {
                 case PackageType.Video:
-                    await PackageUtils.FinishProcessingVideoPackage(package, pkgDataRoot);
+                    await PackageUtils.FinishProcessingVideoPackage(package, pkgDataRoot, _config);
                     break;
                 default: // TODO: handle other cases
                     break;

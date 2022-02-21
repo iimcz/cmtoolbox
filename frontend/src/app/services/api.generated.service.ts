@@ -79,6 +79,73 @@ export class ConfigurationClient {
 @Injectable({
     providedIn: 'root'
 })
+export class ConversionClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    applyVideoConversionParams(fileId: number, param: VideoConversionParams) : Observable<FileResponse> {
+        let url_ = this.baseUrl + "/Conversion/params/video/{fileId}";
+        if (fileId === undefined || fileId === null)
+            throw new Error("The parameter 'fileId' must be defined.");
+        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(param);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processApplyVideoConversionParams(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApplyVideoConversionParams(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processApplyVideoConversionParams(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+}
+
+@Injectable({
+    providedIn: 'root'
+})
 export class DeviceClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -1122,6 +1189,111 @@ export interface IBackendConfiguration {
     imageMagickPath?: string | undefined;
 }
 
+export class ConversionParams implements IConversionParams {
+
+    constructor(data?: IConversionParams) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): ConversionParams {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConversionParams();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data; 
+    }
+}
+
+export interface IConversionParams {
+}
+
+export class VideoConversionParams extends ConversionParams implements IVideoConversionParams {
+    usePreset?: boolean;
+    qualityPreset?: Preset | undefined;
+    videoBitrate?: number | undefined;
+    audioBitrate?: number | undefined;
+    fps?: number | undefined;
+    brightness?: number | undefined;
+    contrast?: number | undefined;
+    saturation?: number | undefined;
+    gamma?: number | undefined;
+    customParams?: string | undefined;
+
+    constructor(data?: IVideoConversionParams) {
+        super(data);
+    }
+
+    init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.usePreset = _data["usePreset"];
+            this.qualityPreset = _data["qualityPreset"];
+            this.videoBitrate = _data["videoBitrate"];
+            this.audioBitrate = _data["audioBitrate"];
+            this.fps = _data["fps"];
+            this.brightness = _data["brightness"];
+            this.contrast = _data["contrast"];
+            this.saturation = _data["saturation"];
+            this.gamma = _data["gamma"];
+            this.customParams = _data["customParams"];
+        }
+    }
+
+    static fromJS(data: any): VideoConversionParams {
+        data = typeof data === 'object' ? data : {};
+        let result = new VideoConversionParams();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["usePreset"] = this.usePreset;
+        data["qualityPreset"] = this.qualityPreset;
+        data["videoBitrate"] = this.videoBitrate;
+        data["audioBitrate"] = this.audioBitrate;
+        data["fps"] = this.fps;
+        data["brightness"] = this.brightness;
+        data["contrast"] = this.contrast;
+        data["saturation"] = this.saturation;
+        data["gamma"] = this.gamma;
+        data["customParams"] = this.customParams;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IVideoConversionParams extends IConversionParams {
+    usePreset?: boolean;
+    qualityPreset?: Preset | undefined;
+    videoBitrate?: number | undefined;
+    audioBitrate?: number | undefined;
+    fps?: number | undefined;
+    brightness?: number | undefined;
+    contrast?: number | undefined;
+    saturation?: number | undefined;
+    gamma?: number | undefined;
+    customParams?: string | undefined;
+}
+
+export enum Preset {
+    High = 0,
+    Medium = 1,
+    Low = 2,
+}
+
 export class PresentationDevice implements IPresentationDevice {
     id?: number;
     deviceName?: string | undefined;
@@ -1259,6 +1431,7 @@ export class PresentationPackage implements IPresentationPackage {
     lastEditedBy?: ToolboxUser | undefined;
     created?: Date;
     lastEdited?: Date;
+    descriptorVersion?: number;
     parametersJson?: string | undefined;
     inputsJson?: string | undefined;
     state?: PackageState;
@@ -1288,6 +1461,7 @@ export class PresentationPackage implements IPresentationPackage {
             this.lastEditedBy = _data["lastEditedBy"] ? ToolboxUser.fromJS(_data["lastEditedBy"]) : <any>undefined;
             this.created = _data["created"] ? new Date(_data["created"].toString()) : <any>undefined;
             this.lastEdited = _data["lastEdited"] ? new Date(_data["lastEdited"].toString()) : <any>undefined;
+            this.descriptorVersion = _data["descriptorVersion"];
             this.parametersJson = _data["parametersJson"];
             this.inputsJson = _data["inputsJson"];
             this.state = _data["state"];
@@ -1333,6 +1507,7 @@ export class PresentationPackage implements IPresentationPackage {
         data["lastEditedBy"] = this.lastEditedBy ? this.lastEditedBy.toJSON() : <any>undefined;
         data["created"] = this.created ? this.created.toISOString() : <any>undefined;
         data["lastEdited"] = this.lastEdited ? this.lastEdited.toISOString() : <any>undefined;
+        data["descriptorVersion"] = this.descriptorVersion;
         data["parametersJson"] = this.parametersJson;
         data["inputsJson"] = this.inputsJson;
         data["state"] = this.state;
@@ -1371,6 +1546,7 @@ export interface IPresentationPackage {
     lastEditedBy?: ToolboxUser | undefined;
     created?: Date;
     lastEdited?: Date;
+    descriptorVersion?: number;
     parametersJson?: string | undefined;
     inputsJson?: string | undefined;
     state?: PackageState;

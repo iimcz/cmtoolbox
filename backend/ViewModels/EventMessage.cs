@@ -2,7 +2,7 @@ namespace backend.ViewModels
 {
     public class EventMessage
     {
-        public EventType Type;
+        public EventType Type { get; set; }
     }
 
     public enum EventType

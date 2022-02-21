@@ -30,7 +30,7 @@ namespace backend.Controllers
         private readonly long _fileSizeLimit;
         private readonly ILogger<FileController> _logger;
         private readonly string[] _permittedExtensions = { };
-        private readonly string[] _thumbnailExtensions = { ".png", ".jpg", ".avi", ".mp4" };
+        private readonly string[] _thumbnailExtensions = { ".png", ".jpg", ".avi", ".mp4", ".webm" };
         private readonly string[] _previewExtensions = { ".avi", ".mp4", ".webm" };
 
         private readonly CMTContext _dbContext;
@@ -161,7 +161,9 @@ namespace backend.Controllers
             }
             if (_previewExtensions.Any(s => s == Path.GetExtension(datafile.Path)))
             {
-                datafile.PreviewPath = datafile.Path;
+                var previewDir = Path.Combine(package.WorkDir, "previews");
+                Directory.CreateDirectory(previewDir);
+                datafile.PreviewPath = Path.Combine(previewDir, Path.GetFileName(datafile.Path));
             }
 
             await _dbContext.SaveChangesAsync();

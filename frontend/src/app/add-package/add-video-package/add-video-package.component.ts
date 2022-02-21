@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
+import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { AspectRatio, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { ISettings, PackagesClient, PresentationPackage } from 'src/app/services/api.generated.service';
+import { ConversionClient, ISettings, PackagesClient, Parameters, PresentationPackage, Preset, VideoConversionParams } from 'src/app/services/api.generated.service';
 import { Parameters as ApiParameters, Settings as ApiSettings, AspectRatio as ApiAspectRatio } from 'src/app/services/api.generated.service';
+import { EventSocketService, EventType } from 'src/app/services/event-socket.service';
 
 @Component({
   selector: 'app-add-video-package',
@@ -37,7 +38,9 @@ export class AddVideoPackageComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private packagesClient: PackagesClient,
-    private fileClient: FileClient
+    private fileClient: FileClient,
+    private conversionClient: ConversionClient,
+    private eventSocket: EventSocketService
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +51,12 @@ export class AddVideoPackageComponent implements OnInit {
       mergeWith(this.notifyPackageUpdate$),
       switchMap((id: number) => this.packagesClient.getUnfinishedPackage(id))
     );
+    this.unfinishedPackage$.pipe(
+      combineLatestWith(this.eventSocket.subscribeEvent(EventType.PackagePreviewUpdated))
+    ).subscribe((arr) => {
+      console.log(this.fileClient.getPreviewUrl(arr[0].dataFiles![0].id!));
+      this.initiatePreview(arr[0]);
+    })
   }
 
   goBack(): void {
@@ -62,12 +71,23 @@ export class AddVideoPackageComponent implements OnInit {
     );
   }
 
-  applySimpleConversionParams() {
+  applySimpleConversionParams(pkg: PresentationPackage) {
+    this.previewUrl = '';
+    let param = new VideoConversionParams();
+    param.usePreset = true;
+    param.qualityPreset = Preset.High;
 
+    this.conversionClient.applyVideoConversionParams(pkg.dataFiles![0].id!, param)
+      .subscribe();
   }
 
-  applyAdvancedConversionParams() {
+  applyAdvancedConversionParams(pkg: PresentationPackage) {
+    this.previewUrl = '';
+    let param = new VideoConversionParams();
+    param.usePreset = false;
 
+    this.conversionClient.applyVideoConversionParams(pkg.dataFiles![0].id!, param)
+      .subscribe();
   }
 
   refreshPackage(id: number) {

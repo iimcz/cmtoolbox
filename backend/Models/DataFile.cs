@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace backend.Models
 {
     public class DataFile
@@ -7,6 +9,7 @@ namespace backend.Models
         public string ThumbnailPath { get; set; }
         public string PreviewPath { get; set; }
 
+        [JsonIgnore]
         public PresentationPackage Package { get; set; }
     }
 }

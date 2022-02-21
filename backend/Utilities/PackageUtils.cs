@@ -7,6 +7,7 @@ using backend.Models;
 using Guidepipe.IO;
 using Guidepipe.Pipelines;
 using Guidepipe.Steps;
+using Microsoft.Extensions.Configuration;
 using Naki3D.Common.Json;
 
 namespace backend.Utilities
@@ -16,27 +17,26 @@ namespace backend.Utilities
         // TODO: proper schema location
         private static readonly string PACKAGE_DESCRIPTOR_SCHEMA = "https://www.iim.cz/package-schema.json";
 
-        public static async Task FinishProcessingVideoPackage(PresentationPackage package, string dataDir)
+        public static async Task FinishProcessingVideoPackage(PresentationPackage package, string dataDir, IConfiguration config)
         {
             var videoFile = package.DataFiles.FirstOrDefault();
             if (videoFile == null)
                 return;
 
             var videoFilePath = new FilePath(videoFile.Path);
-            var videoPipeline = new Pipeline<FilePath, FilePath>();
 
-            videoFilePath
-                .AddStep(videoPipeline, new FfmpegProcess(
-                    (config) =>
-                    {
-                        config.AudioCodec = "libvorbis";
-                        config.VideoCodec = "vp8";
-                        config.OutputDir = dataDir;
-                        config.OutputPattern = "{0}.webm";
-                    }
-                ));
+            var checkPipeline = ConversionPipelines.ConstructVideoCheckPipeline(videoFile.Path, config);
+            bool shouldConvert = ! await checkPipeline.ExecuteAsync(videoFilePath);
 
-            await videoPipeline.ExecuteAsync(videoFilePath);
+            if (shouldConvert)
+            {
+                var pipeline = ConversionPipelines.ConstructVideoProcessPipeline(videoFile.Path, null, config);
+
+                using (var stream = new MemoryStream(package.PipelineState))
+                    pipeline.LoadState(stream);
+
+                await pipeline.ExecuteAsync(videoFilePath);
+            }
         }
 
         public static async Task WritePackageJsonAsync(PresentationPackage package, TextWriter writer, string packageFilePath, string packageUrl)

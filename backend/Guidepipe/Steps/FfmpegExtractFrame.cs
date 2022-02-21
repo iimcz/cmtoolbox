@@ -17,7 +17,7 @@ namespace Guidepipe.Steps
 
         public bool IsGuided => false;
         private Action<FilePath> _sink;
-        private FfmpegExtractFrameConfig _config;
+        private FfmpegExtractFrameConfig _config = new FfmpegExtractFrameConfig();
 
         public FfmpegExtractFrame(Action<FfmpegExtractFrameConfig> configure)
         {
