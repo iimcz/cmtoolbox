@@ -18,18 +18,21 @@ export interface PackageDescriptorGenerated {
 }
 
 export interface Action {
+    effect:  string;
     mapping: Mapping;
-    name:    string;
     type:    Type;
 }
 
 export interface Mapping {
     eventName?:     string;
     source:         string;
-    gestureName?:   string;
     condition?:     Condition;
     threshold?:     string;
     thresholdType?: ThresholdType;
+    inMax?:         number;
+    inMin?:         number;
+    outMax?:        number;
+    outMin?:        number;
 }
 
 export enum Condition {
@@ -47,16 +50,16 @@ export enum ThresholdType {
 
 export enum Type {
     Event = "event",
-    Gesture = "gesture",
-    GestureDrag = "gestureDrag",
     Value = "value",
     ValueTrigger = "valueTrigger",
 }
 
 export interface Metadata {
-    author:     string;
-    exposition: string;
-    other?:     Other[];
+    author:       string;
+    description?: string;
+    exposition:   string;
+    other?:       Other[];
+    packageName?: string;
 }
 
 export interface Other {
@@ -145,9 +148,9 @@ export interface Layout {
 }
 
 export interface GalleryImage {
-    activatedAction?: string;
-    fileName?:        string;
-    selectedAction?:  string;
+    activatedEvent?: string;
+    fileName?:       string;
+    selectedEvent?:  string;
 }
 
 export enum LayoutType {
@@ -337,22 +340,27 @@ const typeMap: any = {
         { json: "version", js: "version", typ: "" },
     ], false),
     "Action": o([
+        { json: "effect", js: "effect", typ: "" },
         { json: "mapping", js: "mapping", typ: r("Mapping") },
-        { json: "name", js: "name", typ: "" },
         { json: "type", js: "type", typ: r("Type") },
     ], false),
     "Mapping": o([
         { json: "eventName", js: "eventName", typ: u(undefined, "") },
         { json: "source", js: "source", typ: "" },
-        { json: "gestureName", js: "gestureName", typ: u(undefined, "") },
         { json: "condition", js: "condition", typ: u(undefined, r("Condition")) },
         { json: "threshold", js: "threshold", typ: u(undefined, "") },
         { json: "thresholdType", js: "thresholdType", typ: u(undefined, r("ThresholdType")) },
+        { json: "inMax", js: "inMax", typ: u(undefined, 3.14) },
+        { json: "inMin", js: "inMin", typ: u(undefined, 3.14) },
+        { json: "outMax", js: "outMax", typ: u(undefined, 3.14) },
+        { json: "outMin", js: "outMin", typ: u(undefined, 3.14) },
     ], false),
     "Metadata": o([
         { json: "author", js: "author", typ: "" },
+        { json: "description", js: "description", typ: u(undefined, "") },
         { json: "exposition", js: "exposition", typ: "" },
         { json: "other", js: "other", typ: u(undefined, a(r("Other"))) },
+        { json: "packageName", js: "packageName", typ: u(undefined, "") },
     ], false),
     "Other": o([
         { json: "key", js: "key", typ: "" },
@@ -420,9 +428,9 @@ const typeMap: any = {
         { json: "visibleImages", js: "visibleImages", typ: u(undefined, 3.14) },
     ], false),
     "GalleryImage": o([
-        { json: "activatedAction", js: "activatedAction", typ: u(undefined, "") },
+        { json: "activatedEvent", js: "activatedEvent", typ: u(undefined, "") },
         { json: "fileName", js: "fileName", typ: u(undefined, "") },
-        { json: "selectedAction", js: "selectedAction", typ: u(undefined, "") },
+        { json: "selectedEvent", js: "selectedEvent", typ: u(undefined, "") },
     ], false),
     "Vector2": o([
         { json: "X", js: "X", typ: u(undefined, 3.14) },
@@ -459,8 +467,6 @@ const typeMap: any = {
     ],
     "Type": [
         "event",
-        "gesture",
-        "gestureDrag",
         "value",
         "valueTrigger",
     ],
