@@ -62,6 +62,8 @@ namespace backend.Controllers
                             args.AddRange(configSection.GetSection("LowPreset").GetSection("Args").Get<string[]>());
                             break;
                     }
+                    args.Add("-vf");
+                    args.Add($"fps=fps={param.Fps}");
 
                     conversionStep.Configure((config) =>
                     {

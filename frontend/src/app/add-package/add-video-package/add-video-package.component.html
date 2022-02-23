@@ -27,54 +27,46 @@
                 <h3>Parametry konverze</h3>
                 <mat-slide-toggle [(ngModel)]="advancedConversionSettings">Pokročilé nastavení parametrů
                 </mat-slide-toggle>
-                <div fxLayout="column" *ngIf="!advancedConversionSettings">
+                <div fxLayout="column" *ngIf="!advancedConversionSettings" [formGroup]="simpleConversionFG">
                     <mat-form-field>
                         <mat-label>Kvalita videa</mat-label>
-                        <mat-select value="2">
-                            <mat-option value="2">Nejvyšší</mat-option>
+                        <mat-select value="2" formControlName="videoQuality">
+                            <mat-option value="0">Nejvyšší</mat-option>
                             <mat-option value="1">Vysoká (lepší poměr kvalita/velikost)</mat-option>
-                            <mat-option value="0">Kompatibilní (nižší pro méně výkonná zařízení)</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <mat-form-field>
-                        <mat-label>Kvalita zvuku</mat-label>
-                        <mat-select value="2">
-                            <mat-option value="2">Nejvyšší</mat-option>
-                            <mat-option value="1">Vysoká (lepší poměr kvalita/velikost)</mat-option>
-                            <mat-option value="0">Kompatibilní (nižší pro méně výkonná zařízení)</mat-option>
+                            <mat-option value="2">Kompatibilní (nižší pro méně výkonná zařízení)</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Počet snímků za sekundu</mat-label>
-                        <input matInput type="number" value="60">
+                        <input matInput type="number" value="60" formControlName="fps">
                     </mat-form-field>
                     <button mat-raised-button (click)="applySimpleConversionParams(package)">Aplikovat nastavení</button>
                 </div>
-                <div fxLayout="column" *ngIf="advancedConversionSettings">
+                <div fxLayout="column" *ngIf="advancedConversionSettings" [formGroup]="advancedConversionFG">
                     <mat-form-field>
                         <mat-label>Video bitrate:</mat-label>
-                        <input matInput type="number" value="5000">
+                        <input matInput type="number" value="5000" formControlName="videoBitrate">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Audio bitrate:</mat-label>
-                        <input matInput type="number" value="600">
+                        <input matInput type="number" value="600" formControlName="audioBitrate">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>FPS:</mat-label>
-                        <input matInput type="number" value="60">
+                        <input matInput type="number" value="30" formControlName="fps">
                     </mat-form-field>
                     <h4>Video úpravy</h4>
                     <mat-form-field>
                         <mat-label>Kontrast</mat-label>
-                        <input matInput type="number" value="1.0" step="0.1">
+                        <input matInput type="number" value="1.0" step="0.1" formControlName="contrast">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Světlost</mat-label>
-                        <input matInput type="number" value="1.0" step="0.1">
+                        <input matInput type="number" value="1.0" step="0.1" formControlName="brightness">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Vlastní parametry pro převaděč (FFMPEG)</mat-label>
-                        <input matInput type="text" value="">
+                        <input matInput type="text" value="" formControlName="customParams">
                     </mat-form-field>
                     <button mat-raised-button (click)="applyAdvancedConversionParams(package)">Aplikovat parametry</button>
                 </div>

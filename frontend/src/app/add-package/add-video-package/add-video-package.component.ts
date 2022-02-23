@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
@@ -24,6 +25,19 @@ export class AddVideoPackageComponent implements OnInit {
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
 
+  simpleConversionFG = this.fb.group({
+    videoQuality: [0],
+    fps: [30]
+  });
+  advancedConversionFG = this.fb.group({
+    videoBitrate: [5000],
+    audioBitrate: [600],
+    fps: [30],
+    contrast: [1.0],
+    brightness: [1.0],
+    customParams: [""]
+  });
+
   videoSettings: Settings = {
     loop: true,
     autoStart: true,
@@ -40,7 +54,8 @@ export class AddVideoPackageComponent implements OnInit {
     private packagesClient: PackagesClient,
     private fileClient: FileClient,
     private conversionClient: ConversionClient,
-    private eventSocket: EventSocketService
+    private eventSocket: EventSocketService,
+    private fb: FormBuilder
   ) { }
 
   ngOnInit(): void {
@@ -74,7 +89,8 @@ export class AddVideoPackageComponent implements OnInit {
     this.previewUrl = '';
     let param = new VideoConversionParams();
     param.usePreset = true;
-    param.qualityPreset = Preset.High;
+    param.qualityPreset = parseInt(this.simpleConversionFG.get('videoQuality')?.value);
+    param.fps = this.simpleConversionFG.get('fps')?.value;
 
     this.conversionClient.applyVideoConversionParams(pkg.dataFiles![0].id!, param)
       .subscribe();
