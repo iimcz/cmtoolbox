@@ -8,6 +8,7 @@ namespace Guidepipe.Steps
     {
         public string DestinationDir { get; set; } = "";
         public string DestinationFilename { get; set; } = null;
+        public bool Overwrite { get; set; } = true;
     }
     public class MoveFile : IPipelineStep<FilePath, FilePath>
     {
@@ -31,7 +32,7 @@ namespace Guidepipe.Steps
 
             // ensure the directory exists
             Directory.CreateDirectory(_config.DestinationDir);
-            File.Move(input.Path, output.Path);
+            File.Move(input.Path, output.Path, _config.Overwrite);
 
             _sink(output);
         }
