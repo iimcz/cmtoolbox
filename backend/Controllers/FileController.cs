@@ -169,6 +169,7 @@ namespace backend.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
+        [ResponseCache(NoStore = true)]
         [HttpGet("preview/{id}")]
         public async Task<ActionResult> DownloadPreview(int id)
         {
