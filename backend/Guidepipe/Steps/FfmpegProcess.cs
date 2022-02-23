@@ -13,7 +13,7 @@ namespace Guidepipe.Steps
         public string OutputPattern { get; set; } = "{0}.webm";
         public string VideoCodec { get; set; } = "vp8";
         public string AudioCodec { get; set; } = "libopus";
-        public List<string> AdditionalArgs { get; set; } = null;
+        public List<string> AdditionalArgs { get; set; } = new List<string>();
         public string FfmpegPath { get; set; } = null;
     }
 
