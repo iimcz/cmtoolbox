@@ -40,16 +40,17 @@
                         <mat-label>Počet snímků za sekundu</mat-label>
                         <input matInput type="number" value="60" formControlName="fps">
                     </mat-form-field>
-                    <button mat-raised-button (click)="applySimpleConversionParams(package)">Aplikovat nastavení</button>
+                    <button mat-raised-button (click)="applySimpleConversionParams(package)">Aplikovat
+                        nastavení</button>
                 </div>
                 <div fxLayout="column" *ngIf="advancedConversionSettings" [formGroup]="advancedConversionFG">
                     <mat-form-field>
                         <mat-label>Video bitrate:</mat-label>
-                        <input matInput type="number" value="5000" formControlName="videoBitrate">
+                        <input matInput type="number" value="5000" min="128" max="50000" formControlName="videoBitrate">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Audio bitrate:</mat-label>
-                        <input matInput type="number" value="600" formControlName="audioBitrate">
+                        <input matInput type="number" value="320" max="500" min="128" formControlName="audioBitrate">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>FPS:</mat-label>
@@ -62,13 +63,22 @@
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Světlost</mat-label>
-                        <input matInput type="number" value="1.0" step="0.1" formControlName="brightness">
+                        <input matInput type="number" value="0.0" step="0.1" formControlName="brightness">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Saturace</mat-label>
+                        <input matInput type="number" value="1.0" step="0.1" formControlName="saturation">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Gamma</mat-label>
+                        <input matInput type="number" value="1.0" step="0.1" formControlName="gamma">
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Vlastní parametry pro převaděč (FFMPEG)</mat-label>
                         <input matInput type="text" value="" formControlName="customParams">
                     </mat-form-field>
-                    <button mat-raised-button (click)="applyAdvancedConversionParams(package)">Aplikovat parametry</button>
+                    <button mat-raised-button (click)="applyAdvancedConversionParams(package)">Aplikovat
+                        parametry</button>
                 </div>
             </div>
         </div>
@@ -87,29 +97,31 @@
                 class="settings-pane mat-elevation-z2 raised-box">
                 <mat-tab-group class="full-width">
                     <mat-tab label="Rozložení">
-                        <div class="setting" fxLayout="row">
-                            <label fxFlex="60%">Typ škálování videa:</label>
-                            <mat-form-field fxFlex="40%">
-                                <select matNativeControl [(ngModel)]="videoSettings.aspectRatio">
-                                    <option value="fitInside">Vyplnit s rámečkem</option>
-                                    <option value="fitOutside">Vyplnit obraz</option>
-                                    <option value="stretch">Roztáhnout (nezachová poměry stran)</option>
-                                </select>
-                            </mat-form-field>
-                        </div>
-                        <div class="setting" fxLayout="row">
-                            <label fxFlex="60%">Opakovat:</label>
-                            <mat-checkbox fxFlex="40%" [(ngModel)]="videoSettings.loop"></mat-checkbox>
-                        </div>
-                        <div class="setting" fxLayout="row">
-                            <label fxFlex="60%">Spustit ihned:</label>
-                            <mat-checkbox fxFlex="40%" [(ngModel)]="videoSettings.autoStart"></mat-checkbox>
-                        </div>
-                        <div class="setting" fxLayout="row">
-                            <label fxFlex="60%">Barva pozadí:</label>
-                            <mat-form-field fxFlex="40%">
-                                <input matInput type="color" [(ngModel)]="videoSettings.backgroundColor">
-                            </mat-form-field>
+                        <div [formGroup]="settingsFG">
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Typ škálování videa:</label>
+                                <mat-form-field fxFlex="40%">
+                                    <select matNativeControl formControlName="aspectRatio">
+                                        <option value="fitInside">Vyplnit s rámečkem</option>
+                                        <option value="fitOutside">Vyplnit obraz</option>
+                                        <option value="stretch">Roztáhnout (nezachová poměry stran)</option>
+                                    </select>
+                                </mat-form-field>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Opakovat:</label>
+                                <mat-checkbox fxFlex="40%" formControlName="loop"></mat-checkbox>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Spustit ihned:</label>
+                                <mat-checkbox fxFlex="40%" formControlName="autoStart"></mat-checkbox>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Barva pozadí:</label>
+                                <mat-form-field fxFlex="40%">
+                                    <input matInput type="color" formControlName="backgroundColor">
+                                </mat-form-field>
+                            </div>
                         </div>
                     </mat-tab>
                     <mat-tab label="Ovládání">
@@ -192,7 +204,8 @@
 
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button matStepperNext (click)="saveParametersAndInputs(package.id!, package.dataFiles![0].path!)">Pokračovat</button>
+            <button mat-raised-button matStepperNext
+                (click)="saveParametersAndInputs(package.id!, package.dataFiles![0].path!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Přídavné skripty">

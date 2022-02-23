@@ -31,11 +31,19 @@ export class AddVideoPackageComponent implements OnInit {
   });
   advancedConversionFG = this.fb.group({
     videoBitrate: [5000],
-    audioBitrate: [600],
+    audioBitrate: [320],
     fps: [30],
     contrast: [1.0],
-    brightness: [1.0],
-    customParams: [""]
+    brightness: [0.0],
+    saturation: [1.0],
+    gamma: [1.0],
+    customParams: ['']
+  });
+  settingsFG = this.fb.group({
+    loop: [true],
+    autoStart: [true],
+    aspectRatio: ['fitOutside'],
+    backgroundColor: ['#000000']
   });
 
   videoSettings: Settings = {
@@ -100,6 +108,14 @@ export class AddVideoPackageComponent implements OnInit {
     this.previewUrl = '';
     let param = new VideoConversionParams();
     param.usePreset = false;
+    param.videoBitrate = this.advancedConversionFG.get('videoBitrate')?.value;
+    param.audioBitrate = this.advancedConversionFG.get('audioBitrate')?.value;
+    param.fps = this.advancedConversionFG.get('fps')?.value;
+    param.contrast = this.advancedConversionFG.get('contrast')?.value;
+    param.brightness = this.advancedConversionFG.get('brightness')?.value;
+    param.saturation = this.advancedConversionFG.get('saturation')?.value;
+    param.gamma = this.advancedConversionFG.get('gamma')?.value;
+    param.customParams = this.advancedConversionFG.get('customParams')?.value;
 
     this.conversionClient.applyVideoConversionParams(pkg.dataFiles![0].id!, param)
       .subscribe();
@@ -127,10 +143,14 @@ export class AddVideoPackageComponent implements OnInit {
   }
 
   saveParametersAndInputs(id: number, filename: string) {
-    let settings = new ApiSettings(this.videoSettings as ISettings);
-    let params = new ApiParameters({ displayType: 'video', settings: settings });
-    settings.aspectRatio = this.mapAspectRatio(this.videoSettings.aspectRatio!);
+    let settings = new ApiSettings();
+    settings.loop = this.settingsFG.get('loop')?.value;
+    settings.autoStart = this.settingsFG.get('autoStart')?.value;
+    settings.backgroundColor = this.settingsFG.get('backgroundColor')?.value;
+    settings.aspectRatio = this.mapAspectRatio(this.settingsFG.get('aspectRatio')?.value);
     settings.fileName = filename.substring(filename.lastIndexOf('/') + 1, filename.lastIndexOf('.')) + ".webm";
+
+    let params = new ApiParameters({ displayType: 'video', settings: settings });
 
     this.packagesClient.setPackageParameters(id, params)
       .subscribe(

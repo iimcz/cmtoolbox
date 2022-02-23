@@ -76,12 +76,15 @@ namespace backend.Controllers
                     {
                         config.AdditionalArgs.AddRange(new string[]
                         {
-                            "-vf", $"fps=fps={param.Fps}",
-                            "-vf", $"eq={param.Contrast}:{param.Brightness}:{param.Saturation}:{param.Gamma}",
                             "-b:v", $"{param.VideoBitrate}k",
-                            "-b:a", $"{param.AudioBitrate}k"
+                            "-b:a", $"{param.AudioBitrate}k",
+                            "-vf", $"fps=fps={param.Fps},eq={param.Contrast}:{param.Brightness}:{param.Saturation}:{param.Gamma}"
                         });
-                        config.AdditionalArgs.AddRange(param.CustomParams.Split());
+
+                        if (param.CustomParams != null && param.CustomParams.Length > 0)
+                        {
+                            config.AdditionalArgs.AddRange(param.CustomParams.Split());
+                        }
                     });
                 }
 
