@@ -72,15 +72,26 @@ namespace backend.Controllers
             _eventBus.OnEvent += incomingEvent;
 
             var buffer = new byte[4];
-            var result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
-            while (!result.CloseStatus.HasValue)
+            do
             {
+                try
+                {
+                    var result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
+                }
+                catch (WebSocketException e)
+                {
+                    _logger.LogWarning($"Websocket error: {e.ToString()}");
+                    break;
+                }
+
                 // Ignore all incoming messages.
                 _logger.LogInformation("Received a message on EventSocket, ignoring...");
-                result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
-            }
+            } while (!webSocket.CloseStatus.HasValue);
 
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+            if (webSocket.CloseStatus.HasValue)
+            {
+                await webSocket.CloseAsync(webSocket.CloseStatus.Value, webSocket.CloseStatusDescription, CancellationToken.None);
+            }
 
             // Unregister forwarded events
             _exhibitionConnectionManager.OnIncomingConnectionEvent -= incomingConnectionHandler;
