@@ -1,4 +1,4 @@
-<mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
+<mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package" (selectionChange)="stepperSelectionChange($event)">
     <mat-step label="Nahrání dat">
         <div class="mat-elevation-z1 raised-box">
             <app-add-local-upload accept="video/*" [showPreview]="true" [packageId]="package.id!">
@@ -21,7 +21,7 @@
         <div fxLayout="row" fxLayoutAlign="center start">
             <div fxFlex="40%">
                 <h3>Náhled aplikovaných nastavení</h3>
-                <video [src]="previewUrl" controls="true" width="600"></video>
+                <video [src]="previewUrl" controls="true" width="600" #conversionPreviewPlayer></video>
             </div>
             <div fxFlex="40%" class="raised-box mat-elevation-z2">
                 <h3>Parametry konverze</h3>
@@ -91,7 +91,7 @@
         <div fxLayout="row" fxLayoutAlign="center start">
             <div fxFlex="40%">
                 <h3>Náhled videa</h3>
-                <video [src]="previewUrl" controls="true" width="600"></video>
+                <video [src]="previewUrl" controls="true" width="600" #settingsVideoPlayer></video>
             </div>
             <div fxLayout="column" fxLayoutAlign="center start" fxFlex="40%"
                 class="settings-pane mat-elevation-z2 raised-box">

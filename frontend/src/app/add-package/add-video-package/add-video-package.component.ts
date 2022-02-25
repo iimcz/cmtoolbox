@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -6,7 +7,7 @@ import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } fro
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { AspectRatio, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { Action, ConversionClient, ISettings, Mapping, PackagesClient, Parameters, PresentationPackage, Preset, TypeEnum, VideoConversionParams } from 'src/app/services/api.generated.service';
+import { Action, ConversionClient, ISettings, Mapping, PackagesClient, Parameters, PresentationPackage, Preset, ThresholdType, TypeEnum, VideoConversionParams } from 'src/app/services/api.generated.service';
 import { Parameters as ApiParameters, Settings as ApiSettings, AspectRatio as ApiAspectRatio } from 'src/app/services/api.generated.service';
 import { EventSocketService, EventType } from 'src/app/services/event-socket.service';
 
@@ -17,6 +18,9 @@ import { EventSocketService, EventType } from 'src/app/services/event-socket.ser
 })
 export class AddVideoPackageComponent implements OnInit {
   @ViewChild(AddMetadataComponent) addMetadataComponent!: AddMetadataComponent;
+
+  @ViewChild('settingPreviewPlayer') settingsPreviewPlayer!: ElementRef;
+  @ViewChild('conversionPreviewPlayer') conversionPreviewPlayer!: ElementRef;
 
   previewUrl: string = '';
   advancedConversionSettings: boolean = false;
@@ -158,27 +162,29 @@ export class AddVideoPackageComponent implements OnInit {
       );
     this.packagesClient.setPackageInputs(id, [
       new Action({
-        effect: 'stop',
+        effect: 'play',
         mapping: new Mapping({
-          source: 'depthcam1',
-          eventName: 'swipeUp'
+          source: 'atom_1_pir_1',
+          thresholdType: ThresholdType.Integer,
+          threshold: '0'
         }),
-        type: TypeEnum.Event
+        type: TypeEnum.ValueTrigger
       }),
       new Action({
-        effect: 'start',
+        effect: 'play',
         mapping: new Mapping({
-          source: 'depthcam1',
-          eventName: 'swipeDown'
+          source: 'atom_2_pir_1',
+          thresholdType: ThresholdType.Integer,
+          threshold: '0'
         }),
-        type: TypeEnum.Event
+        type: TypeEnum.ValueTrigger
       }),
       new Action({
         effect: 'setVolume',
         mapping: new Mapping({
           source: 'lightsensor1',
           inMin: 0,
-          inMax: 1,
+          inMax: 150,
           outMin: 0,
           outMax: 1
         }),
@@ -188,6 +194,17 @@ export class AddVideoPackageComponent implements OnInit {
       .subscribe(
         // TODO: handle
       );
+  }
+
+  stepperSelectionChange(event: StepperSelectionEvent) {
+    if (event.selectedIndex !== 2) {
+      const cplayer: HTMLVideoElement = this.conversionPreviewPlayer.nativeElement;
+      cplayer.pause();
+    }
+    if (event.selectedIndex !== 3) {
+      const splayer: HTMLVideoElement = this.settingsPreviewPlayer.nativeElement;
+      splayer.pause();
+    }
   }
 
   mapAspectRatio(arIn: AspectRatio): ApiAspectRatio {
