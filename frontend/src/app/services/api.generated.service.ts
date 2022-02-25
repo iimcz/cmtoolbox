@@ -720,6 +720,64 @@ export class PackagesClient {
         return _observableOf<PresentationPackage>(<any>null);
     }
 
+    getUnfinishedPackageFiles(id: number) : Observable<PackageFile[]> {
+        let url_ = this.baseUrl + "/Packages/unfinished/{id}/files";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUnfinishedPackageFiles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUnfinishedPackageFiles(<any>response_);
+                } catch (e) {
+                    return <Observable<PackageFile[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PackageFile[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetUnfinishedPackageFiles(response: HttpResponseBase): Observable<PackageFile[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(PackageFile.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<any>(<any>null);
+    }
+
     createNewPackage(type: PackageType) : Observable<CreatedUnfinishedPackage> {
         let url_ = this.baseUrl + "/Packages/new/{type}";
         if (type === undefined || type === null)
@@ -1367,7 +1425,6 @@ export class DeviceSensor implements IDeviceSensor {
     type?: SensorType;
     name?: string | undefined;
     deviceId?: number;
-    device?: PresentationDevice | undefined;
 
     constructor(data?: IDeviceSensor) {
         if (data) {
@@ -1384,7 +1441,6 @@ export class DeviceSensor implements IDeviceSensor {
             this.type = _data["type"];
             this.name = _data["name"];
             this.deviceId = _data["deviceId"];
-            this.device = _data["device"] ? PresentationDevice.fromJS(_data["device"]) : <any>undefined;
         }
     }
 
@@ -1401,7 +1457,6 @@ export class DeviceSensor implements IDeviceSensor {
         data["type"] = this.type;
         data["name"] = this.name;
         data["deviceId"] = this.deviceId;
-        data["device"] = this.device ? this.device.toJSON() : <any>undefined;
         return data; 
     }
 }
@@ -1411,7 +1466,6 @@ export interface IDeviceSensor {
     type?: SensorType;
     name?: string | undefined;
     deviceId?: number;
-    device?: PresentationDevice | undefined;
 }
 
 export enum SensorType {
@@ -1419,7 +1473,8 @@ export enum SensorType {
     Pir = 1,
     Distance = 2,
     Light = 3,
-    GenericValue = 4,
+    Noise = 4,
+    GenericValue = 5,
 }
 
 export class PresentationPackage implements IPresentationPackage {
@@ -1941,6 +1996,46 @@ export interface IScriptParameter {
     id?: number;
     key?: string | undefined;
     defaultValue?: string | undefined;
+}
+
+export class PackageFile implements IPackageFile {
+    id?: number;
+    filename?: string | undefined;
+
+    constructor(data?: IPackageFile) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.filename = _data["filename"];
+        }
+    }
+
+    static fromJS(data: any): PackageFile {
+        data = typeof data === 'object' ? data : {};
+        let result = new PackageFile();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["filename"] = this.filename;
+        return data; 
+    }
+}
+
+export interface IPackageFile {
+    id?: number;
+    filename?: string | undefined;
 }
 
 export class CreatedUnfinishedPackage implements ICreatedUnfinishedPackage {

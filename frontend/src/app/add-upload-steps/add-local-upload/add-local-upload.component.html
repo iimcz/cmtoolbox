@@ -1,17 +1,14 @@
 <h2>Nahrát soubor z tohoto zařízení:</h2>
 <p>
-    <input type="file" id="file" [accept]="accept" (change)="handleFileInput($event)">
+    <input type="file" id="file" [accept]="accept" (change)="handleFileInput($event)" *ngIf="!uploading">
+    <mat-progress-bar *ngIf="uploading" [value]="uploadProgress"></mat-progress-bar>
 </p>
 <h2>Nahrané soubory:</h2>
 <mat-grid-list cols="6">
     <mat-grid-tile *ngFor="let file of uploadedFiles" class="upload-list-item" >
         <mat-card>
-            <img matCardImage [src]="file.thumbUrl" *ngIf="showPreview && file.uploadComplete && file.thumbUrl.length > 0">
-            <mat-icon *ngIf="showPreview && (!file.uploadComplete || file.thumbUrl.length <= 0)">image</mat-icon>
-            <mat-progress-spinner mode="indeterminate" *ngIf="showPreview && !file.uploadComplete">
-            </mat-progress-spinner>
-            <mat-progress-bar mode="indeterminate" *ngIf="!showPreview && !file.uploadComplete">
-            </mat-progress-bar>
+            <img matCardImage [src]="file.thumbUrl" *ngIf="showPreview && file.thumbUrl.length > 0">
+            <mat-icon *ngIf="showPreview && file.thumbUrl.length <= 0">image</mat-icon>
             <div>
                 {{file.filename}}
                 <button mat-icon-button (click)="deleteFile(file)">

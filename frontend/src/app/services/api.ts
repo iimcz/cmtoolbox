@@ -29,7 +29,8 @@ export class FileClient {
             body: formData,
             observe: "events",
             responseType: "blob",
-            headers: new HttpHeaders()
+            headers: new HttpHeaders(),
+            reportProgress: true
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((event_ : any) => {
@@ -58,7 +59,7 @@ export class FileClient {
     }
 
     protected processProgress(event: HttpProgressEvent): Observable<FileResponse | UploadProgress> {
-        return _observableOf({uploaded: event.loaded, total: event.total ?? 0});
+        return _observableOf(new UploadProgress({uploaded: event.loaded, total: event.total ?? 0}));
     }
 
     protected processUpload(response: HttpResponseBase): Observable<FileResponse | UploadProgress> {
@@ -184,9 +185,44 @@ export class FileResponse implements IFileResponse {
     }
 }
 
-export interface UploadProgress {
-    uploaded: number;
-    total: number;
+export interface IUploadProgress {
+    uploaded?: number;
+    total?: number;
+}
+
+export class UploadProgress implements IUploadProgress {
+    uploaded?: number;
+    total?: number;
+
+    constructor(data?: IUploadProgress) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.uploaded = _data["uploaded"];
+            this.total = _data["total"];
+        }
+    }
+
+    static fromJS(data: any): FileResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new FileResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["uploaded"] = this.uploaded;
+        data["total"] = this.total;
+        return data; 
+    }
 }
 
 function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): Observable<any> {

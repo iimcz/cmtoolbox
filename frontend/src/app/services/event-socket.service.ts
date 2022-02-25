@@ -3,7 +3,7 @@ import { InjectionToken } from '@angular/core';
 import { Inject } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
+import { retry, share } from 'rxjs/operators';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 
 export const WS_BASE_URL = new InjectionToken<string>('WS_BASE_URL');
@@ -24,7 +24,7 @@ export class EventSocketService {
   public subscribeEvent(event: EventType) : Observable<EventMessage> {
     return this.socket.multiplex(() => null, () => null, (msg) => {
       return msg.Type === event;
-    }).pipe(share());
+    }).pipe(retry(), share());
   }
 }
 
