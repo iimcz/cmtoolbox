@@ -19,7 +19,7 @@ namespace backend.Utilities
 
         public static async Task FinishProcessingVideoPackage(PresentationPackage package, string dataDir, IConfiguration config)
         {
-            var videoFile = package.DataFiles.FirstOrDefault();
+            var videoFile = package.DataFiles.SingleOrDefault();
             if (videoFile == null)
                 return;
 
@@ -54,8 +54,8 @@ namespace backend.Utilities
             {
                 PackageName = package.Name,
                 Description = package.Description,
-                Author = package.Metadata.FirstOrDefault(m => m.Key == "author")?.Value,
-                Exposition = package.Metadata.FirstOrDefault(m => m.Key == "expo")?.Value,
+                Author = package.Metadata.SingleOrDefault(m => m.Key == "author")?.Value,
+                Exposition = package.Metadata.SingleOrDefault(m => m.Key == "expo")?.Value,
                 Other = package.Metadata.Where(m => m.Key != "author" && m.Key != "expo")
                     .Select(m => new Other { Key = m.Key, Value = m.Value }).ToList()
             };

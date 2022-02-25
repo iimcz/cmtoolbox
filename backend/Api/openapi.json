@@ -361,6 +361,41 @@
         }
       }
     },
+    "/Packages/unfinished/{id}/files": {
+      "get": {
+        "tags": [
+          "Packages"
+        ],
+        "operationId": "Packages_GetUnfinishedPackageFiles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PackageFile"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Packages/new/{type}": {
       "post": {
         "tags": [
@@ -847,14 +882,6 @@
           "deviceId": {
             "type": "integer",
             "format": "int32"
-          },
-          "device": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PresentationDevice"
-              }
-            ]
           }
         }
       },
@@ -866,6 +893,7 @@
           "Pir",
           "Distance",
           "Light",
+          "Noise",
           "GenericValue"
         ],
         "enum": [
@@ -873,7 +901,8 @@
           1,
           2,
           3,
-          4
+          4,
+          5
         ]
       },
       "PresentationPackage": {
@@ -1190,6 +1219,20 @@
             "nullable": true
           },
           "defaultValue": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PackageFile": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "filename": {
             "type": "string",
             "nullable": true
           }

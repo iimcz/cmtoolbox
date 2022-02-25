@@ -73,6 +73,10 @@ namespace backend.Controllers
                 return NotFound();
             return Ok(package);
         }
+
+        [HttpGet("unfinished/{id}/files")]
+        public IEnumerable<PackageFile> GetUnfinishedPackageFiles(int id) =>
+            _dbContext.PresentationPackages.Include(p => p.DataFiles).Single(p => p.Id == id).DataFiles.Select(f => new PackageFile(f.Id, Path.GetFileName(f.Path)));
         
         [HttpPost("new/{type}")]
         public async Task<ActionResult<CreatedUnfinishedPackage>> CreateNewPackage(PackageType type)

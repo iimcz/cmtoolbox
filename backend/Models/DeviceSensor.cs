@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace backend.Models
 {
     public enum SensorType
@@ -6,6 +8,7 @@ namespace backend.Models
         Pir,
         Distance,
         Light,
+        Noise,
         GenericValue
     }
 
@@ -16,6 +19,8 @@ namespace backend.Models
         public string Name { get; set; }
 
         public int DeviceId { get; set; }
+        
+        [JsonIgnore]
         public PresentationDevice Device { get; set; }
     }
 }
