@@ -7,7 +7,7 @@ import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } fro
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
 import { AspectRatio, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { Action, ConversionClient, ISettings, Mapping, PackagesClient, Parameters, PresentationPackage, Preset, ThresholdType, TypeEnum, VideoConversionParams } from 'src/app/services/api.generated.service';
+import { Action, Condition, ConversionClient, ISettings, Mapping, PackagesClient, Parameters, PresentationPackage, Preset, ThresholdType, TypeEnum, VideoConversionParams } from 'src/app/services/api.generated.service';
 import { Parameters as ApiParameters, Settings as ApiSettings, AspectRatio as ApiAspectRatio } from 'src/app/services/api.generated.service';
 import { EventSocketService, EventType } from 'src/app/services/event-socket.service';
 
@@ -166,6 +166,7 @@ export class AddVideoPackageComponent implements OnInit {
         effect: 'play',
         mapping: new Mapping({
           source: 'atom_1_pir_1',
+          condition: Condition.Equals,
           thresholdType: ThresholdType.Integer,
           threshold: '0'
         }),
@@ -175,6 +176,7 @@ export class AddVideoPackageComponent implements OnInit {
         effect: 'play',
         mapping: new Mapping({
           source: 'atom_2_pir_1',
+          condition: Condition.Equals,
           thresholdType: ThresholdType.Integer,
           threshold: '0'
         }),
