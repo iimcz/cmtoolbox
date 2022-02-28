@@ -157,9 +157,6 @@ namespace backend.Controllers
 
             foreach (var file in package.DataFiles)
             {
-                // TODO: this should be handled individually according to the package type
-                //System.IO.File.Move(file.Path, Path.Combine(pkgDataRoot, Path.GetFileName(file.Path)));
-
                 if (file.ThumbnailPath != null && System.IO.File.Exists(file.ThumbnailPath))
                     System.IO.File.Delete(file.ThumbnailPath);
                 if (file.PreviewPath != null && System.IO.File.Exists(file.PreviewPath))

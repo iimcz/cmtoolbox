@@ -30,12 +30,19 @@ namespace backend.Utilities
 
             if (shouldConvert)
             {
-                var pipeline = ConversionPipelines.ConstructVideoProcessPipeline(videoFile.Path, null, config);
+                var pipeline = ConversionPipelines.ConstructVideoProcessPipeline(videoFile.Path, dataDir, config);
 
-                using (var stream = new MemoryStream(package.PipelineState))
-                    pipeline.LoadState(stream);
+                if (package.PipelineState != null)
+                {
+                    using (var stream = new MemoryStream(package.PipelineState))
+                        pipeline.LoadState(stream);
+                }
 
-                await pipeline.ExecuteAsync(videoFilePath);
+                var outputFilePath = await pipeline.ExecuteAsync(videoFilePath);
+            }
+            else
+            {
+                File.Move(videoFile.Path, Path.Combine(dataDir, Path.GetFileName(videoFile.Path)));
             }
         }
 

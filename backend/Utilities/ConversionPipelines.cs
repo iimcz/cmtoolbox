@@ -24,7 +24,7 @@ namespace backend.Utilities
                 config.VideoCodec = configSection.GetValue<string>("VideoCodec");
                 config.FfmpegPath = configSection.GetValue<string>("FfmpegPath") ?? "ffmpeg";
             })).AddStep(pipeline, new MoveFile((config) => {
-                config.DestinationDir = Path.GetDirectoryName(Path.GetFullPath(inPath));
+                config.DestinationDir = Directory.Exists(outPath) ? outPath : Path.GetDirectoryName(Path.GetFullPath(outPath));
             }));
 
             return pipeline;

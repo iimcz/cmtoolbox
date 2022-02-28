@@ -33,62 +33,75 @@ namespace backend.Controllers
         }
 
         [HttpPost("params/video/{fileId}")]
-        public async Task<ActionResult> ApplyVideoConversionParams(int fileId , [FromBody] VideoConversionParams param)
+        public async Task<ActionResult> ApplyVideoConversionParams(int fileId, [FromBody] VideoConversionParams param)
         {
             var file = await _dbContext.DataFiles.Include(f => f.Package).SingleAsync(f => f.Id == fileId);
             if (file == null)
                 return NotFound();
 
-            Response.OnCompleted(async () =>
+            var package = file.Package;
+
+            var pipeline = ConversionPipelines.ConstructVideoProcessPipeline(file.Path, file.Path, _configuration);
+
+            var conversionStep = pipeline.GetCurrentGuidedStep() as FfmpegProcess;
+            if (param.UsePreset)
             {
-                var package = file.Package;
-
-                var pipeline = ConversionPipelines.ConstructVideoProcessPipeline(file.Path, null, _configuration);
-
-                var conversionStep = pipeline.GetCurrentGuidedStep() as FfmpegProcess;
-                if (param.UsePreset)
+                var configSection = _configuration.GetSection("ConversionDefaults").GetSection("Video");
+                var args = new List<string>();
+                switch (param.QualityPreset)
                 {
-                    var configSection = _configuration.GetSection("ConversionDefaults").GetSection("Video");
-                    var args = new List<string>();
-                    switch (param.QualityPreset)
-                    {
-                        case VideoConversionParams.Preset.High:
-                            args.AddRange(configSection.GetSection("HighPreset").GetSection("Args").Get<string[]>());
-                            break;
-                        case VideoConversionParams.Preset.Medium:
-                            args.AddRange(configSection.GetSection("MediumPreset").GetSection("Args").Get<string[]>());
-                            break;
-                        case VideoConversionParams.Preset.Low:
-                            args.AddRange(configSection.GetSection("LowPreset").GetSection("Args").Get<string[]>());
-                            break;
-                    }
-                    args.Add("-vf");
-                    args.Add($"fps=fps={param.Fps}");
-
-                    conversionStep.Configure((config) =>
-                    {
-                        config.AdditionalArgs = args;
-                    });
+                    case VideoConversionParams.Preset.High:
+                        args.AddRange(configSection.GetSection("HighPreset").GetSection("Args").Get<string[]>());
+                        break;
+                    case VideoConversionParams.Preset.Medium:
+                        args.AddRange(configSection.GetSection("MediumPreset").GetSection("Args").Get<string[]>());
+                        break;
+                    case VideoConversionParams.Preset.Low:
+                        args.AddRange(configSection.GetSection("LowPreset").GetSection("Args").Get<string[]>());
+                        break;
                 }
-                else
+                args.Add("-vf");
+                args.Add($"fps=fps={param.Fps}");
+
+                conversionStep.Configure((config) =>
                 {
-                    conversionStep.Configure((config) =>
+                    config.AdditionalArgs = args;
+                });
+            }
+            else
+            {
+                conversionStep.Configure((config) =>
+                {
+                    config.AdditionalArgs.AddRange(new string[]
                     {
-                        config.AdditionalArgs.AddRange(new string[]
-                        {
                             "-b:v", $"{param.VideoBitrate}k",
                             "-b:a", $"{param.AudioBitrate}k",
                             "-vf", $"fps=fps={param.Fps},eq={param.Contrast}:{param.Brightness}:{param.Saturation}:{param.Gamma}"
-                        });
-
-                        if (param.CustomParams != null && param.CustomParams.Length > 0)
-                        {
-                            config.AdditionalArgs.AddRange(param.CustomParams.Split());
-                        }
                     });
-                }
 
+                    if (param.CustomParams != null && param.CustomParams.Length > 0)
+                    {
+                        config.AdditionalArgs.AddRange(param.CustomParams.Split());
+                    }
+                });
+            }
+
+            using (var stream = new MemoryStream())
+            {
+                pipeline.SaveState(stream);
+                package.PipelineState = stream.ToArray();
+            }
+            await _dbContext.SaveChangesAsync();
+
+            Response.OnCompleted(async () =>
+            {
                 var preview = await pipeline.ExecuteUntilPreviewAsync(new FilePath(file.Path));
+
+                if (package.State != PackageState.Unfinished)
+                {
+                    _logger.LogWarning($"Video preview generated for a finished/processing package ({package.Id}). Deleting the file: {preview.Path}");
+                    System.IO.File.Delete(preview.Path);
+                }
 
                 using (var stream = new MemoryStream())
                 {
