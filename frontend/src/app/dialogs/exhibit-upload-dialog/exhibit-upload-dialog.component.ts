@@ -40,9 +40,9 @@ export class ExhibitUploadDialogComponent implements OnInit {
 
   acceptConnection(connid: string) {
     this.exhibitClient.acceptConnection(connid)
-      .subscribe(
-        // do nothing
-      );
+      .subscribe(() => {
+        this.updateDeviceLists();
+      });
   }
 
   sendPackage(connid: string) {
