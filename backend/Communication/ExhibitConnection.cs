@@ -210,5 +210,15 @@ namespace backend.Communication
 
             message.WriteJsonTo(_connectionStream);
         }
+
+        public string GetSocketAddress()
+        {
+            var endpoint = _connectionClient.Client.LocalEndPoint as IPEndPoint;
+            if (endpoint != null)
+            {
+                return endpoint.Address.ToString();
+            }
+            return null;
+        }
     }
 }

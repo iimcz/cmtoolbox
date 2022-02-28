@@ -24,6 +24,7 @@ namespace backend.Controllers
         private ExhibitConnectionManager _connectionManager;
         private CMTContext _dbContext;
         private string _basePackageDir;
+        private bool _useHttps;
 
         public ExhibitController(IConfiguration config, ILogger<ExhibitController> logger, ExhibitConnectionManager connectionManager, CMTContext dbContext)
         {
@@ -32,6 +33,7 @@ namespace backend.Controllers
             _dbContext = dbContext;
 
             _basePackageDir = config.GetSection("Packages").GetValue<string>("BaseStorageDir");
+            _useHttps = config.GetSection("ExCon").GetValue<bool>("UseHttps");
         }
 
         [HttpGet("/pending")]
@@ -69,7 +71,8 @@ namespace backend.Controllers
             using (var writer = new StringWriter())
             {
                 string filepath = Path.Combine(_basePackageDir, String.Format("{0}.zip", package.Id));
-                string pkgurl = MyHttpContext.AppBaseUrl + String.Format("/Packages/download/{0}", package.Id);
+                string pkgurl = _useHttps ? "https://" : "http://";
+                pkgurl += String.Format("{0}:5000/Packages/download/{1}", _connectionManager.GetInterfaceAddressFor(exhibit_id), package.Id);
                 await PackageUtils.WritePackageJsonAsync(package, writer, filepath, pkgurl);
                 _connectionManager.LoadPackage(exhibit_id, writer.ToString());
             }

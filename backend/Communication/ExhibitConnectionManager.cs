@@ -164,6 +164,20 @@ namespace backend.Communication
             });
         }
 
+        public string GetInterfaceAddressFor(string connId)
+        {
+            _establishedConnections.TryGetValue(connId, out var connection);
+
+            if (connection != null)
+            {
+                return connection.GetSocketAddress();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private void cleanupConnections()
         {
             // TODO: implement this properly - this code doesn't work correctly (breaks the dictionary)
