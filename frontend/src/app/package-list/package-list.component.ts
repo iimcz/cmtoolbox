@@ -3,6 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { FileClient } from '../services/api';
 import { PackagesClient } from '../services/api.generated.service';
 
 @Component({
@@ -13,7 +14,7 @@ import { PackagesClient } from '../services/api.generated.service';
 export class PackageListComponent implements OnInit, AfterViewInit {
   searchTerm: string = "";
 
-  displayedColumns: string[] = ['id', 'label', 'desc'];
+  displayedColumns: string[] = ['img', 'id', 'label', 'desc'];
   pkgDataSource = new MatTableDataSource<Package>();
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -21,10 +22,12 @@ export class PackageListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private router: Router,
-    private packagesClient: PackagesClient
+    private packagesClient: PackagesClient,
+    private fileClient: FileClient
   ) { }
 
   ngAfterViewInit(): void {
+    this.pkgDataSource.filterPredicate = this.doFilter;
   }
 
   ngOnInit(): void {
@@ -33,7 +36,7 @@ export class PackageListComponent implements OnInit, AfterViewInit {
         this.pkgDataSource.paginator = this.paginator;
         this.pkgDataSource.sort = this.sort;
         this.pkgDataSource.data = packages.map(
-          (pkg): Package => ({ id: pkg.id!, label: pkg.name!, desc: pkg.description!, thumbUrl: "" })
+          (pkg): Package => ({ id: pkg.id!, label: pkg.name!, desc: pkg.description!, thumbUrl: this.fileClient.getPackageThumbnailUrl(pkg.id!) })
         );
       }
     )
@@ -41,6 +44,17 @@ export class PackageListComponent implements OnInit, AfterViewInit {
 
   navigatePackage(item: Package) {
     this.router.navigate(['/package', item.id]);
+  }
+
+  doFilter(item: Package, filter: string): boolean {
+    filter = filter.toLowerCase();
+    if (item.label!.toLowerCase().indexOf(filter) >= 0) {
+      return true;
+    }
+    if (item.desc!.toLowerCase().indexOf(filter) >= 0) {
+      return true;
+    }
+    return false;
   }
 
 }

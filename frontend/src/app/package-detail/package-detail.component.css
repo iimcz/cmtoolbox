@@ -90,3 +90,9 @@
 .checkbox-column {
     padding-left: 2em;
 }
+
+.package-thumb {
+    margin: 2em;
+    width: 500px;
+    height: auto;
+}

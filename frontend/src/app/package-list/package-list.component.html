@@ -2,8 +2,8 @@
     <div fxFlex="25%" class="search-filters-bar">
         <mat-form-field class="full-width">
             <mat-label>Hledat...</mat-label>
-            <input matInput type="text" [(ngModel)]="searchTerm">
-            <button mat-button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''">
+            <input matInput type="text" [(ngModel)]="pkgDataSource.filter">
+            <button mat-button *ngIf="pkgDataSource.filter" matSuffix mat-icon-button aria-label="Clear" (click)="pkgDataSource.filter=''">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
@@ -15,7 +15,7 @@
                     <mat-icon class="list-tab-icon">collections</mat-icon>
                     Miniatury
                 </ng-template>
-                    <mat-grid-list cols="4" gutterSize="20" rowHeight="20:34">
+                    <mat-grid-list cols="4" gutterSize="20" rowHeight="20:20">
                         <mat-grid-tile *ngFor="let item of pkgDataSource.connect().value">
                             <mat-card (click)="navigatePackage(item)" class="package-card">
                                 <mat-card-header>
@@ -38,6 +38,10 @@
                 </ng-template>
 
                 <table mat-table [dataSource]="pkgDataSource" matSort class="full-width">
+                    <ng-container matColumnDef="img">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header><mat-icon>image</mat-icon></th>
+                        <td mat-cell *matCellDef="let item"><img [src]="item.thumbUrl" class="list-package-thumb"></td>
+                    </ng-container>
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
                         <td mat-cell *matCellDef="let item"> {{item.id}} </td>

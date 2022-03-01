@@ -55,6 +55,10 @@ export class PackageDetailComponent implements OnInit {
     return this.filesClient.getPackageDownloadUrl(id);
   }
 
+  getPackageThumbnailUrl(id: number) {
+    return this.filesClient.getPackageThumbnailUrl(id);
+  }
+
   openUploadDialog(pkg: PresentationPackage) {
     this.dialog.open(ExhibitUploadDialogComponent, {
       data: {

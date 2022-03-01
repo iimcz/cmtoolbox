@@ -30,7 +30,7 @@ export class AddLocalUploadComponent implements OnInit {
       for (let file of files) {
         this.uploadedFiles.push({
           id: file.id!,
-          thumbUrl: this.fileClient.getThumbnailUrl(file.id!),
+          thumbUrl: this.fileClient.getFileThumbnailUrl(file.id!),
           filename: file.filename!
         })
       }
@@ -52,7 +52,7 @@ export class AddLocalUploadComponent implements OnInit {
           this.uploadedFiles.push(
             {
               id: value.id!,
-              thumbUrl: this.fileClient.getThumbnailUrl(value.id!),
+              thumbUrl: this.fileClient.getFileThumbnailUrl(value.id!),
               filename: value.filename!
             }
           )

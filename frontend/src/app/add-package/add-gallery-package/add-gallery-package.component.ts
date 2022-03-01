@@ -122,7 +122,7 @@ export class AddGalleryPackageComponent implements OnInit {
     const newData: GalleryItem[] = [];
     for (let file of pkg.dataFiles!) {
       newData.push({
-        previewUrl: this.fileClient.getThumbnailUrl(file.id!),
+        previewUrl: this.fileClient.getFileThumbnailUrl(file.id!),
         fileName: file.path!.substring(file.path?.lastIndexOf('/')! + 1), // TODO: implement on backend instead
       });
     }
