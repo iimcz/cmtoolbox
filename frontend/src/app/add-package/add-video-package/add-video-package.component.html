@@ -21,7 +21,10 @@
         <div fxLayout="row" fxLayoutAlign="center start">
             <div fxFlex="40%">
                 <h3>Náhled aplikovaných nastavení</h3>
-                <video [src]="previewUrl" controls="true" width="600" #conversionPreviewPlayer></video>
+                <div class="preview-box">
+                    <video *ngIf="previewUrl !== ''" [src]="previewUrl" controls="true" width="600" #conversionPreviewPlayer></video>
+                    <mat-spinner *ngIf="previewUrl === ''" class="preview-box-loading"></mat-spinner>
+                </div>
             </div>
             <div fxFlex="40%" class="raised-box mat-elevation-z2">
                 <h3>Parametry konverze</h3>
@@ -30,11 +33,11 @@
                 <div fxLayout="column" *ngIf="!advancedConversionSettings" [formGroup]="simpleConversionFG">
                     <mat-form-field>
                         <mat-label>Kvalita videa</mat-label>
-                        <mat-select value="2" formControlName="videoQuality">
-                            <mat-option value="0">Nejvyšší</mat-option>
-                            <mat-option value="1">Vysoká (lepší poměr kvalita/velikost)</mat-option>
-                            <mat-option value="2">Kompatibilní (nižší pro méně výkonná zařízení)</mat-option>
-                        </mat-select>
+                        <select matNativeControl formControlName="videoQuality">
+                            <option value="0">Nejvyšší</option>
+                            <option value="1">Vysoká (lepší poměr kvalita/velikost)</option>
+                            <option value="2">Kompatibilní (nižší pro méně výkonná zařízení)</option>
+                        </select>
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Počet snímků za sekundu</mat-label>
@@ -54,7 +57,7 @@
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>FPS:</mat-label>
-                        <input matInput type="number" value="30" formControlName="fps">
+                        <input matInput type="number" value="60" formControlName="fps">
                     </mat-form-field>
                     <h4>Video úpravy</h4>
                     <mat-form-field>
@@ -91,7 +94,10 @@
         <div fxLayout="row" fxLayoutAlign="center start">
             <div fxFlex="40%">
                 <h3>Náhled videa</h3>
-                <video [src]="previewUrl" controls="true" width="600" #settingPreviewPlayer></video>
+                <div class="exhibit-frame" fxLayout="row" fxLayoutAlign="space-around" [style.background-color]="settingsFG.get('backgroundColor')?.valueChanges | async">
+                    <video *ngIf="previewUrl !== ''" [src]="previewUrl" controls="true" width="600" #settingPreviewPlayer></video>
+                    <mat-spinner *ngIf="previewUrl === ''" class="preview-box-loading"></mat-spinner>
+                </div>
             </div>
             <div fxLayout="column" fxLayoutAlign="center start" fxFlex="40%"
                 class="settings-pane mat-elevation-z2 raised-box">
@@ -125,18 +131,6 @@
                         </div>
                     </mat-tab>
                     <mat-tab label="Ovládání">
-                        <!--
-                        <div class="setting full-width">
-                            <mat-form-field>
-                                <mat-label>Mód spuštění videa:</mat-label>
-                                <mat-select [(ngModel)]="videoSettings.launchOption">
-                                    <mat-option value="immediately">Okamžitě</mat-option>
-                                    <mat-option value="onPresence">Po detekci uživatele</mat-option>
-                                    <mat-option value="onSkeleton">Po detekci kostry</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                        -->
                         <div class="full-width">
                             <div class="raised-box">
                                 <button mat-raised-button (click)="addCustomControl()">Přidat akci</button>

@@ -31,12 +31,12 @@ export class AddVideoPackageComponent implements OnInit {
 
   simpleConversionFG = this.fb.group({
     videoQuality: [0],
-    fps: [30]
+    fps: [60]
   });
   advancedConversionFG = this.fb.group({
     videoBitrate: [5000],
     audioBitrate: [320],
-    fps: [30],
+    fps: [60],
     contrast: [1.0],
     brightness: [0.0],
     saturation: [1.0],
@@ -45,18 +45,10 @@ export class AddVideoPackageComponent implements OnInit {
   });
   settingsFG = this.fb.group({
     loop: [true],
-    autoStart: [true],
-    aspectRatio: ['fitOutside'],
+    autoStart: [false],
+    aspectRatio: ['fitInside'],
     backgroundColor: ['#000000']
   });
-
-  videoSettings: Settings = {
-    loop: true,
-    autoStart: true,
-    aspectRatio: AspectRatio.FitOutside,
-    backgroundColor: '#000000',
-    videoEvents: []
-  };
 
   videoCustomControls = new MatTableDataSource<CustomControl>();
 
@@ -200,11 +192,11 @@ export class AddVideoPackageComponent implements OnInit {
   }
 
   stepperSelectionChange(event: StepperSelectionEvent) {
-    if (event.selectedIndex !== 2) {
+    if (event.selectedIndex !== 2 && this.previewUrl !== '') {
       const cplayer: HTMLVideoElement = this.conversionPreviewPlayer.nativeElement;
       cplayer.pause();
     }
-    if (event.selectedIndex !== 3) {
+    if (event.selectedIndex !== 3 && this.previewUrl !== '') {
       const splayer: HTMLVideoElement = this.settingsPreviewPlayer.nativeElement;
       splayer.pause();
     }

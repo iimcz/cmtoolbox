@@ -90,3 +90,20 @@
 .checkbox-column {
     padding-left: 2em;
 }
+
+.exhibit-frame {
+    margin: 2em;
+    overflow: hidden;
+
+    width: 40em;
+    height: 20em;
+}
+
+.preview-box {
+    width: 600px;
+    height: fit-content;
+}
+
+.preview-box-loading {
+    margin: auto;
+}
