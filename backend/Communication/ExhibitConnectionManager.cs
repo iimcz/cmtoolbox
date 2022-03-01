@@ -137,7 +137,8 @@ namespace backend.Communication
         {
             return Task.Run(() =>
             {
-                _incomingListener = new TcpListener(IPAddress.Any, ServerListenPort);
+                _incomingListener = new TcpListener(IPAddress.IPv6Any, ServerListenPort);
+                _incomingListener.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
                 _incomingListener.Start();
 
                 _logger.LogInformation("Starting to listen for incoming TCP connections on port {}", ServerListenPort);
