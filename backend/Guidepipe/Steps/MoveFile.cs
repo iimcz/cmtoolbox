@@ -19,7 +19,8 @@ namespace Guidepipe.Steps
 
         public MoveFile(Action<MoveFileConfig> configure)
         {
-            configure(_config);
+            if (configure != null)
+                configure(_config);
         }
 
         public void Execute(FilePath input)

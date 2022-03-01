@@ -7,8 +7,8 @@ namespace Guidepipe.Steps
 {
     public class FfmpegExtractFrameConfig
     {
-        public string OutputDir { get; set; } = "";
-        public string OutputPattern { get; set; } = "{0}.png";
+        public string OutputDir { get; set; } = Path.GetTempPath();
+        public string OutputPattern { get; set; } = Path.GetFileName(Path.GetTempFileName()) + ".png";
         public string FfmpegPath { get; set; } = null;
     }
 
@@ -21,7 +21,8 @@ namespace Guidepipe.Steps
 
         public FfmpegExtractFrame(Action<FfmpegExtractFrameConfig> configure)
         {
-            configure(_config);
+            if (configure != null)
+                configure(_config);
         }
 
         public void Execute(FilePath input)

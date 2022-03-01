@@ -22,7 +22,8 @@ namespace Guidepipe.Steps
 
         public FfprobeCodecCheck(Action<FfprobeCodecCheckConfig> configure)
         {
-            configure(_config);
+            if (configure != null)
+                configure(_config);
         }
 
         public bool IsGuided => false;

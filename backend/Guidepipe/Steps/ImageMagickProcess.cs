@@ -29,7 +29,8 @@ namespace Guidepipe.Steps
 
         public ImageMagickProcess(Action<ImageMagickProcessConfig> configure)
         {
-            configure(_config);
+            if (configure != null)
+                configure(_config);
         }
 
         public void Execute(FilePath input)
@@ -39,7 +40,7 @@ namespace Guidepipe.Steps
             FilePath output = new FilePath();
             output.Path = Path.Combine(
                 _config.OutputDir,
-                String.Format(_config.OutputPattern, Path.GetFileName(input.Path))
+                String.Format(_config.OutputPattern, Path.GetFileNameWithoutExtension(input.Path))
             );
 
             ProcessStartInfo imStartInfo = new ProcessStartInfo();
