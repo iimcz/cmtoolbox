@@ -36,22 +36,22 @@ namespace backend.Controllers
             _useHttps = config.GetSection("ExCon").GetValue<bool>("UseHttps");
         }
 
-        [HttpGet("/pending")]
+        [HttpGet("pending")]
         public IEnumerable<string> GetPendingConnections() =>
             _connectionManager.GetPendingConnections();
 
-        [HttpGet("/established")]
+        [HttpGet("established")]
         public IEnumerable<string> GetEstablishedConnections() =>
             _connectionManager.GetEstablishedConnections();
         
-        [HttpPost("/accept/{id}")]
+        [HttpPost("accept/{id}")]
         public ActionResult AcceptConnection(string id)
         {
             _connectionManager.AcceptPendingConnection(id);
             return Ok();
         }
 
-        [HttpPost("/send/{exhibit_id}/{package_id}")]
+        [HttpPost("send/{exhibit_id}/{package_id}")]
         public async Task<ActionResult> SendPackage(string exhibit_id, int package_id)
         {
             PresentationPackage package = await _dbContext.PresentationPackages
