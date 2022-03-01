@@ -284,7 +284,7 @@ export class ExhibitClient {
     }
 
     getPendingConnections() : Observable<string[]> {
-        let url_ = this.baseUrl + "/pending";
+        let url_ = this.baseUrl + "/Exhibit/pending";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -339,7 +339,7 @@ export class ExhibitClient {
     }
 
     getEstablishedConnections() : Observable<string[]> {
-        let url_ = this.baseUrl + "/established";
+        let url_ = this.baseUrl + "/Exhibit/established";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -394,7 +394,7 @@ export class ExhibitClient {
     }
 
     acceptConnection(id: string | null) : Observable<FileResponse> {
-        let url_ = this.baseUrl + "/accept/{id}";
+        let url_ = this.baseUrl + "/Exhibit/accept/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -443,7 +443,7 @@ export class ExhibitClient {
     }
 
     sendPackage(exhibit_id: string | null, package_id: number) : Observable<FileResponse> {
-        let url_ = this.baseUrl + "/send/{exhibit_id}/{package_id}";
+        let url_ = this.baseUrl + "/Exhibit/send/{exhibit_id}/{package_id}";
         if (exhibit_id === undefined || exhibit_id === null)
             throw new Error("The parameter 'exhibit_id' must be defined.");
         url_ = url_.replace("{exhibit_id}", encodeURIComponent("" + exhibit_id));

@@ -295,7 +295,7 @@ namespace backend.Utilities
                 config.OutputPattern = "thumb-{0}.png";
                 config.OutputOptions = new string[] {
                     "-resize",
-                    "128x128"
+                    "500x500"
                 };
             };
 
@@ -310,13 +310,8 @@ namespace backend.Utilities
                 case ".mp4":
                 case ".webm":
                     input
-                        .AddStep(pipeline, new FfmpegExtractFrame(
-                            (config) =>
-                            {
-                                config.OutputDir = outDir;
-                                config.OutputPattern = "thumb-v-{0}.png";
-                            }
-                        )).AddStep(pipeline, new ImageMagickProcess(imagickConfig));
+                        .AddStep(pipeline, new FfmpegExtractFrame(null))
+                        .AddStep(pipeline, new ImageMagickProcess(imagickConfig));
                     break;
             }
             return (await pipeline.ExecuteAsync(input)).Path;

@@ -31,6 +31,7 @@ namespace backend.Controllers
         private readonly string[] _previewExtensions = { ".avi", ".mp4", ".webm" };
 
         private readonly CMTContext _dbContext;
+        private readonly string _basePackageDir;
 
         public FileController(ILogger<FileController> logger, IConfiguration config, CMTContext dbContext)
         {
@@ -39,6 +40,7 @@ namespace backend.Controllers
             _permittedExtensions = config.GetSection("Files").GetSection("PermittedExtensions").Get<string[]>();
 
             _dbContext = dbContext;
+            _basePackageDir = config.GetSection("Packages").GetValue<string>("BaseStorageDir");
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -179,10 +181,7 @@ namespace backend.Controllers
             if (!System.IO.File.Exists(datafile.PreviewPath))
                 return NotFound();
 
-            var contentTypeProvider = new FileExtensionContentTypeProvider();
-            contentTypeProvider.TryGetContentType(datafile.PreviewPath, out var contentType);
-            var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), datafile.PreviewPath), FileMode.Open);
-            return File(stream, contentType);
+            return Download(datafile.PreviewPath);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -208,8 +207,8 @@ namespace backend.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet("thumbnail/{id}")]
-        public async Task<ActionResult> DownloadThumbnail(int id)
+        [HttpGet("thumbnail/file/{id}")]
+        public async Task<ActionResult> DownloadFileThumbnail(int id)
         {
             var datafile = await _dbContext.DataFiles.FindAsync(id);
             if (datafile == null)
@@ -217,9 +216,28 @@ namespace backend.Controllers
             if (!System.IO.File.Exists(datafile.ThumbnailPath))
                 return NotFound();
 
+            return Download(datafile.ThumbnailPath);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("thumbnail/package/{id}")]
+        public async Task<ActionResult> DownloadPackageThumbnail(int id)
+        {
+            var package = await _dbContext.PresentationPackages.FindAsync(id);
+            if (package == null)
+                return NotFound();
+            var path = Path.Combine(_basePackageDir, $"{id}", "thumbnail.png");
+            if (!System.IO.File.Exists(path))
+                return NotFound();
+
+            return Download(path);
+        }
+
+        private ActionResult Download(string path)
+        {
             var contentTypeProvider = new FileExtensionContentTypeProvider();
-            contentTypeProvider.TryGetContentType(datafile.ThumbnailPath, out var contentType);
-            var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), datafile.ThumbnailPath), FileMode.Open);
+            contentTypeProvider.TryGetContentType(path, out var contentType);
+            var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), path), FileMode.Open);
             return File(stream, contentType);
         }
     }

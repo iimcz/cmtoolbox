@@ -129,7 +129,7 @@
         }
       }
     },
-    "/pending": {
+    "/Exhibit/pending": {
       "get": {
         "tags": [
           "Exhibit"
@@ -152,7 +152,7 @@
         }
       }
     },
-    "/established": {
+    "/Exhibit/established": {
       "get": {
         "tags": [
           "Exhibit"
@@ -175,7 +175,7 @@
         }
       }
     },
-    "/accept/{id}": {
+    "/Exhibit/accept/{id}": {
       "post": {
         "tags": [
           "Exhibit"
@@ -208,7 +208,7 @@
         }
       }
     },
-    "/send/{exhibit_id}/{package_id}": {
+    "/Exhibit/send/{exhibit_id}/{package_id}": {
       "post": {
         "tags": [
           "Exhibit"

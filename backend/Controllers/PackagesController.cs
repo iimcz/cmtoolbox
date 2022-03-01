@@ -25,8 +25,9 @@ namespace backend.Controllers
         CMTContext _dbContext;
         EventBus _eventBus;
         IConfiguration _config;
-        string _baseWorkDir;
-        string _basePackageDir;
+        private readonly string _baseWorkDir;
+        private readonly bool _purgeWorkDir;
+        private readonly string _basePackageDir;
 
         public PackagesController(ILogger<PackagesController> logger, CMTContext dbContext, IConfiguration config, EventBus eventBus)
         {
@@ -36,6 +37,7 @@ namespace backend.Controllers
             _config = config;
 
             _baseWorkDir = config.GetSection("UnfinishedPackages").GetValue<string>("BaseWorkDir");
+            _purgeWorkDir = config.GetSection("UnfinishedPackages").GetValue<bool>("PurgeWorkDir");
             _basePackageDir = config.GetSection("Packages").GetValue<string>("BaseStorageDir");
         }
 
@@ -155,12 +157,23 @@ namespace backend.Controllers
                     break;
             }
 
+            // Use the first file of the package for its thumbnail
+            var firstFile = package.DataFiles.First();
+            System.IO.File.Copy(firstFile.ThumbnailPath, Path.Combine(pkgDir, "thumbnail.png"));
+
+            // Clean working directory after the package is finished.
             foreach (var file in package.DataFiles)
             {
                 if (file.ThumbnailPath != null && System.IO.File.Exists(file.ThumbnailPath))
                     System.IO.File.Delete(file.ThumbnailPath);
                 if (file.PreviewPath != null && System.IO.File.Exists(file.PreviewPath))
                     System.IO.File.Delete(file.PreviewPath);
+                if (file.Path != null && System.IO.File.Exists(file.Path))
+                    System.IO.File.Delete(file.Path);
+
+                var enumOpts = new EnumerationOptions { RecurseSubdirectories = true };
+                if (System.IO.Directory.EnumerateFiles(package.WorkDir, "*", enumOpts).Count() <= 0 || _purgeWorkDir)
+                    System.IO.Directory.Delete(package.WorkDir, true);
             }
 
             // TODO: make "package.json" a constant somewhere

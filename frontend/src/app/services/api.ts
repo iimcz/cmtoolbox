@@ -131,8 +131,12 @@ export class FileClient {
         return _observableOf(undefined);
     }
 
-    getThumbnailUrl(id: number): string {
-        return (this.baseUrl + "/File/thumbnail/{id}").replace("{id}", encodeURIComponent("" + id));
+    getFileThumbnailUrl(id: number): string {
+        return (this.baseUrl + "/File/thumbnail/file/{id}").replace("{id}", encodeURIComponent("" + id));
+    }
+
+    getPackageThumbnailUrl(id: number): string {
+        return (this.baseUrl + "/File/thumbnail/package/{id}").replace("{id}", encodeURIComponent("" + id));
     }
 
     getPreviewUrl(id: number): string {
