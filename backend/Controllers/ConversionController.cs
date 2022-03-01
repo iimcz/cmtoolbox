@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using backend.Utilities;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace backend.Controllers
 {
@@ -42,11 +43,11 @@ namespace backend.Controllers
             var package = file.Package;
 
             var pipeline = ConversionPipelines.ConstructVideoProcessPipeline(file.Path, file.Path, _configuration);
+            var configSection = _configuration.GetSection("ConversionDefaults").GetSection("Video");
 
             var conversionStep = pipeline.GetCurrentGuidedStep() as FfmpegProcess;
             if (param.UsePreset)
             {
-                var configSection = _configuration.GetSection("ConversionDefaults").GetSection("Video");
                 var args = new List<string>();
                 switch (param.QualityPreset)
                 {
@@ -65,7 +66,7 @@ namespace backend.Controllers
 
                 conversionStep.Configure((config) =>
                 {
-                    config.AdditionalArgs = args;
+                    config.AdditionalArgs = MergeVideoFilterArgs(configSection.GetValue<string>("PreVideoFilter"),  args);
                 });
             }
             else
@@ -81,7 +82,7 @@ namespace backend.Controllers
 
                     if (param.CustomParams != null && param.CustomParams.Length > 0)
                     {
-                        config.AdditionalArgs.AddRange(param.CustomParams.Split());
+                        config.AdditionalArgs = MergeVideoFilterArgs(configSection.GetValue<string>("PreVideoFilter"), param.CustomParams.Split().ToList());
                     }
                 });
             }
@@ -124,6 +125,50 @@ namespace backend.Controllers
             });
 
             return Ok();
+        }
+
+        private List<string> MergeVideoFilterArgs(string prefilter, List<string> args)
+        {
+            var filterStrings = new List<string>();
+
+            if (prefilter != null && prefilter.Length > 0)
+                filterStrings.Add(prefilter);
+
+            var newArgs = new List<string>();
+
+            bool takeFilter = false;
+            int firstFilterDef = -1;
+            foreach (var arg in args)
+            {
+                if (arg == "-vf" || arg == "-filter:v")
+                {
+                    takeFilter = true;
+
+                    if (firstFilterDef < 0)
+                    {
+                        firstFilterDef = newArgs.Count;
+                        newArgs.Add("-vf");
+                    }
+                }
+                else if (takeFilter)
+                {
+                    filterStrings.Add(arg);
+                    takeFilter = false;
+                }
+                else
+                {
+                    newArgs.Add(arg);
+                }
+            }
+
+            newArgs.Insert(firstFilterDef + 1, String.Join(',', filterStrings));
+
+            foreach(var arg in newArgs)
+            {
+                Console.WriteLine(arg);
+            }
+
+            return newArgs;
         }
     }
 }
