@@ -24,9 +24,8 @@ namespace backend.Controllers
         {
             return Ok(new BackendConfiguration
             {
-                // TODO: actual data
-                //FfmpegPath = "",
-                //ImageMagickPath = ""
+                FfmpegPath = _config.GetSection("ExternalUtilities").GetValue<string>("FfmpegPath") ?? null,
+                ImageMagickPath = _config.GetSection("ExternalUtilities").GetValue<string>("ImagemagickPath") ?? null
             });
         }
     }

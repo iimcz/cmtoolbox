@@ -22,7 +22,7 @@ namespace backend.Utilities
                 config.OutputPattern = "{0}.webm";
                 config.AudioCodec = configSection.GetValue<string>("AudioCodec");
                 config.VideoCodec = configSection.GetValue<string>("VideoCodec");
-                config.FfmpegPath = configSection.GetValue<string>("FfmpegPath") ?? "ffmpeg";
+                config.FfmpegPath = gConfig.GetSection("ExternalUtilities").GetValue<string>("FfmpegPath") ?? "ffmpeg";
             })).AddStep(pipeline, new MoveFile((config) => {
                 config.DestinationDir = Directory.Exists(outPath) ? outPath : Path.GetDirectoryName(Path.GetFullPath(outPath));
             }));
@@ -42,7 +42,7 @@ namespace backend.Utilities
 
             input.AddStep(pipeline, new FfprobeCodecCheck((config) =>
             {
-                config.FfmpegPath = configSection.GetValue<string>("FfmpegPath") ?? "ffmpeg";
+                config.FfmpegPath = gConfig.GetSection("ExternalUtilities").GetValue<string>("FfmpegPath") ?? "ffmpeg";
                 config.AudioCodec = cleanAudioCodec;
                 config.VideoCodec = cleanVideoCodec;
             }));
