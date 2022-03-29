@@ -15,7 +15,7 @@ namespace backend.Communication
 {
     public class ExhibitConnection : IDisposable
     {
-        private readonly double TIMEOUT_INTERVAL = 30_000;
+        private readonly double TIMEOUT_INTERVAL = 10_000;
 
         TcpClient _connectionClient;
         Stream _connectionStream;
@@ -216,7 +216,14 @@ namespace backend.Communication
             var endpoint = _connectionClient.Client.LocalEndPoint as IPEndPoint;
             if (endpoint != null)
             {
-                return endpoint.Address.ToString();
+                if (endpoint.Address.IsIPv4MappedToIPv6)
+                {
+                    return endpoint.Address.MapToIPv4().ToString();
+                }
+                else
+                {
+                    return $"[{endpoint.Address.MapToIPv6().ToString()}]";
+                }
             }
             return null;
         }
