@@ -28,9 +28,9 @@
             </div>
             <div fxFlex="40%" class="raised-box mat-elevation-z2">
                 <h3>Parametry konverze</h3>
-                <mat-slide-toggle [(ngModel)]="advancedConversionSettings">Pokročilé nastavení parametrů
+                <mat-slide-toggle [formControl]="advancedConversionSettings">Pokročilé nastavení parametrů
                 </mat-slide-toggle>
-                <div fxLayout="column" *ngIf="!advancedConversionSettings" [formGroup]="simpleConversionFG">
+                <div fxLayout="column" *ngIf="!advancedConversionSettings.value" [formGroup]="simpleConversionFG">
                     <mat-form-field>
                         <mat-label>Kvalita videa</mat-label>
                         <select matNativeControl formControlName="videoQuality">
@@ -46,7 +46,7 @@
                     <button mat-raised-button (click)="applySimpleConversionParams(package)">Aplikovat
                         nastavení</button>
                 </div>
-                <div fxLayout="column" *ngIf="advancedConversionSettings" [formGroup]="advancedConversionFG">
+                <div fxLayout="column" *ngIf="advancedConversionSettings.value" [formGroup]="advancedConversionFG">
                     <mat-form-field>
                         <mat-label>Video bitrate:</mat-label>
                         <input matInput type="number" value="5000" min="128" max="50000" formControlName="videoBitrate">

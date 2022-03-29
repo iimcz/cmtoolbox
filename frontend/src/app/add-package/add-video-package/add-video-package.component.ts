@@ -1,6 +1,6 @@
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
@@ -23,31 +23,31 @@ export class AddVideoPackageComponent implements OnInit {
   @ViewChild('conversionPreviewPlayer') conversionPreviewPlayer!: ElementRef;
 
   previewUrl: string = '';
-  advancedConversionSettings: boolean = false;
+  advancedConversionSettings = new FormControl(false, {initialValueIsDefault: true});
   unfinishedPackage$!: Observable<PresentationPackage>;
 
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
 
   simpleConversionFG = this.fb.group({
-    videoQuality: [0],
-    fps: [60]
+    videoQuality: [0, {initialValueIsDefault: true}],
+    fps: [60, {initialValueIsDefault: true}]
   });
   advancedConversionFG = this.fb.group({
-    videoBitrate: [5000],
-    audioBitrate: [320],
-    fps: [60],
-    contrast: [1.0],
-    brightness: [0.0],
-    saturation: [1.0],
-    gamma: [1.0],
-    customParams: ['']
+    videoBitrate: [5000, {initialValueIsDefault: true}],
+    audioBitrate: [320, {initialValueIsDefault: true}],
+    fps: [60, {initialValueIsDefault: true}],
+    contrast: [1.0, {initialValueIsDefault: true}],
+    brightness: [0.0, {initialValueIsDefault: true}],
+    saturation: [1.0, {initialValueIsDefault: true}],
+    gamma: [1.0, {initialValueIsDefault: true}],
+    customParams: ['', {initialValueIsDefault: true}]
   });
   settingsFG = this.fb.group({
-    loop: [true],
-    autoStart: [false],
-    aspectRatio: ['fitInside'],
-    backgroundColor: ['#000000']
+    loop: [true, {initialValueIsDefault: true}],
+    autoStart: [false, {initialValueIsDefault: true}],
+    aspectRatio: ['fitInside', {initialValueIsDefault: true}],
+    backgroundColor: ['#000000', {initialValueIsDefault: true}]
   });
 
   videoCustomControls = new MatTableDataSource<CustomControl>();
