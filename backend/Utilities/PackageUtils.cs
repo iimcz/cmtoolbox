@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.Models;
 using Guidepipe.IO;
-using Guidepipe.Pipelines;
-using Guidepipe.Steps;
 using Microsoft.Extensions.Configuration;
 using Naki3D.Common.Json;
 
@@ -44,6 +42,22 @@ namespace backend.Utilities
             {
                 File.Move(videoFile.Path, Path.Combine(dataDir, Path.GetFileName(videoFile.Path)));
             }
+        }
+
+        public static async Task FinishProcessingGalleryPackage(PresentationPackage package, string dataDir, IConfiguration config)
+        {
+            // NOTE: no additional processing necessary
+            return;
+        }
+
+        public static async Task FinishProcessingModelPackage(PresentationPackage package, string dataDir, IConfiguration config)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static async Task FinishProcessingScenePackage(PresentationPackage package, string dataDir, IConfiguration config)
+        {
+            throw new NotImplementedException();
         }
 
         public static async Task WritePackageJsonAsync(PresentationPackage package, TextWriter writer, string packageFilePath, string packageUrl)

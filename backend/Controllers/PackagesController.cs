@@ -140,8 +140,6 @@ namespace backend.Controllers
 
         private async Task FinalizePackageData(PresentationPackage package)
         {
-            // TODO: launch final data processing
-
             string pkgDir = Path.Combine(_basePackageDir, package.Id.ToString());
             Directory.CreateDirectory(pkgDir);
 
@@ -153,8 +151,17 @@ namespace backend.Controllers
                 case PackageType.Video:
                     await PackageUtils.FinishProcessingVideoPackage(package, pkgDataRoot, _config);
                     break;
-                default: // TODO: handle other cases
+                case PackageType.Gallery:
+                    await PackageUtils.FinishProcessingGalleryPackage(package, pkgDataRoot, _config);
                     break;
+                case PackageType.Model:
+                    await PackageUtils.FinishProcessingModelPackage(package, pkgDataRoot, _config);
+                    break;
+                case PackageType.Scene:
+                    await PackageUtils.FinishProcessingScenePackage(package, pkgDataRoot, _config);
+                    break;
+                default:
+                    throw new InvalidDataException("Unknown package type, cannot finish processing!");
             }
 
             // Use the first file of the package for its thumbnail
@@ -173,7 +180,13 @@ namespace backend.Controllers
 
                 var enumOpts = new EnumerationOptions { RecurseSubdirectories = true };
                 if (System.IO.Directory.EnumerateFiles(package.WorkDir, "*", enumOpts).Count() <= 0 || _purgeWorkDir)
+                {
                     System.IO.Directory.Delete(package.WorkDir, true);
+                }
+                else
+                {
+                    _logger.LogWarning("Workdir has leftover files and will NOT be deleted.");
+                }
             }
 
             // TODO: make "package.json" a constant somewhere
