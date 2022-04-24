@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/Configuration/current": {
+    "/configuration/current": {
       "get": {
         "tags": [
           "Configuration"
@@ -26,7 +26,7 @@
         }
       }
     },
-    "/Conversion/params/video/{fileId}": {
+    "/conversion/params/video/{fileId}": {
       "post": {
         "tags": [
           "Conversion"
@@ -71,7 +71,7 @@
         }
       }
     },
-    "/Device/all": {
+    "/device/all": {
       "get": {
         "tags": [
           "Device"
@@ -94,7 +94,7 @@
         }
       }
     },
-    "/Device/sensors/{id}": {
+    "/device/sensors/{id}": {
       "get": {
         "tags": [
           "Device"
@@ -129,7 +129,7 @@
         }
       }
     },
-    "/Exhibit/pending": {
+    "/exhibit/pending": {
       "get": {
         "tags": [
           "Exhibit"
@@ -152,7 +152,7 @@
         }
       }
     },
-    "/Exhibit/established": {
+    "/exhibit/established": {
       "get": {
         "tags": [
           "Exhibit"
@@ -175,7 +175,7 @@
         }
       }
     },
-    "/Exhibit/accept/{id}": {
+    "/exhibit/accept/{id}": {
       "post": {
         "tags": [
           "Exhibit"
@@ -208,7 +208,7 @@
         }
       }
     },
-    "/Exhibit/send/{exhibit_id}/{package_id}": {
+    "/exhibit/send/{exhibit_id}/{package_id}": {
       "post": {
         "tags": [
           "Exhibit"
@@ -251,7 +251,7 @@
         }
       }
     },
-    "/Packages/all": {
+    "/packages/all": {
       "get": {
         "tags": [
           "Packages"
@@ -274,7 +274,7 @@
         }
       }
     },
-    "/Packages/single/{id}": {
+    "/packages/single/{id}": {
       "get": {
         "tags": [
           "Packages"
@@ -306,7 +306,7 @@
         }
       }
     },
-    "/Packages/unfinished": {
+    "/packages/unfinished": {
       "get": {
         "tags": [
           "Packages"
@@ -329,7 +329,7 @@
         }
       }
     },
-    "/Packages/unfinished/{id}": {
+    "/packages/unfinished/{id}": {
       "get": {
         "tags": [
           "Packages"
@@ -361,7 +361,7 @@
         }
       }
     },
-    "/Packages/unfinished/{id}/files": {
+    "/packages/unfinished/{id}/files": {
       "get": {
         "tags": [
           "Packages"
@@ -396,7 +396,7 @@
         }
       }
     },
-    "/Packages/new/{type}": {
+    "/packages/new/{type}": {
       "post": {
         "tags": [
           "Packages"
@@ -427,7 +427,7 @@
         }
       }
     },
-    "/Packages/finish/{id}": {
+    "/packages/finish/{id}": {
       "post": {
         "tags": [
           "Packages"
@@ -459,7 +459,7 @@
         }
       }
     },
-    "/Packages/metadata/{id}": {
+    "/packages/metadata/{id}": {
       "get": {
         "tags": [
           "Packages"
@@ -540,7 +540,7 @@
         }
       }
     },
-    "/Packages/metapack/{id}/{format}": {
+    "/packages/metapack/{id}/{format}": {
       "post": {
         "tags": [
           "Packages"
@@ -596,7 +596,7 @@
         }
       }
     },
-    "/Packages/properties/{id}": {
+    "/packages/properties/{id}": {
       "post": {
         "tags": [
           "Packages"
@@ -641,7 +641,7 @@
         }
       }
     },
-    "/Packages/parameters/{id}": {
+    "/packages/parameters/{id}": {
       "post": {
         "tags": [
           "Packages"
@@ -686,7 +686,7 @@
         }
       }
     },
-    "/Packages/inputs/{id}": {
+    "/packages/inputs/{id}": {
       "post": {
         "tags": [
           "Packages"
