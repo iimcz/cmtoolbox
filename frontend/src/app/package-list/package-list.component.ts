@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { FileClient } from '../services/api';
-import { PackagesClient } from '../services/api.generated.service';
+import { PackagesClient, PackageType } from '../services/api.generated.service';
 
 @Component({
   selector: 'app-package-list',
@@ -14,7 +14,7 @@ import { PackagesClient } from '../services/api.generated.service';
 export class PackageListComponent implements OnInit, AfterViewInit {
   searchTerm: string = "";
 
-  displayedColumns: string[] = ['img', 'id', 'label', 'desc'];
+  displayedColumns: string[] = ['icon', 'img', 'id', 'label', 'desc'];
   pkgDataSource = new MatTableDataSource<Package>();
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -36,10 +36,22 @@ export class PackageListComponent implements OnInit, AfterViewInit {
         this.pkgDataSource.paginator = this.paginator;
         this.pkgDataSource.sort = this.sort;
         this.pkgDataSource.data = packages.map(
-          (pkg): Package => ({ id: pkg.id!, label: pkg.name!, desc: pkg.description!, thumbUrl: this.fileClient.getPackageThumbnailUrl(pkg.id!) })
+          (pkg): Package => ({ id: pkg.id!, label: pkg.name!, desc: pkg.description!, thumbUrl: this.fileClient.getPackageThumbnailUrl(pkg.id!), icon: this.selectIcon(pkg.type!) })
         );
       }
     )
+  }
+  selectIcon(type: PackageType): string {
+    switch (type) {
+      case PackageType.Gallery:
+        return 'image';
+      case PackageType.Model:
+        return 'view_in_ar';
+      case PackageType.Scene:
+        return 'grain';
+      case PackageType.Video:
+        return 'movie';
+    }
   }
 
   navigatePackage(item: Package) {
@@ -64,4 +76,5 @@ export interface Package {
   label: string;
   desc: string;
   thumbUrl: string;
+  icon: string;
 }
