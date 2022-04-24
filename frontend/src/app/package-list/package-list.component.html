@@ -22,7 +22,7 @@
                                     <mat-icon>{{item.icon}}</mat-icon>
                                     <mat-card-title>{{item.label}}</mat-card-title>
                                 </mat-card-header>
-                                <img mat-card-image [src]="item.thumbUrl" *ngIf="item.thumbUrl && item.thumbUrl.length > 0">
+                                <img mat-card-image class="package-thumbnail" [src]="item.thumbUrl" *ngIf="item.thumbUrl && item.thumbUrl.length > 0">
                                 <mat-card-content>
                                     <p>
                                         {{item.desc}}

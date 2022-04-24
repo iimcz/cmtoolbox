@@ -20,6 +20,10 @@ tr.package-row:hover {
     cursor: pointer;
 }
 
+.package-card .package-thumbnail {
+    max-height: 12em;
+}
+
 .list-package-thumb {
     height: 2em;
 }
