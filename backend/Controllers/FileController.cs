@@ -107,14 +107,7 @@ namespace backend.Controllers
                         var trustedFileNameForFileStorage = contentDisposition.FileName.Value;
 
                         // **WARNING!**
-                        // In the following example, the file is saved without
-                        // scanning the file's contents. In most production
-                        // scenarios, an anti-virus/anti-malware scanner API
-                        // is used on the file before making the file available
-                        // for download or for use by other systems. 
-                        // For more information, see the topic that accompanies 
-                        // this sample.
-
+                        // Files are not scanned for malicious content.
                         var streamedFileContent = await FileHelpers.ProcessStreamedFile(
                             section, contentDisposition, ModelState,
                             _permittedExtensions, _fileSizeLimit);
@@ -202,6 +195,14 @@ namespace backend.Controllers
             await _dbContext.SaveChangesAsync();
 
             System.IO.File.Delete(datafile.Path);
+            if (System.IO.File.Exists(datafile.PreviewPath))
+            {
+                System.IO.File.Delete(datafile.PreviewPath);
+            }
+            if (System.IO.File.Exists(datafile.ThumbnailPath))
+            {
+                System.IO.File.Delete(datafile.ThumbnailPath);
+            }
 
             return Ok();
         }
