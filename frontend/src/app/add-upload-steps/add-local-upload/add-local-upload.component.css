@@ -3,3 +3,7 @@
     height: auto;
     margin-top: 1em;
 }
+
+.upload-item-thumbnail {
+    max-height: 15em;
+}

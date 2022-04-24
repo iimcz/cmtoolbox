@@ -7,7 +7,7 @@
 <mat-grid-list cols="6">
     <mat-grid-tile *ngFor="let file of uploadedFiles" class="upload-list-item" >
         <mat-card>
-            <img matCardImage [src]="file.thumbUrl" *ngIf="showPreview && file.thumbUrl.length > 0">
+            <img matCardImage class="upload-item-thumbnail" [src]="file.thumbUrl" *ngIf="showPreview && file.thumbUrl.length > 0">
             <mat-icon *ngIf="showPreview && file.thumbUrl.length <= 0">image</mat-icon>
             <div>
                 {{file.filename}}
