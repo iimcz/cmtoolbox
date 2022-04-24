@@ -1,7 +1,8 @@
 <mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
     <mat-step label="Nahrání dat">
         <div class="mat-elevation-z1 raised-box">
-            <app-add-local-upload accept="image/*" [showPreview]="true" [packageId]="package.id!"></app-add-local-upload>
+            <app-add-local-upload accept="image/*" [showPreview]="true" [packageId]="package.id!">
+            </app-add-local-upload>
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>
@@ -17,7 +18,7 @@
     </mat-step>
     <mat-step label="Nastavení galerie">
         <div fxLayout="row">
-            <div fxFlex="50%" class="raised-box">
+            <div fxFlex="40%" class="raised-box">
                 <h3>Náhled</h3>
                 <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="1em">
                     <div class="preview-ips" id="preview" [style.gap]="3 + '%'"
@@ -27,109 +28,118 @@
                     </div>
                 </div>
             </div>
-            <div fxLayout="column" fxLayoutAlign="center start" fxFlex
+            <div fxLayout="column" fxLayoutAlign="center start" fxFlex="40%"
                 class="settings-pane mat-elevation-z2 raised-box">
                 <mat-tab-group class="full-width">
-                    <mat-tab label="Rozložení">
-                        <div class="setting" fxLayout="row">
-                            
+                    <mat-tab label="Rozložení" [formGroup]="settingsFG">
+                        <div fxLayout="column">
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="40%">Styl:</label>
+                                <mat-form-field fxFlex="60%">
+                                    <select matNativeControl formControlName="layoutType">
+                                        <option value="grid">Mřížka</option>
+                                        <option value="list">Řádek</option>
+                                    </select>
+                                </mat-form-field>
+                            </div>
+                            <div *ngIf="settingsFG.get('layoutType')?.value === 'grid'">
+                                <div class="setting" fxLayout="row">
+                                    <label fxFlex="40%">&nbsp;Sloupců:</label>
+                                    <mat-form-field fxFlex="5%">
+                                        <input matInput type="number" min="1" max="10" formControlName="width"
+                                            [value]="settingsFG.get('width')?.value">
+                                    </mat-form-field>
+                                    <mat-slider fxFlex="55%" min="1" max="10" thumbLabel="true" formControlName="width"
+                                        [value]="settingsFG.get('width')?.value">
+                                    </mat-slider>
+                                </div>
+                                <div class="setting" fxLayout="row">
+                                    <label fxFlex="40%">&nbsp;Řádků:</label>
+                                    <mat-form-field fxFlex="5%">
+                                        <input matInput type="number" min="1" max="10" formControlName="height"
+                                            [value]="settingsFG.get('height')?.value">
+                                    </mat-form-field>
+                                    <mat-slider fxFlex="55%" min="1" max="10" thumbLabel="true" formControlName="height"
+                                        [value]="settingsFG.get('height')?.value">
+                                    </mat-slider>
+                                </div>
+                                <div class="setting" fxLayout="row">
+                                    <label fxFlex="40%">&nbsp;Vertikální mezera v %:</label>
+                                    <mat-form-field fxFlex="5%">
+                                        <input matInput type="number" min="0" max="100" formControlName="verticalSpacing"
+                                            [value]="settingsFG.get('verticalSpacing')?.value">
+                                    </mat-form-field>
+                                    <mat-slider fxFlex="55%" min="0" max="100" thumbLabel="true" formControlName="verticalSpacing"
+                                        [value]="settingsFG.get('verticalSpacing')?.value">
+                                    </mat-slider>
+                                </div>
+                                <div class="setting" fxLayout="row">
+                                    <label fxFlex="40%">&nbsp;Horizontální mezera v %:</label>
+                                    <mat-form-field fxFlex="5%">
+                                        <input matInput type="number" min="0" max="100" formControlName="horizontalSpacing"
+                                            [value]="settingsFG.get('horizontalSpacing')?.value">
+                                    </mat-form-field>
+                                    <mat-slider fxFlex="55%" min="0" max="100" thumbLabel="true" formControlName="horizontalSpacing"
+                                        [value]="settingsFG.get('horizontalSpacing')?.value">
+                                    </mat-slider>
+                                </div>
+                            </div>
+                            <div *ngIf="settingsFG.get('layoutType')?.value === 'list'">
+                                <div class="setting" fxLayout="row">
+                                    <label fxFlex="40%">&nbsp;Počet zobrazených obrázků:</label>
+                                    <mat-form-field fxFlex="5%">
+                                        <input matInput type="number" min="1" max="10" formControlName="visibleImages"
+                                            [value]="settingsFG.get('visibleImages')?.value">
+                                    </mat-form-field>
+                                    <mat-slider fxFlex="55%" min="1" max="10" thumbLabel="true" formControlName="visibleImages"
+                                        [value]="settingsFG.get('visibleImages')?.value">
+                                    </mat-slider>
+                                </div>
+                                <div class="setting" fxLayout="row">
+                                    <label fxFlex="40%">&nbsp;Mezera v %:</label>
+                                    <mat-form-field fxFlex="5%">
+                                        <input matInput type="number" min="0" max="100" formControlName="spacing"
+                                            [value]="settingsFG.get('spacing')?.value">
+                                    </mat-form-field>
+                                    <mat-slider fxFlex="55%" min="0" max="100" thumbLabel="true" formControlName="spacing"
+                                        [value]="settingsFG.get('spacing')?.value">
+                                    </mat-slider>
+                                </div>
+                            </div>
                         </div>
                         <div class="setting" fxLayout="row">
-                            <label fxFlex="80%">Styl:</label>
-                            <mat-form-field>
-                                <select matNativeControl [(ngModel)]="gallerySettings.layoutType">
-                                    <option value="grid">Mřížka</option>
-                                    <option value="list">Řádek</option>
-                                </select>
+                            <label fxFlex="40%">Vsazení obrázků:</label>
+                            <mat-form-field fxFlex="5%">
+                                <input matInput type="number" min="0" max="100" formControlName="padding" [value]="settingsFG.get('padding')?.value">
                             </mat-form-field>
-                        </div>
-
-                        <div *ngIf="gallerySettings.layoutType === 'grid'">
-                            <div class="setting" fxLayout="row">
-                                <label fxFlex="80%">Obrázků na šířku:</label>
-                                <mat-form-field fxFlex="20%">
-                                    <input matInput type="number" min="1" max="10" [(ngModel)]="gallerySettings.layout!.width">
-                                </mat-form-field>
-                                <mat-slider min="1" max="10" thumbLabel="true" [(ngModel)]="gallerySettings.layout!.width">
-                                </mat-slider>
-                            </div>
-                            <div class="setting" fxLayout="row">
-                                <label fxFlex="80%">Obrázků na výšku:</label>
-                                <mat-form-field fxFlex="20%">
-                                    <input matInput type="number" min="1" max="10" [(ngModel)]="gallerySettings.layout!.height">
-                                </mat-form-field>
-                                <mat-slider min="1" max="10" thumbLabel="true" [(ngModel)]="gallerySettings.layout!.height">
-                                </mat-slider>
-                            </div>
-                            <div class="setting" fxLayout="row">
-                                <label fxFlex="80%">Vertikální mezera:</label>
-                                <mat-form-field fxFlex="20%">
-                                    <input matInput type="number" min="0" max="100" [(ngModel)]="gallerySettings.layout!.verticalSpacing">
-                                </mat-form-field>
-                                <mat-slider min="0" max="100" thumbLabel="true" [(ngModel)]="gallerySettings.layout!.verticalSpacing">
-                                </mat-slider>
-                            </div>
-                            <div class="setting" fxLayout="row">
-                                <label fxFlex="80%">Horizontální mezera:</label>
-                                <mat-form-field fxFlex="20%">
-                                    <input matInput type="number" min="0" max="100" [(ngModel)]="gallerySettings.layout!.horizontalSpacing">
-                                </mat-form-field>
-                                <mat-slider min="0" max="100" thumbLabel="true" [(ngModel)]="gallerySettings.layout!.horizontalSpacing">
-                                </mat-slider>
-                            </div>
-                        </div>
-
-                        <div *ngIf="gallerySettings.layoutType === 'list'">
-                            <div class="setting" fxLayout="row">
-                                <label fxFlex="80%">Počet viditelných obrázků:</label>
-                                <mat-form-field fxFlex="20%">
-                                    <input matInput type="number" min="1" max="10" [(ngModel)]="gallerySettings.layout!.visibleImages">
-                                </mat-form-field>
-                                <mat-slider min="1" max="10" thumbLabel="true" [(ngModel)]="gallerySettings.layout!.visibleImages">
-                                </mat-slider>
-                            </div>
-                            <div class="setting" fxLayout="row">
-                                <label fxFlex="80%">Mezera mezi obrázky:</label>
-                                <mat-form-field fxFlex="20%">
-                                    <input matInput type="number" min="0" max="100" [(ngModel)]="gallerySettings.layout!.spacing">
-                                </mat-form-field>
-                                <mat-slider min="0" max="100" thumbLabel="true" [(ngModel)]="gallerySettings.layout!.spacing">
-                                </mat-slider>
-                            </div>
-                        </div>
-                        <div class="setting" fxLayout="row">
-                            <label fxFlex="80%">Vsazení obrázků:</label>
-                            <mat-form-field fxFlex="20%">
-                                <input matInput type="number" min="0" max="100" [(ngModel)]="gallerySettings.padding">
-                            </mat-form-field>
-                            <mat-slider min="0" max="100" thumbLabel="true" [(ngModel)]="gallerySettings.padding">
+                            <mat-slider fxFlex="55%" min="0" max="100" thumbLabel="true" formControlName="padding" [value]="settingsFG.get('padding')?.value">
                             </mat-slider>
                         </div>
                         <div class="setting" fxLayout="row">
-                            <label fxFlex="80%">Pauza mezi automat. posunem (sekundy):</label>
-                            <mat-form-field fxFlex="20%">
-                                <input matInput type="number" min="0.0" max="10.0" step="0.1" [(ngModel)]="gallerySettings.scrollDelay">
+                            <label fxFlex="40%">Pauza mezi automat. posunem (sekundy):</label>
+                            <mat-form-field fxFlex="10%">
+                                <input matInput type="number" min="0.0" max="10.0" step="0.1" formControlName="scrollDelay" [value]="settingsFG.get('scrollDelay')?.value">
                             </mat-form-field>
-                            <mat-slider min="0.0" max="10.0" step="0.1" thumbLabel="true" [(ngModel)]="gallerySettings.scrollDelay">
+                            <mat-slider fxFlex="40%" min="0.0" max="10.0" step="0.1" thumbLabel="true" formControlName="scrollDelay" [value]="settingsFG.get('scrollDelay')?.value">
                             </mat-slider>
                         </div>
                         <div class="setting" fxLayout="row">
-                            <label fxFlex="80%">Délka automat. posunu (sekundy):</label>
-                            <mat-form-field fxFlex="20%">
-                                <input matInput type="number" min="0.0" max="10.0" step="0.1" [(ngModel)]="gallerySettings.slideAnimationLength">
+                            <label fxFlex="40%">Délka automat. posunu (sekundy):</label>
+                            <mat-form-field fxFlex="10%">
+                                <input matInput type="number" min="0.0" max="10.0" step="0.1" formControlName="slideAnimationLength" [value]="settingsFG.get('slideAnimationLength')?.value">
                             </mat-form-field>
-                            <mat-slider min="0.0" max="10.0" step="0.1" thumbLabel="true" [(ngModel)]="gallerySettings.slideAnimationLength">
+                            <mat-slider fxFlex="40%" min="0.0" max="10.0" step="0.1" thumbLabel="true" formControlName="slideAnimationLength" [value]="settingsFG.get('slideAnimationLength')?.value">
                             </mat-slider>
                         </div>
                         <div class="setting" fxLayout="row">
-                            <label fxFlex="80%">Barva pozadí:</label>
-                            <mat-form-field fxFlex="20%">
-                                <input matInput type="color" [(ngModel)]="gallerySettings.backgroundColor">
+                            <label fxFlex="40%">Barva pozadí:</label>
+                            <mat-form-field fxFlex="60%">
+                                <input matInput type="color" formControlName="backgroundColor">
                             </mat-form-field>
                         </div>
                         <mat-expansion-panel class="full-width">
                             <mat-expansion-panel-header>
-                                Řazení a individuální nastavení obrázků
+                                Řazení obrázků
                             </mat-expansion-panel-header>
                             <mat-table [dataSource]="galleryItemsDataSource" cdkDropList
                                 [cdkDropListData]="galleryItemsDataSource.data"
@@ -145,34 +155,15 @@
                                     <mat-header-cell *matHeaderCellDef> Název </mat-header-cell>
                                     <mat-cell *matCellDef="let pic"> {{pic.fileName}} </mat-cell>
                                 </ng-container>
-        
+
                                 <mat-header-row *matHeaderRowDef="['preview', 'filename']"></mat-header-row>
-                                <mat-row class="draggable"
-                                    *matRowDef="let pic; columns: ['preview', 'filename'];" cdkDrag></mat-row>
+                                <mat-row class="draggable" *matRowDef="let pic; columns: ['preview', 'filename'];"
+                                    cdkDrag></mat-row>
                             </mat-table>
                         </mat-expansion-panel>
                     </mat-tab>
                     <mat-tab label="Ovládání">
-                        <!-- TODO: redo
-                        <div class="setting full-width">
-                            <label>Ovádání galerie:</label>
-                            <mat-form-field>
-                                <select matNativeControl [(ngModel)]="gallerySettings.basicControls">
-                                    <option value="grab-drag">Gesta tažení</option>
-                                    <option value="swipe-gestures">Swipe gesta</option>
-                                    <option value="custom">Vlastní nastavení (speciální)</option>
-                                </select>
-                            </mat-form-field>
-                            <p *ngIf="gallerySettings.basicControls === 'grab-drag'">
-                                <img src="https://picsum.photos/200/200" class="controls-preview">
-                            </p>
-                            <p *ngIf="gallerySettings.basicControls === 'swipe-gestures'">
-                                <img src="https://picsum.photos/300/300" class="controls-preview">
-                            </p>
-                        </div>
-                        -->
-                        <div *ngIf="true"
-                            class="mat-elevation-z1 raised-box-padless full-width">
+                        <div *ngIf="true" class="mat-elevation-z1 raised-box-padless full-width">
                             <div class="raised-box">
                                 <button mat-raised-button (click)="addCustomControl()">Přidat akci</button>
                             </div>
@@ -224,9 +215,10 @@
                                         </mat-form-field>
                                     </mat-cell>
                                 </ng-container>
-        
+
                                 <mat-header-row *matHeaderRowDef="['action', 'event', 'event-detail']"></mat-header-row>
-                                <mat-row *matRowDef="let control; columns: ['action', 'event', 'event-detail'];"></mat-row>
+                                <mat-row *matRowDef="let control; columns: ['action', 'event', 'event-detail'];">
+                                </mat-row>
                             </mat-table>
                         </div>
                         <mat-expansion-panel class="full-width">
@@ -265,8 +257,9 @@
                                         </mat-form-field>
                                     </mat-cell>
                                 </ng-container>
-        
-                                <mat-header-row *matHeaderRowDef="['preview', 'filename', 'can-zoom', 'has-link', 'link']">
+
+                                <mat-header-row
+                                    *matHeaderRowDef="['preview', 'filename', 'can-zoom', 'has-link', 'link']">
                                 </mat-header-row>
                                 <mat-row
                                     *matRowDef="let pic; columns: ['preview', 'filename', 'can-zoom', 'has-link', 'link'];">

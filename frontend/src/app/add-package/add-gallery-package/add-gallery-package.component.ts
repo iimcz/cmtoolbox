@@ -1,13 +1,14 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { map, merge, mergeWith, Observable, share, shareReplay, Subject, switchMap } from 'rxjs';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
-import { Action, GalleryImage, LayoutType, Parameters, Settings } from 'src/app/interfaces/package-descriptor.generated';
+import { GalleryImage, LayoutType, Parameters, Settings } from 'src/app/interfaces/package-descriptor.generated';
 import { FileClient } from 'src/app/services/api';
-import { ILayout, IParameters, ISettings, IVector2, PackagesClient, PresentationPackage, Vector2 } from 'src/app/services/api.generated.service';
-import { Settings as ApiSettings, Parameters as ApiParameters, Layout as ApiLayout, LayoutType as ApiLayoutType } from 'src/app/services/api.generated.service';
+import { Action, ILayout, IParameters, ISettings, IVector2, Mapping, PackagesClient, PresentationPackage, TypeEnum, Vector2 } from 'src/app/services/api.generated.service';
+import { Settings as ApiSettings, Parameters as ApiParameters, Layout as ApiLayout, LayoutType as ApiLayoutType, GalleryImage as ApiGalleryImage } from 'src/app/services/api.generated.service';
 
 @Component({
   selector: 'app-add-gallery-package',
@@ -21,6 +22,23 @@ export class AddGalleryPackageComponent implements OnInit {
 
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
+
+  settingsFG = this.fb.group({
+    layoutType: ['grid', { initialValueIsDefault: true }],
+    
+    width: [2, { initialValueIsDefault: true }],
+    height: [2, { initialValueIsDefault: true }],
+    verticalSpacing: [10, { initialValueIsDefault: true }],
+    horizontalSpacing: [10, { initialValueIsDefault: true }],
+    
+    visibleImages: [2, { initialValueIsDefault: true }],
+    spacing: [10, { initialValueIsDefault: true }],
+
+    padding: [0, { initialValueIsDefault: true }],
+    scrollDelay: [5.0, { initialValueIsDefault: true }],
+    slideAnimationLength: [2.0, { initialValueIsDefault: true }],
+    backgroundColor: ['#000000', { initialValueIsDefault: true }]
+  });
 
   galleryItemsDataSource = new MatTableDataSource<GalleryItem>();
   galleryCustomControls = new MatTableDataSource<CustomControl>();
@@ -50,7 +68,8 @@ export class AddGalleryPackageComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private packagesClient: PackagesClient,
-    private fileClient: FileClient
+    private fileClient: FileClient,
+    private fb: FormBuilder
   ) { }
 
   ngOnInit(): void {
@@ -100,19 +119,57 @@ export class AddGalleryPackageComponent implements OnInit {
   saveParametersAndInputs(id: number) {
     let inputs: Action[] = []; // TODO: fill
 
-    let settings = new ApiSettings(this.gallerySettings as ISettings);
-    let layout = new ApiLayout(this.gallerySettings.layout as ILayout);
-    let padding = new Vector2(this.gallerySettings.padding as IVector2);
+    let settings = new ApiSettings();
+    settings.layoutType = this.mapLayoutType(this.settingsFG.get('layoutType')?.value);
+    settings.layout = new ApiLayout();
+
+    if (this.settingsFG.get('layoutType')?.value === 'grid') {
+      settings.layout.width = this.settingsFG.get('width')?.value;
+      settings.layout.height = this.settingsFG.get('height')?.value;
+      settings.layout.verticalSpacing = this.settingsFG.get('verticalSpacing')?.value;
+      settings.layout.horizontalSpacing = this.settingsFG.get('horizontalSpacing')?.value;
+    } else {
+      settings.layout.visibleImages = this.settingsFG.get('visibleImages')?.value;
+      settings.layout.spacing = this.settingsFG.get('spacing')?.value;
+    }
+    settings.layout.images = this.galleryItemsDataSource.data.map((img): ApiGalleryImage => {
+      return new ApiGalleryImage({
+        activatedEvent: img.selectedEvent,
+        fileName: img.fileName,
+        selectedEvent: img.activatedEvent
+      })
+    });
+
+    settings.padding = new Vector2({ x: this.settingsFG.get('padding')?.value, y: this.settingsFG.get('padding')?.value });
+    settings.scrollDelay = this.settingsFG.get('scrollDelay')?.value;
+    settings.slideAnimationLength = this.settingsFG.get('slideAnimationLength')?.value;
+    settings.backgroundColor = this.settingsFG.get('backgroundColor')?.value;
+
     let params = new ApiParameters({ displayType: 'gallery', settings: settings });
-    settings.layout = layout;
-    settings.padding = padding;
-    settings.layoutType = this.mapLayoutType(this.gallerySettings.layoutType!);
 
     this.packagesClient.setPackageParameters(id, params)
       .subscribe(
         // TODO: handle
       );
-    this.packagesClient.setPackageInputs(id, []) // TODO: fill with actual data
+    this.packagesClient.setPackageInputs(id, [
+      // TESTING DATA
+      // new Action({
+      //   effect: 'left',
+      //   type: TypeEnum.Event,
+      //   mapping: new Mapping({
+      //     source: 'depthCam1',
+      //     eventName: 'swipeLeft'
+      //   })
+      // }),
+      // new Action({
+      //   effect: 'right',
+      //   type: TypeEnum.Event,
+      //   mapping: new Mapping({
+      //     source: 'depthCam1',
+      //     eventName: 'swipeRight'
+      //   })
+      // })
+    ]) // TODO: fill with actual data
       .subscribe(
         // TODO: handle
       );
