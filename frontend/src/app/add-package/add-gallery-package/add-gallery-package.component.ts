@@ -126,11 +126,11 @@ export class AddGalleryPackageComponent implements OnInit {
     if (this.settingsFG.get('layoutType')?.value === 'grid') {
       settings.layout.width = this.settingsFG.get('width')?.value;
       settings.layout.height = this.settingsFG.get('height')?.value;
-      settings.layout.verticalSpacing = this.settingsFG.get('verticalSpacing')?.value;
-      settings.layout.horizontalSpacing = this.settingsFG.get('horizontalSpacing')?.value;
+      settings.layout.verticalSpacing = this.settingsFG.get('verticalSpacing')?.value / 100.0;
+      settings.layout.horizontalSpacing = this.settingsFG.get('horizontalSpacing')?.value / 100.0;
     } else {
       settings.layout.visibleImages = this.settingsFG.get('visibleImages')?.value;
-      settings.layout.spacing = this.settingsFG.get('spacing')?.value;
+      settings.layout.spacing = this.settingsFG.get('spacing')?.value / 100.0;
     }
     settings.layout.images = this.galleryItemsDataSource.data.map((img): ApiGalleryImage => {
       return new ApiGalleryImage({
@@ -140,7 +140,7 @@ export class AddGalleryPackageComponent implements OnInit {
       })
     });
 
-    settings.padding = new Vector2({ x: this.settingsFG.get('padding')?.value, y: this.settingsFG.get('padding')?.value });
+    settings.padding = new Vector2({ x: this.settingsFG.get('padding')?.value / 100.0, y: this.settingsFG.get('padding')?.value / 100.0 });
     settings.scrollDelay = this.settingsFG.get('scrollDelay')?.value;
     settings.slideAnimationLength = this.settingsFG.get('slideAnimationLength')?.value;
     settings.backgroundColor = this.settingsFG.get('backgroundColor')?.value;

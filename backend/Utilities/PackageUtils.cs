@@ -46,7 +46,11 @@ namespace backend.Utilities
 
         public static async Task FinishProcessingGalleryPackage(PresentationPackage package, string dataDir, IConfiguration config)
         {
-            // NOTE: no additional processing necessary
+            var datafiles = package.DataFiles;
+            foreach (var file in datafiles)
+            {
+                File.Move(file.Path, Path.Combine(dataDir, Path.GetFileName(file.Path)));
+            }
             return;
         }
 
