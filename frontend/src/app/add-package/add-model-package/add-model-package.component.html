@@ -1,7 +1,8 @@
 <mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
     <mat-step label="Nahrání dat">
         <div class="mat-elevation-z1 raised-box">
-            <app-add-local-upload accept="model/*" [showPreview]="true" [packageId]="package.id!"></app-add-local-upload>
+            <app-add-local-upload accept="model/*" [showPreview]="true" [packageId]="package.id!">
+            </app-add-local-upload>
         </div>
         <div class="button-row">
             <button mat-raised-button (click)="goBack()">Zrušit</button>
@@ -17,19 +18,54 @@
     </mat-step>
     <mat-step label="Nastavení modelu">
         <div fxLayout="row">
-            <div fxFlex="50%" class="raised-box preview-pane">
+            <div fxFlex="40%" class="raised-box preview-pane">
                 <h3>Náhled</h3>
                 <canvas class="preview-3d" #preview3d></canvas>
             </div>
-            <div fxLayout="column" fxLayoutAlign="center start" fxFlex
+            <div fxLayout="column" fxLayoutAlign="center start" fxFlex="40%"
                 class="settings-pane mat-elevation-z2 raised-box">
                 <mat-tab-group class="full-width">
-                    <mat-tab label="Pohled">
-                        <div class="setting">
-                            <label>Barva pozadí:</label>
-                            <mat-form-field>
-                                <input matInput type="color" [(ngModel)]="modelSettings.backgroundColor">
-                            </mat-form-field>
+                    <mat-tab label="Rozložení">
+                        <div [formGroup]="settingsFG">
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Barva pozadí:</label>
+                                <mat-form-field fxFlex="60%">
+                                    <input matInput type="color" formControlName="skyboxTint">
+                                </mat-form-field>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Vzdálenost kamery (v metrech):</label>
+                                <mat-form-field fxFlex="10%">
+                                    <input matInput type="number" min="0" formControlName="cameraDistance" [value]="settingsFG.get('cameraDistance')?.value">
+                                </mat-form-field>
+                                <mat-slider fxFlex="50%" min="0" max="100" step="0.5" formControlName="cameraDistance" thumbLabel="true" [value]="settingsFG.get('cameraDistance')?.value">
+                                </mat-slider>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Výška kamery (v metrech):</label>
+                                <mat-form-field fxFlex="10%">
+                                    <input matInput type="number" min="0" formControlName="cameraHeight" [value]="settingsFG.get('cameraHeight')?.value">
+                                </mat-form-field>
+                                <mat-slider fxFlex="50%" min="0" max="100" step="0.5" formControlName="cameraHeight" thumbLabel="true" [value]="settingsFG.get('cameraHeight')?.value">
+                                </mat-slider>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Doba otočení kamery (v sekundách):</label>
+                                <mat-form-field fxFlex="10%">
+                                    <input matInput type="number" min="1" max="600" formControlName="cameraRevolutionTime" [value]="settingsFG.get('cameraRevolutionTime')?.value">
+                                </mat-form-field>
+                                <mat-slider fxFlex="50%" min="1" max="600" formControlName="cameraRevolutionTime" thumbLabel="true" [value]="settingsFG.get('cameraRevolutionTime')?.value">
+                                </mat-slider>
+                            </div>
+                            <div class="setting" fxLayout="row">
+                                <label fxFlex="60%">Způsob volby vlaječek:</label>
+                                <mat-form-field fxFlex="40%">
+                                    <select matNativeControl formControlName="flagInteraction">
+                                        <option value="swipe">Gestem mávnutí (předchozí/další)</option>
+                                        <option value="point">Přímým ukázáním</option>
+                                    </select>
+                                </mat-form-field>
+                            </div>
                         </div>
                     </mat-tab>
                     <mat-tab label="Ovládání">
@@ -91,7 +127,7 @@
                                     </mat-form-field>
                                 </mat-cell>
                             </ng-container>
-    
+
                             <mat-header-row *matHeaderRowDef="['action', 'event', 'event-detail']"></mat-header-row>
                             <mat-row *matRowDef="let control; columns: ['action', 'event', 'event-detail'];"></mat-row>
                         </mat-table>
@@ -102,7 +138,8 @@
 
         <div class="button-row">
             <button mat-raised-button matStepperPrevious>Zpět</button>
-            <button mat-raised-button matStepperNext>Pokračovat</button>
+            <button mat-raised-button matStepperNext
+                (click)="saveParametersAndInputs(package.id!, package.dataFiles![0].path!)">Pokračovat</button>
         </div>
     </mat-step>
     <mat-step label="Přídavné skripty">

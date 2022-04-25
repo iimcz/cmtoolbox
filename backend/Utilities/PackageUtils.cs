@@ -56,12 +56,20 @@ namespace backend.Utilities
 
         public static async Task FinishProcessingModelPackage(PresentationPackage package, string dataDir, IConfiguration config)
         {
-            throw new NotImplementedException();
+            var datafiles = package.DataFiles;
+            foreach (var file in datafiles)
+            {
+                File.Move(file.Path, Path.Combine(dataDir, Path.GetFileName(file.Path)));
+            }
         }
 
         public static async Task FinishProcessingScenePackage(PresentationPackage package, string dataDir, IConfiguration config)
         {
-            throw new NotImplementedException();
+            var datafile = package.DataFiles.SingleOrDefault();
+            if (datafile == null)
+                return;
+
+            System.IO.Compression.ZipFile.ExtractToDirectory(datafile.Path, dataDir);
         }
 
         public static async Task WritePackageJsonAsync(PresentationPackage package, TextWriter writer, string packageFilePath, string packageUrl)

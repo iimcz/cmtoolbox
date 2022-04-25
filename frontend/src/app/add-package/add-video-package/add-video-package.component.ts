@@ -144,7 +144,7 @@ export class AddVideoPackageComponent implements OnInit {
     settings.autoStart = this.settingsFG.get('autoStart')?.value;
     settings.backgroundColor = this.settingsFG.get('backgroundColor')?.value;
     settings.aspectRatio = this.mapAspectRatio(this.settingsFG.get('aspectRatio')?.value);
-    settings.fileName = filename.substring(filename.lastIndexOf('/') + 1, filename.lastIndexOf('.')) + ".webm";
+    settings.fileName = filename.substring(filename.lastIndexOf('/') + 1, filename.lastIndexOf('.')) + '.webm';
     settings.videoEvents = [];
 
     let params = new ApiParameters({ displayType: 'video', settings: settings });

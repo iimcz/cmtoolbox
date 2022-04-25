@@ -164,9 +164,12 @@ namespace backend.Controllers
                     throw new InvalidDataException("Unknown package type, cannot finish processing!");
             }
 
-            // Use the first file of the package for its thumbnail
+            // Use the first file of the package for its thumbnail if it exists
             var firstFile = package.DataFiles.First();
-            System.IO.File.Copy(firstFile.ThumbnailPath, Path.Combine(pkgDir, "thumbnail.png"));
+            if (System.IO.File.Exists(firstFile.ThumbnailPath))
+            {
+                System.IO.File.Copy(firstFile.ThumbnailPath, Path.Combine(pkgDir, "thumbnail.png"));
+            }
 
             // Clean working directory after the package is finished.
             foreach (var file in package.DataFiles)
