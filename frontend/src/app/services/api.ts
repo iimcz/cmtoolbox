@@ -18,7 +18,7 @@ export class FileClient {
     }
 
     upload(file: File, packageId: number) : Observable<FileResponse | UploadProgress> {
-        let url_ = this.baseUrl + "/File/upload/{packageId}";
+        let url_ = this.baseUrl + "/file/upload/{packageId}";
         url_ = url_.replace("{packageId}", encodeURIComponent("" + packageId));
         url_ = url_.replace(/[?&]$/, "");
 
@@ -92,7 +92,7 @@ export class FileClient {
     }
 
     delete(id: number) : Observable<void> {
-        let url_ = this.baseUrl + "/File/delete/{id}";
+        let url_ = this.baseUrl + "/file/delete/{id}";
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
         
@@ -132,20 +132,20 @@ export class FileClient {
     }
 
     getFileThumbnailUrl(id: number): string {
-        return (this.baseUrl + "/File/thumbnail/file/{id}").replace("{id}", encodeURIComponent("" + id));
+        return (this.baseUrl + "/file/thumbnail/file/{id}").replace("{id}", encodeURIComponent("" + id));
     }
 
     getPackageThumbnailUrl(id: number): string {
-        return (this.baseUrl + "/File/thumbnail/package/{id}").replace("{id}", encodeURIComponent("" + id));
+        return (this.baseUrl + "/file/thumbnail/package/{id}").replace("{id}", encodeURIComponent("" + id));
     }
 
     getPreviewUrl(id: number): string {
-        return (this.baseUrl + "/File/preview/{id}").replace("{id}", encodeURIComponent("" + id));
+        return (this.baseUrl + "/file/preview/{id}").replace("{id}", encodeURIComponent("" + id));
     }
 
     // TODO: Consider moving this elsewhere
     getPackageDownloadUrl(id: number): string {
-        return (this.baseUrl + "/Packages/download/{id}").replace("{id}", encodeURIComponent("" + id));
+        return (this.baseUrl + "/packages/download/{id}").replace("{id}", encodeURIComponent("" + id));
     }
 }
 

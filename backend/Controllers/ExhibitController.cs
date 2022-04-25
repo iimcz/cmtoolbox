@@ -72,7 +72,7 @@ namespace backend.Controllers
             {
                 string filepath = Path.Combine(_basePackageDir, String.Format("{0}.zip", package.Id));
                 string pkgurl = _useHttps ? "https://" : "http://";
-                pkgurl += String.Format("{0}:5000/Packages/download/{1}", _connectionManager.GetInterfaceAddressFor(exhibit_id), package.Id);
+                pkgurl += String.Format("{0}:5000/packages/download/{1}", _connectionManager.GetInterfaceAddressFor(exhibit_id), package.Id);
                 await PackageUtils.WritePackageJsonAsync(package, writer, filepath, pkgurl);
                 _connectionManager.LoadPackage(exhibit_id, writer.ToString());
             }
