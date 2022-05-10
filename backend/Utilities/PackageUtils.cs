@@ -72,6 +72,15 @@ namespace backend.Utilities
             System.IO.Compression.ZipFile.ExtractToDirectory(datafile.Path, dataDir);
         }
 
+        public static async Task FinishProcessingPanoramaPackage(PresentationPackage package, string dataDir, IConfiguration config)
+        {
+            var datafiles = package.DataFiles;
+            foreach (var file in datafiles)
+            {
+                File.Move(file.Path, Path.Combine(dataDir, Path.GetFileName(file.Path)));
+            }
+        }
+
         public static async Task WritePackageJsonAsync(PresentationPackage package, TextWriter writer, string packageFilePath, string packageUrl)
         {
             bool shouldGenerateHash = packageFilePath != null && packageUrl != null;

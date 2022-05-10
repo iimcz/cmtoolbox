@@ -160,6 +160,9 @@ namespace backend.Controllers
                 case PackageType.Scene:
                     await PackageUtils.FinishProcessingScenePackage(package, pkgDataRoot, _config);
                     break;
+                case PackageType.Panorama:
+                    await PackageUtils.FinishProcessingPanoramaPackage(package, pkgDataRoot, _config);
+                    break;
                 default:
                     throw new InvalidDataException("Unknown package type, cannot finish processing!");
             }

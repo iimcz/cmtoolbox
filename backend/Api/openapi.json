@@ -1009,13 +1009,15 @@
           "Gallery",
           "Video",
           "Scene",
-          "Model"
+          "Model",
+          "Panorama"
         ],
         "enum": [
           0,
           1,
           2,
-          3
+          3,
+          4
         ]
       },
       "ToolboxUser": {
