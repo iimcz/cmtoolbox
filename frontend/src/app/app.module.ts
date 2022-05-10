@@ -56,6 +56,7 @@ import { API_BASE_URL } from './services/api.generated.service';
 import { environment } from 'src/environments/environment';
 import { ExhibitUploadDialogComponent } from './dialogs/exhibit-upload-dialog/exhibit-upload-dialog.component';
 import { WS_BASE_URL } from './services/event-socket.service';
+import { AddPanoramaPackageComponent } from './add-package/add-panorama-package/add-panorama-package.component';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { WS_BASE_URL } from './services/event-socket.service';
     AddLocalUploadComponent,
     HelpSceneImportComponent,
     HelpScriptsComponent,
-    ExhibitUploadDialogComponent
+    ExhibitUploadDialogComponent,
+    AddPanoramaPackageComponent
   ],
   imports: [
     BrowserModule,

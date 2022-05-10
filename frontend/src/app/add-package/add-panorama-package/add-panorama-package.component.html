@@ -1,0 +1,25 @@
+<mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
+    <mat-step label="Nahrání dat">
+        <div class="mat-elevation-z1 raised-box">
+            <app-add-local-upload accept="image/*" [packageId]="package.id!"></app-add-local-upload>
+        </div>
+        <div class="button-row">
+            <button mat-raised-button (click)="goBack()">Zrušit</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Nastavení">
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext
+                (click)="saveParametersAndInputs(package.id!, package.dataFiles![0].path!)">Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Metadata">
+        <app-add-metadata [package]="package" #addMetadataComponent></app-add-metadata>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button (click)="finishAddingPackage(package.id!)">Uložit balíček</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

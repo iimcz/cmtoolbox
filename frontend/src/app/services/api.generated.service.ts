@@ -1619,6 +1619,7 @@ export enum PackageType {
     Video = 1,
     Scene = 2,
     Model = 3,
+    Panorama = 4,
 }
 
 export class IdentityUserOfString implements IIdentityUserOfString {
