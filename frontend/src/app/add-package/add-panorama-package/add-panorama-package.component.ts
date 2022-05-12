@@ -22,6 +22,11 @@ export class AddPanoramaPackageComponent implements OnInit {
   notifyPackageUpdate$: Subject<number> = new Subject();
   notifyRouteUpdate$!: Observable<number>;
 
+  settingsFG = this.fb.group({
+    cameraVerticalAngle: [0.0, { initialValueIsDefault: true }],
+    rotationSpeed: [1.5, { initialValueIsDefault: true }]
+  });
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -55,6 +60,8 @@ export class AddPanoramaPackageComponent implements OnInit {
     let inputs: Action[] = [];
     let settings = new ApiSettings();
     settings.fileName = filename.substring(filename.lastIndexOf('/') + 1);
+    settings.cameraVerticalAngle = this.settingsFG.get('cameraVerticalAngle')?.value;
+    settings.rotationSpeed = this.settingsFG.get('rotationSpeed')?.value;
 
     let params = new ApiParameters({ displayType: 'panorama', settings: settings });
 
@@ -62,9 +69,7 @@ export class AddPanoramaPackageComponent implements OnInit {
       .subscribe(
         // TODO: handle
       );
-    this.packagesClient.setPackageInputs(id, [
-
-    ]) // TODO: fill with actual data
+    this.packagesClient.setPackageInputs(id, inputs) // TODO: fill with actual data
       .subscribe(
         // TODO: handle
       );

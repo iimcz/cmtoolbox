@@ -1405,6 +1405,16 @@
             "items": {
               "$ref": "#/components/schemas/VideoEvent"
             }
+          },
+          "rotationSpeed": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cameraVerticalAngle": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
