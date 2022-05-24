@@ -24,16 +24,16 @@ namespace Naki3D.Common.Protocol {
     static ManagementReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChBtYW5hZ2VtZW50LnByb3RvEhZuYWtpM2QuY29tbW9uLnByb3RvY29sIuAB",
+            "ChBtYW5hZ2VtZW50LnByb3RvEhZuYWtpM2QuY29tbW9uLnByb3RvY29sIvsB",
             "ChFNYW5hZ2VtZW50UmVxdWVzdBIVCg1jb25uZWN0aW9uX2lkGAEgASgJElEK",
             "D21hbmFnZW1lbnRfdHlwZRgCIAEoDjI4Lm5ha2kzZC5jb21tb24ucHJvdG9j",
-            "b2wuTWFuYWdlbWVudFJlcXVlc3QuTWFuYWdlbWVudFR5cGUiYQoOTWFuYWdl",
+            "b2wuTWFuYWdlbWVudFJlcXVlc3QuTWFuYWdlbWVudFR5cGUifAoOTWFuYWdl",
             "bWVudFR5cGUSDAoIU0hVVERPV04QABISCg5TSFVURE9XTl9DTEVBUhABEgoK",
-            "BlJFQk9PVBACEhAKDFJFQk9PVF9DTEVBUhADEg8KC0FMSVZFX0NIRUNLEAQi",
-            "hwEKEk1hbmFnZW1lbnRSZXNwb25zZRJOCg1kZXZpY2Vfc3RhdHVzGAEgASgO",
-            "MjcubmFraTNkLmNvbW1vbi5wcm90b2NvbC5NYW5hZ2VtZW50UmVzcG9uc2Uu",
-            "RGV2aWNlU3RhdHVzIiEKDERldmljZVN0YXR1cxIGCgJPSxAAEgkKBUVSUk9S",
-            "EAFiBnByb3RvMw=="));
+            "BlJFQk9PVBACEhAKDFJFQk9PVF9DTEVBUhADEg8KC0FMSVZFX0NIRUNLEAQS",
+            "CQoFU1RBUlQQBRIOCgpTVEFSVF9NVVRFEAYihwEKEk1hbmFnZW1lbnRSZXNw",
+            "b25zZRJOCg1kZXZpY2Vfc3RhdHVzGAEgASgOMjcubmFraTNkLmNvbW1vbi5w",
+            "cm90b2NvbC5NYW5hZ2VtZW50UmVzcG9uc2UuRGV2aWNlU3RhdHVzIiEKDERl",
+            "dmljZVN0YXR1cxIGCgJPSxAAEgkKBUVSUk9SEAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -295,6 +295,14 @@ namespace Naki3D.Common.Protocol {
         /// Ping
         /// </summary>
         [pbr::OriginalName("ALIVE_CHECK")] AliveCheck = 4,
+        /// <summary>
+        /// Starts ipw-firmware if not running
+        /// </summary>
+        [pbr::OriginalName("START")] Start = 5,
+        /// <summary>
+        /// Starts ipw-firmware with sound disabled
+        /// </summary>
+        [pbr::OriginalName("START_MUTE")] StartMute = 6,
       }
 
     }

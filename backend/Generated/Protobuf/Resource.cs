@@ -24,24 +24,27 @@ namespace Naki3D.Common.Protocol {
     static ResourceReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg5yZXNvdXJjZS5wcm90bxIWbmFraTNkLmNvbW1vbi5wcm90b2NvbCKuAgoI",
+            "Cg5yZXNvdXJjZS5wcm90bxIWbmFraTNkLmNvbW1vbi5wcm90b2NvbCLkAgoI",
             "UmVzb3VyY2USMAoFc2NlbmUYASABKAsyHy5uYWtpM2QuY29tbW9uLnByb3Rv",
             "Y29sLlNjZW5lM0RIABIwCgVtb2RlbBgCIAEoCzIfLm5ha2kzZC5jb21tb24u",
             "cHJvdG9jb2wuTW9kZWwzREgAEi4KBWltYWdlGAMgASgLMh0ubmFraTNkLmNv",
             "bW1vbi5wcm90b2NvbC5JbWFnZUgAEi4KBXZpZGVvGAQgASgLMh0ubmFraTNk",
-            "LmNvbW1vbi5wcm90b2NvbC5WaWRlb0gAEhUKDWlucHV0X21hcHBpbmcYBSAB",
-            "KAkSPwoSYWRkaXRpb25hbF9zY3JpcHRzGAYgAygLMiMubmFraTNkLmNvbW1v",
-            "bi5wcm90b2NvbC5FdmVudFNjcmlwdEIGCgRkYXRhIhcKB01vZGVsM0QSDAoE",
-            "Z2x0ZhgBIAEoDCKMAQoFSW1hZ2USDgoGaW1hZ2VzGAEgAygMEkYKEmltYWdl",
-            "X3ByZXNlbnRhdGlvbhgCIAEoDjIqLm5ha2kzZC5jb21tb24ucHJvdG9jb2wu",
-            "SW1hZ2UuUHJlc2VudGF0aW9uIisKDFByZXNlbnRhdGlvbhINCglTTElERVNI",
-            "T1cQABIMCghQQU5fWk9PTRABIssBCgVWaWRlbxIMCgRkYXRhGAEgASgMEj0K",
-            "C3ZpZGVvX2NvZGVjGAIgASgOMigubmFraTNkLmNvbW1vbi5wcm90b2NvbC5W",
-            "aWRlby5WaWRlb0NvZGVjEj0KC2F1ZGlvX2NvZGVjGAMgASgOMigubmFraTNk",
-            "LmNvbW1vbi5wcm90b2NvbC5WaWRlby5BdWRpb0NvZGVjIh4KClZpZGVvQ29k",
-            "ZWMSBwoDVlA5EAASBwoDQVYxEAEiFgoKQXVkaW9Db2RlYxIICgRPUFVTEAAi",
-            "WAoHU2NlbmUzRBI4CgtlbnZpcm9ubWVudBgBIAEoCzIjLm5ha2kzZC5jb21t",
-            "b24ucHJvdG9jb2wuRW52aXJvbm1lbnQSEwoLZGF0YXBhY2tfaWQYAiABKAki",
+            "LmNvbW1vbi5wcm90b2NvbC5WaWRlb0gAEjQKCHBhbm9yYW1hGAcgASgLMiAu",
+            "bmFraTNkLmNvbW1vbi5wcm90b2NvbC5QYW5vcmFtYUgAEhUKDWlucHV0X21h",
+            "cHBpbmcYBSABKAkSPwoSYWRkaXRpb25hbF9zY3JpcHRzGAYgAygLMiMubmFr",
+            "aTNkLmNvbW1vbi5wcm90b2NvbC5FdmVudFNjcmlwdEIGCgRkYXRhIhcKB01v",
+            "ZGVsM0QSDAoEZ2x0ZhgBIAEoDCKMAQoFSW1hZ2USDgoGaW1hZ2VzGAEgAygM",
+            "EkYKEmltYWdlX3ByZXNlbnRhdGlvbhgCIAEoDjIqLm5ha2kzZC5jb21tb24u",
+            "cHJvdG9jb2wuSW1hZ2UuUHJlc2VudGF0aW9uIisKDFByZXNlbnRhdGlvbhIN",
+            "CglTTElERVNIT1cQABIMCghQQU5fWk9PTRABIssBCgVWaWRlbxIMCgRkYXRh",
+            "GAEgASgMEj0KC3ZpZGVvX2NvZGVjGAIgASgOMigubmFraTNkLmNvbW1vbi5w",
+            "cm90b2NvbC5WaWRlby5WaWRlb0NvZGVjEj0KC2F1ZGlvX2NvZGVjGAMgASgO",
+            "MigubmFraTNkLmNvbW1vbi5wcm90b2NvbC5WaWRlby5BdWRpb0NvZGVjIh4K",
+            "ClZpZGVvQ29kZWMSBwoDVlA5EAASBwoDQVYxEAEiFgoKQXVkaW9Db2RlYxII",
+            "CgRPUFVTEAAiWAoHU2NlbmUzRBI4CgtlbnZpcm9ubWVudBgBIAEoCzIjLm5h",
+            "a2kzZC5jb21tb24ucHJvdG9jb2wuRW52aXJvbm1lbnQSEwoLZGF0YXBhY2tf",
+            "aWQYAiABKAkiTwoIUGFub3JhbWESDAoEZGF0YRgBIAEoDBIWCg5yb3RhdGlv",
+            "bl9zcGVlZBgDIAEoARIdChVjYW1lcmFfdmVydGljYWxfYW5nbGUYBCABKAEi",
             "ewoLRW52aXJvbm1lbnQSPwoLZW5naW5lX3R5cGUYASABKA4yKi5uYWtpM2Qu",
             "Y29tbW9uLnByb3RvY29sLkVudmlyb25tZW50LkVuZ2luZRIWCg5lbmdpbmVf",
             "dmVyc2lvbhgCIAEoCSITCgZFbmdpbmUSCQoFVU5JVFkQACInCgtFdmVudFNj",
@@ -49,11 +52,12 @@ namespace Naki3D.Common.Protocol {
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Resource), global::Naki3D.Common.Protocol.Resource.Parser, new[]{ "Scene", "Model", "Image", "Video", "InputMapping", "AdditionalScripts" }, new[]{ "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Resource), global::Naki3D.Common.Protocol.Resource.Parser, new[]{ "Scene", "Model", "Image", "Video", "Panorama", "InputMapping", "AdditionalScripts" }, new[]{ "Data" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Model3D), global::Naki3D.Common.Protocol.Model3D.Parser, new[]{ "Gltf" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Image), global::Naki3D.Common.Protocol.Image.Parser, new[]{ "Images", "ImagePresentation" }, null, new[]{ typeof(global::Naki3D.Common.Protocol.Image.Types.Presentation) }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Video), global::Naki3D.Common.Protocol.Video.Parser, new[]{ "Data", "VideoCodec", "AudioCodec" }, null, new[]{ typeof(global::Naki3D.Common.Protocol.Video.Types.VideoCodec), typeof(global::Naki3D.Common.Protocol.Video.Types.AudioCodec) }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Scene3D), global::Naki3D.Common.Protocol.Scene3D.Parser, new[]{ "Environment", "DatapackId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Panorama), global::Naki3D.Common.Protocol.Panorama.Parser, new[]{ "Data", "RotationSpeed", "CameraVerticalAngle" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.Environment), global::Naki3D.Common.Protocol.Environment.Parser, new[]{ "EngineType", "EngineVersion" }, null, new[]{ typeof(global::Naki3D.Common.Protocol.Environment.Types.Engine) }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Naki3D.Common.Protocol.EventScript), global::Naki3D.Common.Protocol.EventScript.Parser, new[]{ "Name", "Id" }, null, null, null, null)
           }));
@@ -110,6 +114,9 @@ namespace Naki3D.Common.Protocol {
           break;
         case DataOneofCase.Video:
           Video = other.Video.Clone();
+          break;
+        case DataOneofCase.Panorama:
+          Panorama = other.Panorama.Clone();
           break;
       }
 
@@ -170,6 +177,18 @@ namespace Naki3D.Common.Protocol {
       }
     }
 
+    /// <summary>Field number for the "panorama" field.</summary>
+    public const int PanoramaFieldNumber = 7;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Naki3D.Common.Protocol.Panorama Panorama {
+      get { return dataCase_ == DataOneofCase.Panorama ? (global::Naki3D.Common.Protocol.Panorama) data_ : null; }
+      set {
+        data_ = value;
+        dataCase_ = value == null ? DataOneofCase.None : DataOneofCase.Panorama;
+      }
+    }
+
     /// <summary>Field number for the "input_mapping" field.</summary>
     public const int InputMappingFieldNumber = 5;
     private string inputMapping_ = "";
@@ -204,6 +223,7 @@ namespace Naki3D.Common.Protocol {
       Model = 2,
       Image = 3,
       Video = 4,
+      Panorama = 7,
     }
     private DataOneofCase dataCase_ = DataOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -238,6 +258,7 @@ namespace Naki3D.Common.Protocol {
       if (!object.Equals(Model, other.Model)) return false;
       if (!object.Equals(Image, other.Image)) return false;
       if (!object.Equals(Video, other.Video)) return false;
+      if (!object.Equals(Panorama, other.Panorama)) return false;
       if (InputMapping != other.InputMapping) return false;
       if(!additionalScripts_.Equals(other.additionalScripts_)) return false;
       if (DataCase != other.DataCase) return false;
@@ -252,6 +273,7 @@ namespace Naki3D.Common.Protocol {
       if (dataCase_ == DataOneofCase.Model) hash ^= Model.GetHashCode();
       if (dataCase_ == DataOneofCase.Image) hash ^= Image.GetHashCode();
       if (dataCase_ == DataOneofCase.Video) hash ^= Video.GetHashCode();
+      if (dataCase_ == DataOneofCase.Panorama) hash ^= Panorama.GetHashCode();
       if (InputMapping.Length != 0) hash ^= InputMapping.GetHashCode();
       hash ^= additionalScripts_.GetHashCode();
       hash ^= (int) dataCase_;
@@ -294,6 +316,10 @@ namespace Naki3D.Common.Protocol {
         output.WriteString(InputMapping);
       }
       additionalScripts_.WriteTo(output, _repeated_additionalScripts_codec);
+      if (dataCase_ == DataOneofCase.Panorama) {
+        output.WriteRawTag(58);
+        output.WriteMessage(Panorama);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -325,6 +351,10 @@ namespace Naki3D.Common.Protocol {
         output.WriteString(InputMapping);
       }
       additionalScripts_.WriteTo(ref output, _repeated_additionalScripts_codec);
+      if (dataCase_ == DataOneofCase.Panorama) {
+        output.WriteRawTag(58);
+        output.WriteMessage(Panorama);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -346,6 +376,9 @@ namespace Naki3D.Common.Protocol {
       }
       if (dataCase_ == DataOneofCase.Video) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Video);
+      }
+      if (dataCase_ == DataOneofCase.Panorama) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Panorama);
       }
       if (InputMapping.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(InputMapping);
@@ -391,6 +424,12 @@ namespace Naki3D.Common.Protocol {
             Video = new global::Naki3D.Common.Protocol.Video();
           }
           Video.MergeFrom(other.Video);
+          break;
+        case DataOneofCase.Panorama:
+          if (Panorama == null) {
+            Panorama = new global::Naki3D.Common.Protocol.Panorama();
+          }
+          Panorama.MergeFrom(other.Panorama);
           break;
       }
 
@@ -453,6 +492,15 @@ namespace Naki3D.Common.Protocol {
             additionalScripts_.AddEntriesFrom(input, _repeated_additionalScripts_codec);
             break;
           }
+          case 58: {
+            global::Naki3D.Common.Protocol.Panorama subBuilder = new global::Naki3D.Common.Protocol.Panorama();
+            if (dataCase_ == DataOneofCase.Panorama) {
+              subBuilder.MergeFrom(Panorama);
+            }
+            input.ReadMessage(subBuilder);
+            Panorama = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -510,6 +558,15 @@ namespace Naki3D.Common.Protocol {
           }
           case 50: {
             additionalScripts_.AddEntriesFrom(ref input, _repeated_additionalScripts_codec);
+            break;
+          }
+          case 58: {
+            global::Naki3D.Common.Protocol.Panorama subBuilder = new global::Naki3D.Common.Protocol.Panorama();
+            if (dataCase_ == DataOneofCase.Panorama) {
+              subBuilder.MergeFrom(Panorama);
+            }
+            input.ReadMessage(subBuilder);
+            Panorama = subBuilder;
             break;
           }
         }
@@ -1461,6 +1518,275 @@ namespace Naki3D.Common.Protocol {
 
   }
 
+  public sealed partial class Panorama : pb::IMessage<Panorama>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<Panorama> _parser = new pb::MessageParser<Panorama>(() => new Panorama());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<Panorama> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Naki3D.Common.Protocol.ResourceReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Panorama() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Panorama(Panorama other) : this() {
+      data_ = other.data_;
+      rotationSpeed_ = other.rotationSpeed_;
+      cameraVerticalAngle_ = other.cameraVerticalAngle_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Panorama Clone() {
+      return new Panorama(this);
+    }
+
+    /// <summary>Field number for the "data" field.</summary>
+    public const int DataFieldNumber = 1;
+    private pb::ByteString data_ = pb::ByteString.Empty;
+    /// <summary>
+    ///Maybe separate panoramas for left/right eye in future
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pb::ByteString Data {
+      get { return data_; }
+      set {
+        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "rotation_speed" field.</summary>
+    public const int RotationSpeedFieldNumber = 3;
+    private double rotationSpeed_;
+    /// <summary>
+    ///field 2 placeholder for left/right split
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public double RotationSpeed {
+      get { return rotationSpeed_; }
+      set {
+        rotationSpeed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "camera_vertical_angle" field.</summary>
+    public const int CameraVerticalAngleFieldNumber = 4;
+    private double cameraVerticalAngle_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public double CameraVerticalAngle {
+      get { return cameraVerticalAngle_; }
+      set {
+        cameraVerticalAngle_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as Panorama);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(Panorama other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Data != other.Data) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(RotationSpeed, other.RotationSpeed)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(CameraVerticalAngle, other.CameraVerticalAngle)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Data.Length != 0) hash ^= Data.GetHashCode();
+      if (RotationSpeed != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(RotationSpeed);
+      if (CameraVerticalAngle != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(CameraVerticalAngle);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Data.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteBytes(Data);
+      }
+      if (RotationSpeed != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(RotationSpeed);
+      }
+      if (CameraVerticalAngle != 0D) {
+        output.WriteRawTag(33);
+        output.WriteDouble(CameraVerticalAngle);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Data.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteBytes(Data);
+      }
+      if (RotationSpeed != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(RotationSpeed);
+      }
+      if (CameraVerticalAngle != 0D) {
+        output.WriteRawTag(33);
+        output.WriteDouble(CameraVerticalAngle);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Data.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Data);
+      }
+      if (RotationSpeed != 0D) {
+        size += 1 + 8;
+      }
+      if (CameraVerticalAngle != 0D) {
+        size += 1 + 8;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(Panorama other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Data.Length != 0) {
+        Data = other.Data;
+      }
+      if (other.RotationSpeed != 0D) {
+        RotationSpeed = other.RotationSpeed;
+      }
+      if (other.CameraVerticalAngle != 0D) {
+        CameraVerticalAngle = other.CameraVerticalAngle;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Data = input.ReadBytes();
+            break;
+          }
+          case 25: {
+            RotationSpeed = input.ReadDouble();
+            break;
+          }
+          case 33: {
+            CameraVerticalAngle = input.ReadDouble();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Data = input.ReadBytes();
+            break;
+          }
+          case 25: {
+            RotationSpeed = input.ReadDouble();
+            break;
+          }
+          case 33: {
+            CameraVerticalAngle = input.ReadDouble();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
   public sealed partial class Environment : pb::IMessage<Environment>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -1475,7 +1801,7 @@ namespace Naki3D.Common.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Naki3D.Common.Protocol.ResourceReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Naki3D.Common.Protocol.ResourceReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1725,7 +2051,7 @@ namespace Naki3D.Common.Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Naki3D.Common.Protocol.ResourceReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Naki3D.Common.Protocol.ResourceReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
