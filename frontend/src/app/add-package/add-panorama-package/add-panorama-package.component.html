@@ -1,0 +1,55 @@
+<mat-horizontal-stepper [linear]="true" *ngIf="unfinishedPackage$ | async as package">
+    <mat-step label="Nahrání dat">
+        <div class="mat-elevation-z1 raised-box">
+            <app-add-local-upload accept="image/*" [packageId]="package.id!"></app-add-local-upload>
+        </div>
+        <div class="button-row">
+            <button mat-raised-button (click)="goBack()">Zrušit</button>
+            <button mat-raised-button matStepperNext (click)="refreshPackage(package.id!)">Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Nastavení">
+        <div fxLayout="column" fxLayoutAlign="center start" fxFlex="40%"
+                        class="settings-pane mat-elevation-z2 raised-box">
+            <mat-tab-group class="full-width">
+                <mat-tab label="Kamera">
+                    <div [formGroup]="settingsFG">
+                        <div class="setting" fxLayout="row">
+                            <label fxFlex="60%">Vertikální úhel:</label>
+                            <mat-form-field fxFlex="5%">
+                                <input matInput type="number" min="-90" max="90"
+                                        formControlName="cameraVerticalAngle"
+                                        [value]="settingsFG.get('cameraVerticalAngle')?.value">
+                            </mat-form-field>
+                            <mat-slider fxFlex="55%" min="-90" max="90" thumbLabel="true" formControlName="cameraVerticalAngle" [value]="settingsFG.get('cameraVerticalAngle')?.value">
+                            </mat-slider>
+                        </div>
+                        <div class="setting" fxLayout="row">
+                            <label fxFlex="60%">Rychlost rotace:</label>
+                            <mat-form-field fxFlex="5%">
+                                <input matInput type="rotationSpeed" min="-10" max="10"
+                                        formControlName="rotationSpeed"
+                                        [value]="settingsFG.get('rotationSpeed')?.value">
+                            </mat-form-field>
+                            <mat-slider fxFlex="55%" min="-10" max="10" thumbLabel="true" formControlName="rotationSpeed" [value]="settingsFG.get('rotationSpeed')?.value">
+                            </mat-slider>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button matStepperNext
+                (click)="saveParametersAndInputs(package.id!, package.dataFiles![0].path!)">Pokračovat</button>
+        </div>
+    </mat-step>
+    <mat-step label="Metadata">
+        <app-add-metadata [package]="package" #addMetadataComponent></app-add-metadata>
+        <div class="button-row">
+            <button mat-raised-button matStepperPrevious>Zpět</button>
+            <button mat-raised-button (click)="finishAddingPackage(package.id!)">Uložit balíček</button>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

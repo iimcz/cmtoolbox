@@ -51,6 +51,8 @@ export class PackageListComponent implements OnInit, AfterViewInit {
         return 'grain';
       case PackageType.Video:
         return 'movie';
+      case PackageType.Panorama:
+        return 'panorama_horizontal';
     }
   }
 

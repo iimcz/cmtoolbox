@@ -1,0 +1,12 @@
+.button-row {
+    margin-top: 2em;
+    display: flex;
+    justify-content: space-around;
+}
+
+.raised-box {
+    margin: 1em 0em 1em 0em;
+    padding: 2em;
+    border-radius: 5px;
+    height: 100%;
+}

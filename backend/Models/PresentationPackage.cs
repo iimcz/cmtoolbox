@@ -8,7 +8,8 @@ namespace backend.Models
         Gallery,
         Video,
         Scene,
-        Model
+        Model,
+        Panorama
     }
 
     public enum PackageState

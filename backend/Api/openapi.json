@@ -1009,13 +1009,15 @@
           "Gallery",
           "Video",
           "Scene",
-          "Model"
+          "Model",
+          "Panorama"
         ],
         "enum": [
           0,
           1,
           2,
-          3
+          3,
+          4
         ]
       },
       "ToolboxUser": {
@@ -1403,6 +1405,16 @@
             "items": {
               "$ref": "#/components/schemas/VideoEvent"
             }
+          },
+          "rotationSpeed": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cameraVerticalAngle": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },

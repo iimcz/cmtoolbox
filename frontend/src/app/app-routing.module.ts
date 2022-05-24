@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';import { AddGalleryPackag
 import { AddModelPackageComponent } from './add-package/add-model-package/add-model-package.component';
 import { AddScenePackageComponent } from './add-package/add-scene-package/add-scene-package.component';
 import { AddVideoPackageComponent } from './add-package/add-video-package/add-video-package.component';
+import { AddPanoramaPackageComponent } from './add-package/add-panorama-package/add-panorama-package.component';
 import { HelpSceneImportComponent } from './help/help-scene-import/help-scene-import.component';
 import { HelpScriptsComponent } from './help/help-scripts/help-scripts.component';
 import { PackageDetailComponent } from './package-detail/package-detail.component';
@@ -25,7 +26,8 @@ const routes: Routes = [
       { path: 'gallery/:id', component: AddGalleryPackageComponent },
       { path: 'video/:id', component: AddVideoPackageComponent },
       { path: 'scene/:id', component: AddScenePackageComponent },
-      { path: 'model/:id', component: AddModelPackageComponent }
+      { path: 'model/:id', component: AddModelPackageComponent },
+      { path: 'panorama/:id', component: AddPanoramaPackageComponent }
     ]
   },
 

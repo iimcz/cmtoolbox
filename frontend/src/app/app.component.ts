@@ -48,4 +48,11 @@ export class AppComponent {
       this.router.navigate(["add-package", "scene", pkg.id]);
     });
   }
+
+  addPackagePanorama()
+  {
+    this.packagesClient.createNewPackage(PackageType.Panorama).subscribe(pkg => {
+      this.router.navigate(["add-package", "panorama", pkg.id]);
+    });
+  }
 }

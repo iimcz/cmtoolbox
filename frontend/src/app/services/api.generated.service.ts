@@ -1619,6 +1619,7 @@ export enum PackageType {
     Video = 1,
     Scene = 2,
     Model = 3,
+    Panorama = 4,
 }
 
 export class IdentityUserOfString implements IIdentityUserOfString {
@@ -2248,6 +2249,8 @@ export class Settings implements ISettings {
     autoStart?: boolean | undefined;
     loop?: boolean | undefined;
     videoEvents?: VideoEvent[] | undefined;
+    rotationSpeed?: number | undefined;
+    cameraVerticalAngle?: number | undefined;
 
     constructor(data?: ISettings) {
         if (data) {
@@ -2284,6 +2287,8 @@ export class Settings implements ISettings {
                 for (let item of _data["videoEvents"])
                     this.videoEvents!.push(VideoEvent.fromJS(item));
             }
+            this.rotationSpeed = _data["rotationSpeed"];
+            this.cameraVerticalAngle = _data["cameraVerticalAngle"];
         }
     }
 
@@ -2320,6 +2325,8 @@ export class Settings implements ISettings {
             for (let item of this.videoEvents)
                 data["videoEvents"].push(item.toJSON());
         }
+        data["rotationSpeed"] = this.rotationSpeed;
+        data["cameraVerticalAngle"] = this.cameraVerticalAngle;
         return data;
     }
 }
@@ -2341,6 +2348,8 @@ export interface ISettings {
     autoStart?: boolean | undefined;
     loop?: boolean | undefined;
     videoEvents?: VideoEvent[] | undefined;
+    rotationSpeed?: number | undefined;
+    cameraVerticalAngle?: number | undefined;
 }
 
 export class Layout implements ILayout {
