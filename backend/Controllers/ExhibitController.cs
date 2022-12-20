@@ -37,10 +37,12 @@ namespace backend.Controllers
         }
 
         [HttpGet("pending")]
+        [ResponseCache(NoStore = true)]
         public IEnumerable<string> GetPendingConnections() =>
             _connectionManager.GetPendingConnections();
 
         [HttpGet("established")]
+        [ResponseCache(NoStore = true)]
         public IEnumerable<string> GetEstablishedConnections() =>
             _connectionManager.GetEstablishedConnections();
         

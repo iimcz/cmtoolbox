@@ -15,7 +15,7 @@ namespace backend.Communication
         public event System.Action OnIncomingConnectionEvent;
 
         // TODO: Configurable port
-        private const int ServerListenPort = 3917;
+        private const int ServerListenPort = 3918;
         private ILogger<ExhibitConnectionManager> _logger;
 
         private TcpListener _incomingListener;

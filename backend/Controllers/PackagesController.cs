@@ -51,7 +51,7 @@ namespace backend.Controllers
             var package = await _dbContext.PresentationPackages
                 .Include(p => p.Metadata)
                 .SingleOrDefaultAsync(p => p.Id == id);
-            
+
             if (package == null)
                 return NotFound();
             return Ok(package);
@@ -70,7 +70,7 @@ namespace backend.Controllers
                 .Include(p => p.DataFiles)
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == id);
-            
+
             if (package == null)
                 return NotFound();
             return Ok(package);
@@ -79,7 +79,7 @@ namespace backend.Controllers
         [HttpGet("unfinished/{id}/files")]
         public IEnumerable<PackageFile> GetUnfinishedPackageFiles(int id) =>
             _dbContext.PresentationPackages.Include(p => p.DataFiles).Single(p => p.Id == id).DataFiles.Select(f => new PackageFile(f.Id, Path.GetFileName(f.Path)));
-        
+
         [HttpPost("new/{type}")]
         public async Task<ActionResult<CreatedUnfinishedPackage>> CreateNewPackage(PackageType type)
         {
@@ -120,7 +120,8 @@ namespace backend.Controllers
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("Finalizing package {0}...", unfinished.Id);
 
-            Response.OnCompleted(async () => {
+            Response.OnCompleted(async () =>
+            {
                 await FinalizePackageData(unfinished);
 
                 // TODO: improve performance
@@ -213,7 +214,7 @@ namespace backend.Controllers
             var package = await _dbContext.PresentationPackages
                 .Include(p => p.Metadata)
                 .SingleOrDefaultAsync(p => p.Id == id);
-            
+
             if (package == null)
                 return NotFound();
 
@@ -226,7 +227,7 @@ namespace backend.Controllers
             var package = await _dbContext.PresentationPackages
                 .Include(p => p.Metadata)
                 .SingleOrDefaultAsync(p => p.Id == id);
-            
+
             if (package == null)
                 return NotFound();
 
@@ -243,7 +244,7 @@ namespace backend.Controllers
             var package = await _dbContext.PresentationPackages
                 .Include(p => p.Metadata)
                 .SingleOrDefaultAsync(p => p.Id == id);
-            
+
             if (package == null)
                 return NotFound();
 
@@ -272,7 +273,7 @@ namespace backend.Controllers
             var package = await _dbContext.PresentationPackages
                 .Include(p => p.Metadata)
                 .SingleOrDefaultAsync(p => p.Id == id);
-            
+
             if (package == null)
                 return NotFound();
 
@@ -287,7 +288,7 @@ namespace backend.Controllers
         {
             var package = await _dbContext.PresentationPackages
                 .FindAsync(id);
-            
+
             if (package == null)
                 return NotFound();
 
@@ -302,7 +303,7 @@ namespace backend.Controllers
         {
             var package = await _dbContext.PresentationPackages
                 .FindAsync(id);
-            
+
             if (package == null)
                 return NotFound();
 
@@ -328,6 +329,22 @@ namespace backend.Controllers
 
             var stream = new FileStream(Path.Combine(Directory.GetCurrentDirectory(), zipPath), FileMode.Open);
             return File(stream, "application/zip");
+        }
+
+        [HttpGet("hash/{id}")]
+        public async Task<string> GetPackageHash(int id)
+        {
+            string filepath = Path.Combine(_basePackageDir, String.Format("{0}.zip", id));
+            byte[] hash;
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                using (var file = System.IO.File.OpenRead(filepath))
+                {
+                    hash = await sha256.ComputeHashAsync(file);
+                }
+            }
+
+            return BitConverter.ToString(hash).Replace("-", String.Empty).ToLowerInvariant();
         }
     }
 }
