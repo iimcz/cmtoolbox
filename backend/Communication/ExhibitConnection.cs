@@ -63,17 +63,17 @@ namespace backend.Communication
                 {
                     message = DeviceMessage.Parser.ParseJson(_jsonReader.NextJsonObject());
                 }
-                catch (InvalidProtocolBufferException)
+                catch (InvalidProtocolBufferException e)
                 {
-                    Console.WriteLine("InvalidProtobuf");
+                    Console.WriteLine("InvalidProtobuf: " + e.Message);
                     // TODO: proper loging
                     // Failed either due to message having invalid format
                     // If the stream is still open, it will eventually time out.
                     return;
                 }
-                catch (InvalidDataException)
+                catch (InvalidDataException e)
                 {
-                    Console.WriteLine("InvalidData");
+                    Console.WriteLine("InvalidData: " + e.Message);
                     // TODO: proper loging
                     // Failed either due to the stream closing or because of another error.
                     // If the stream is still open, it will eventually time out.

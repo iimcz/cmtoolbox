@@ -49,7 +49,7 @@ namespace backend.Communication
                             if (Char.IsWhiteSpace(c))
                                 break; // Skip whitespaces between objects.
                             if (OBJECT_BEGIN != c)
-                                throw new InvalidDataException("Expected start of a JSON object.");
+                                throw new InvalidDataException("Expected start of a JSON object: " + builder.ToString());
                             depth++;
                             state = ReaderState.InObject;
                             break;
