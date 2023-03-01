@@ -1,12 +1,10 @@
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
-import { MatTableDataSource } from '@angular/material/table';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { AddMetadataComponent } from 'src/app/add-common-steps/add-metadata/add-metadata.component';
-import { combineLatestWith, map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
+import { map, mergeWith, Observable, Subject, switchMap } from 'rxjs';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { FileClient } from 'src/app/services/api';
-import { Action, Condition, ConversionClient, ISettings, Mapping, PackagesClient, Parameters, PresentationPackage, Preset, ThresholdType, TypeEnum, VideoConversionParams } from 'src/app/services/api.generated.service';
+import { Action, PackagesClient, PresentationPackage } from 'src/app/services/api.generated.service';
 import { Parameters as ApiParameters, Settings as ApiSettings } from 'src/app/services/api.generated.service';
 
 @Component({

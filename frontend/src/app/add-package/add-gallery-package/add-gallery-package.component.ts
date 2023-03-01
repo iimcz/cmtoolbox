@@ -152,23 +152,117 @@ export class AddGalleryPackageComponent implements OnInit {
         // TODO: handle
       );
     this.packagesClient.setPackageInputs(id, [
-      // TESTING DATA
-      // new Action({
-      //   effect: 'left',
-      //   type: TypeEnum.Event,
-      //   mapping: new Mapping({
-      //     source: 'depthCam1',
-      //     eventName: 'swipeLeft'
-      //   })
-      // }),
-      // new Action({
-      //   effect: 'right',
-      //   type: TypeEnum.Event,
-      //   mapping: new Mapping({
-      //     source: 'depthCam1',
-      //     eventName: 'swipeRight'
-      //   })
-      // })
+      new Action({
+        effect: 'left',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/left/gestures/swipe_left'
+        })
+      }),
+      new Action({
+        effect: 'left',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/right/gestures/swipe_left'
+        })
+      }),
+      new Action({
+        effect: 'left',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/left/gestures/swipe_left'
+        })
+      }),
+      new Action({
+        effect: 'left',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/right/gestures/swipe_left'
+        })
+      }),
+      new Action({
+        effect: 'right',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/left/gestures/swipe_right'
+        })
+      }),
+      new Action({
+        effect: 'right',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/right/gestures/swipe_right'
+        })
+      }),
+      new Action({
+        effect: 'right',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/left/gestures/swipe_right'
+        })
+      }),
+      new Action({
+        effect: 'right',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/right/gestures/swipe_right'
+        })
+      }),
+      new Action({
+        effect: 'unzoom',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/left/gestures/swipe_up'
+        })
+      }),
+      new Action({
+        effect: 'unzoom',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/right/gestures/swipe_up'
+        })
+      }),
+      new Action({
+        effect: 'unzoom',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/left/gestures/swipe_up'
+        })
+      }),
+      new Action({
+        effect: 'unzoom',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/right/gestures/swipe_up'
+        })
+      }),
+      new Action({
+        effect: 'cursor_position',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/left/center_position'
+        })
+      }),
+      new Action({
+        effect: 'cursor_position',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'mediapipe/handtracking/hand/right/center_position'
+        })
+      }),new Action({
+        effect: 'unzoom',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/left/center_position'
+        })
+      }),
+      new Action({
+        effect: 'unzoom',
+        type: TypeEnum.Void,
+        mapping: new Mapping({
+          source: 'nuitrack/handtracking/user/0/hand/right/center_position'
+        })
+      })
     ]) // TODO: fill with actual data
       .subscribe(
         // TODO: handle
