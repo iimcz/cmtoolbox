@@ -24,7 +24,6 @@ namespace backend.Controllers
         private ExhibitConnectionManager _connectionManager;
         private CMTContext _dbContext;
         private string _basePackageDir;
-        private bool _useHttps;
 
         public ExhibitController(IConfiguration config, ILogger<ExhibitController> logger, ExhibitConnectionManager connectionManager, CMTContext dbContext)
         {
@@ -33,7 +32,6 @@ namespace backend.Controllers
             _dbContext = dbContext;
 
             _basePackageDir = config.GetSection("Packages").GetValue<string>("BaseStorageDir");
-            _useHttps = config.GetSection("ExCon").GetValue<bool>("UseHttps");
         }
 
         [HttpGet("pending")]
@@ -47,9 +45,9 @@ namespace backend.Controllers
             _connectionManager.GetEstablishedConnections();
         
         [HttpPost("accept/{id}")]
-        public ActionResult AcceptConnection(string id)
+        public async Task<ActionResult> AcceptConnection(string id)
         {
-            _connectionManager.AcceptPendingConnection(id);
+            await _connectionManager.AcceptPendingConnection(id);
             return Ok();
         }
 
@@ -68,15 +66,18 @@ namespace backend.Controllers
                 return BadRequest();
 
             // First clear, then load the new package.
-            _connectionManager.ClearPackage(exhibit_id);
+            await _connectionManager.PurgeCachedPackages(exhibit_id);
 
             using (var writer = new StringWriter())
             {
                 string filepath = Path.Combine(_basePackageDir, String.Format("{0}.zip", package.Id));
-                string pkgurl = _useHttps ? "https://" : "http://";
-                pkgurl += String.Format("{0}:5000/packages/download/{1}", _connectionManager.GetInterfaceAddressFor(exhibit_id), package.Id);
+                string pkgurl = this.HttpContext.Request.IsHttps ? "https://" : "http://";
+                int port = this.HttpContext.Connection.LocalPort;
+                pkgurl += String.Format("{0}:{2}/packages/download/{1}", _connectionManager.GetInterfaceAddressFor(exhibit_id), package.Id, port.ToString());
                 await PackageUtils.WritePackageJsonAsync(package, writer, filepath, pkgurl);
-                _connectionManager.LoadPackage(exhibit_id, writer.ToString());
+                await _connectionManager.LoadPackage(exhibit_id, writer.ToString());
+                await _connectionManager.SetStartupPackage(exhibit_id, package.Id.ToString());
+                await _connectionManager.StartPackage(exhibit_id, package.Id.ToString());
             }
 
             return Ok();

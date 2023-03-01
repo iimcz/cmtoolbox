@@ -1,5 +1,5 @@
 {
-  "x-generator": "NSwag v13.14.4.0 (NJsonSchema v10.5.2.0 (Newtonsoft.Json v12.0.0.0))",
+  "x-generator": "NSwag v13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v12.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "My Title",
@@ -1089,8 +1089,7 @@
         "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "userName": {
             "type": "string",
@@ -1438,12 +1437,12 @@
               "$ref": "#/components/schemas/VideoEvent"
             }
           },
-          "rotationSpeed": {
+          "cameraVerticalAngle": {
             "type": "number",
             "format": "double",
             "nullable": true
           },
-          "cameraVerticalAngle": {
+          "rotationSpeed": {
             "type": "number",
             "format": "double",
             "nullable": true
@@ -1723,80 +1722,154 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "eventName": {
-            "type": "string",
-            "nullable": true
-          },
           "source": {
             "type": "string",
             "nullable": true
           },
-          "condition": {
+          "transform": {
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/Condition"
+                "$ref": "#/components/schemas/Transform"
               }
             ]
-          },
-          "threshold": {
+          }
+        }
+      },
+      "Transform": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
             "type": "string",
             "nullable": true
           },
-          "thresholdType": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "comparisonType": {
+            "type": "string",
+            "nullable": true
+          },
+          "comparisonValue": {
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ThresholdType"
+                "$ref": "#/components/schemas/ComparisonValue"
               }
             ]
           },
           "inMax": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InM"
+              }
+            ]
           },
           "inMin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InM"
+              }
+            ]
           },
           "outMax": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/OutM"
+              }
+            ]
+          },
+          "outMin": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/OutM"
+              }
+            ]
+          },
+          "rangeMaxValue": {
             "type": "number",
             "format": "double",
             "nullable": true
           },
-          "outMin": {
+          "roundingMethod": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RoundingMethod"
+              }
+            ]
+          },
+          "passValue": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ComparisonValue": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bool": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "double": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "string": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "InM": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bool": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "double": {
             "type": "number",
             "format": "double",
             "nullable": true
           }
         }
       },
-      "Condition": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Above",
-          "AboveOrEquals",
-          "Below",
-          "BelowOrEquals",
-          "Equals"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4
-        ]
+      "OutM": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "double": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "string": {
+            "type": "string",
+            "nullable": true
+          }
+        }
       },
-      "ThresholdType": {
+      "RoundingMethod": {
         "type": "integer",
         "description": "",
         "x-enumNames": [
-          "Float",
-          "Integer"
+          "Down",
+          "Up"
         ],
         "enum": [
           0,
@@ -1807,14 +1880,20 @@
         "type": "integer",
         "description": "",
         "x-enumNames": [
-          "Event",
-          "Value",
-          "ValueTrigger"
+          "Bool",
+          "Complex",
+          "Float",
+          "Integer",
+          "String",
+          "Void"
         ],
         "enum": [
           0,
           1,
-          2
+          2,
+          3,
+          4,
+          5
         ]
       }
     }

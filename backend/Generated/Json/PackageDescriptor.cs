@@ -53,32 +53,50 @@ namespace Naki3D.Common.Json
 
     public partial class Mapping
     {
-        [JsonProperty("eventName", NullValueHandling = NullValueHandling.Ignore)]
-        public string EventName { get; set; }
-
         [JsonProperty("source")]
         public string Source { get; set; }
 
-        [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
-        public Condition? Condition { get; set; }
+        [JsonProperty("transform", NullValueHandling = NullValueHandling.Ignore)]
+        public Transform Transform { get; set; }
+    }
 
-        [JsonProperty("threshold", NullValueHandling = NullValueHandling.Ignore)]
-        public string Threshold { get; set; }
+    public partial class Transform
+    {
+        [JsonProperty("from", NullValueHandling = NullValueHandling.Ignore)]
+        public string From { get; set; }
 
-        [JsonProperty("thresholdType", NullValueHandling = NullValueHandling.Ignore)]
-        public ThresholdType? ThresholdType { get; set; }
+        [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
+        public string Type { get; set; }
+
+        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
+        public string Value { get; set; }
+
+        [JsonProperty("comparisonType", NullValueHandling = NullValueHandling.Ignore)]
+        public string ComparisonType { get; set; }
+
+        [JsonProperty("comparisonValue", NullValueHandling = NullValueHandling.Ignore)]
+        public ComparisonValue? ComparisonValue { get; set; }
 
         [JsonProperty("inMax", NullValueHandling = NullValueHandling.Ignore)]
-        public double? InMax { get; set; }
+        public InM? InMax { get; set; }
 
         [JsonProperty("inMin", NullValueHandling = NullValueHandling.Ignore)]
-        public double? InMin { get; set; }
+        public InM? InMin { get; set; }
 
         [JsonProperty("outMax", NullValueHandling = NullValueHandling.Ignore)]
-        public double? OutMax { get; set; }
+        public OutM? OutMax { get; set; }
 
         [JsonProperty("outMin", NullValueHandling = NullValueHandling.Ignore)]
-        public double? OutMin { get; set; }
+        public OutM? OutMin { get; set; }
+
+        [JsonProperty("rangeMaxValue", NullValueHandling = NullValueHandling.Ignore)]
+        public double? RangeMaxValue { get; set; }
+
+        [JsonProperty("roundingMethod", NullValueHandling = NullValueHandling.Ignore)]
+        public RoundingMethod? RoundingMethod { get; set; }
+
+        [JsonProperty("passValue", NullValueHandling = NullValueHandling.Ignore)]
+        public string PassValue { get; set; }
     }
 
     public partial class Metadata
@@ -92,11 +110,14 @@ namespace Naki3D.Common.Json
         [JsonProperty("exposition")]
         public string Exposition { get; set; }
 
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
         [JsonProperty("other", NullValueHandling = NullValueHandling.Ignore)]
         public List<Other> Other { get; set; }
 
-        [JsonProperty("packageName", NullValueHandling = NullValueHandling.Ignore)]
-        public string PackageName { get; set; }
+        [JsonProperty("title")]
+        public string Title { get; set; }
     }
 
     public partial class Other
@@ -176,11 +197,11 @@ namespace Naki3D.Common.Json
         [JsonProperty("videoEvents", NullValueHandling = NullValueHandling.Ignore)]
         public List<VideoEvent> VideoEvents { get; set; }
 
-        [JsonProperty("rotationSpeed", NullValueHandling = NullValueHandling.Ignore)]
-        public double? RotationSpeed { get; set; }
-
         [JsonProperty("cameraVerticalAngle", NullValueHandling = NullValueHandling.Ignore)]
         public double? CameraVerticalAngle { get; set; }
+
+        [JsonProperty("rotationSpeed", NullValueHandling = NullValueHandling.Ignore)]
+        public double? RotationSpeed { get; set; }
     }
 
     public partial class CameraAnimation
@@ -305,14 +326,14 @@ namespace Naki3D.Common.Json
 
     public partial class Sync
     {
-        [JsonProperty("canvasDimensions")]
+        [JsonProperty("canvasDimensions", NullValueHandling = NullValueHandling.Ignore)]
         public CanvasDimensions CanvasDimensions { get; set; }
 
-        [JsonProperty("elements")]
+        [JsonProperty("elements", NullValueHandling = NullValueHandling.Ignore)]
         public List<Element> Elements { get; set; }
 
-        [JsonProperty("selfIndex")]
-        public long SelfIndex { get; set; }
+        [JsonProperty("relayAddress")]
+        public string RelayAddress { get; set; }
     }
 
     public partial class CanvasDimensions
@@ -329,24 +350,48 @@ namespace Naki3D.Common.Json
         [JsonProperty("hostname")]
         public string Hostname { get; set; }
 
-        [JsonProperty("role")]
-        public string Role { get; set; }
-
         [JsonProperty("viewportTransform")]
         public string ViewportTransform { get; set; }
     }
 
-    public enum Condition { Above, AboveOrEquals, Below, BelowOrEquals, Equals };
+    public enum RoundingMethod { Down, Up };
 
-    public enum ThresholdType { Float, Integer };
-
-    public enum TypeEnum { Event, Value, ValueTrigger };
+    public enum TypeEnum { Bool, Complex, Float, Integer, String, Void };
 
     public enum AspectRatio { FitInside, FitOutside, Stretch };
 
     public enum FlagInteraction { Point, Swipe };
 
     public enum LayoutType { Grid, List };
+
+    public partial struct ComparisonValue
+    {
+        public bool? Bool;
+        public double? Double;
+        public string String;
+
+        public static implicit operator ComparisonValue(bool Bool) => new ComparisonValue { Bool = Bool };
+        public static implicit operator ComparisonValue(double Double) => new ComparisonValue { Double = Double };
+        public static implicit operator ComparisonValue(string String) => new ComparisonValue { String = String };
+    }
+
+    public partial struct InM
+    {
+        public bool? Bool;
+        public double? Double;
+
+        public static implicit operator InM(bool Bool) => new InM { Bool = Bool };
+        public static implicit operator InM(double Double) => new InM { Double = Double };
+    }
+
+    public partial struct OutM
+    {
+        public double? Double;
+        public string String;
+
+        public static implicit operator OutM(double Double) => new OutM { Double = Double };
+        public static implicit operator OutM(string String) => new OutM { String = String };
+    }
 
     public partial class PackageDescriptor
     {
@@ -366,8 +411,10 @@ namespace Naki3D.Common.Json
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
-                ConditionConverter.Singleton,
-                ThresholdTypeConverter.Singleton,
+                ComparisonValueConverter.Singleton,
+                InMConverter.Singleton,
+                OutMConverter.Singleton,
+                RoundingMethodConverter.Singleton,
                 TypeEnumConverter.Singleton,
                 AspectRatioConverter.Singleton,
                 FlagInteractionConverter.Singleton,
@@ -377,65 +424,133 @@ namespace Naki3D.Common.Json
         };
     }
 
-    internal class ConditionConverter : JsonConverter
+    internal class ComparisonValueConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Condition) || t == typeof(Condition?);
+        public override bool CanConvert(Type t) => t == typeof(ComparisonValue) || t == typeof(ComparisonValue?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
+            switch (reader.TokenType)
             {
-                case "above":
-                    return Condition.Above;
-                case "aboveOrEquals":
-                    return Condition.AboveOrEquals;
-                case "below":
-                    return Condition.Below;
-                case "belowOrEquals":
-                    return Condition.BelowOrEquals;
-                case "equals":
-                    return Condition.Equals;
+                case JsonToken.Integer:
+                case JsonToken.Float:
+                    var doubleValue = serializer.Deserialize<double>(reader);
+                    return new ComparisonValue { Double = doubleValue };
+                case JsonToken.Boolean:
+                    var boolValue = serializer.Deserialize<bool>(reader);
+                    return new ComparisonValue { Bool = boolValue };
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    return new ComparisonValue { String = stringValue };
             }
-            throw new Exception("Cannot unmarshal type Condition");
+            throw new Exception("Cannot unmarshal type ComparisonValue");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            if (untypedValue == null)
+            var value = (ComparisonValue)untypedValue;
+            if (value.Double != null)
             {
-                serializer.Serialize(writer, null);
+                serializer.Serialize(writer, value.Double.Value);
                 return;
             }
-            var value = (Condition)untypedValue;
-            switch (value)
+            if (value.Bool != null)
             {
-                case Condition.Above:
-                    serializer.Serialize(writer, "above");
-                    return;
-                case Condition.AboveOrEquals:
-                    serializer.Serialize(writer, "aboveOrEquals");
-                    return;
-                case Condition.Below:
-                    serializer.Serialize(writer, "below");
-                    return;
-                case Condition.BelowOrEquals:
-                    serializer.Serialize(writer, "belowOrEquals");
-                    return;
-                case Condition.Equals:
-                    serializer.Serialize(writer, "equals");
-                    return;
+                serializer.Serialize(writer, value.Bool.Value);
+                return;
             }
-            throw new Exception("Cannot marshal type Condition");
+            if (value.String != null)
+            {
+                serializer.Serialize(writer, value.String);
+                return;
+            }
+            throw new Exception("Cannot marshal type ComparisonValue");
         }
 
-        public static readonly ConditionConverter Singleton = new ConditionConverter();
+        public static readonly ComparisonValueConverter Singleton = new ComparisonValueConverter();
     }
 
-    internal class ThresholdTypeConverter : JsonConverter
+    internal class InMConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(ThresholdType) || t == typeof(ThresholdType?);
+        public override bool CanConvert(Type t) => t == typeof(InM) || t == typeof(InM?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.Integer:
+                case JsonToken.Float:
+                    var doubleValue = serializer.Deserialize<double>(reader);
+                    return new InM { Double = doubleValue };
+                case JsonToken.Boolean:
+                    var boolValue = serializer.Deserialize<bool>(reader);
+                    return new InM { Bool = boolValue };
+            }
+            throw new Exception("Cannot unmarshal type InM");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (InM)untypedValue;
+            if (value.Double != null)
+            {
+                serializer.Serialize(writer, value.Double.Value);
+                return;
+            }
+            if (value.Bool != null)
+            {
+                serializer.Serialize(writer, value.Bool.Value);
+                return;
+            }
+            throw new Exception("Cannot marshal type InM");
+        }
+
+        public static readonly InMConverter Singleton = new InMConverter();
+    }
+
+    internal class OutMConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(OutM) || t == typeof(OutM?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.Integer:
+                case JsonToken.Float:
+                    var doubleValue = serializer.Deserialize<double>(reader);
+                    return new OutM { Double = doubleValue };
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    return new OutM { String = stringValue };
+            }
+            throw new Exception("Cannot unmarshal type OutM");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (OutM)untypedValue;
+            if (value.Double != null)
+            {
+                serializer.Serialize(writer, value.Double.Value);
+                return;
+            }
+            if (value.String != null)
+            {
+                serializer.Serialize(writer, value.String);
+                return;
+            }
+            throw new Exception("Cannot marshal type OutM");
+        }
+
+        public static readonly OutMConverter Singleton = new OutMConverter();
+    }
+
+    internal class RoundingMethodConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(RoundingMethod) || t == typeof(RoundingMethod?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -443,12 +558,12 @@ namespace Naki3D.Common.Json
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "float":
-                    return ThresholdType.Float;
-                case "integer":
-                    return ThresholdType.Integer;
+                case "down":
+                    return RoundingMethod.Down;
+                case "up":
+                    return RoundingMethod.Up;
             }
-            throw new Exception("Cannot unmarshal type ThresholdType");
+            throw new Exception("Cannot unmarshal type RoundingMethod");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -458,20 +573,20 @@ namespace Naki3D.Common.Json
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (ThresholdType)untypedValue;
+            var value = (RoundingMethod)untypedValue;
             switch (value)
             {
-                case ThresholdType.Float:
-                    serializer.Serialize(writer, "float");
+                case RoundingMethod.Down:
+                    serializer.Serialize(writer, "down");
                     return;
-                case ThresholdType.Integer:
-                    serializer.Serialize(writer, "integer");
+                case RoundingMethod.Up:
+                    serializer.Serialize(writer, "up");
                     return;
             }
-            throw new Exception("Cannot marshal type ThresholdType");
+            throw new Exception("Cannot marshal type RoundingMethod");
         }
 
-        public static readonly ThresholdTypeConverter Singleton = new ThresholdTypeConverter();
+        public static readonly RoundingMethodConverter Singleton = new RoundingMethodConverter();
     }
 
     internal class TypeEnumConverter : JsonConverter
@@ -484,12 +599,18 @@ namespace Naki3D.Common.Json
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "event":
-                    return TypeEnum.Event;
-                case "value":
-                    return TypeEnum.Value;
-                case "valueTrigger":
-                    return TypeEnum.ValueTrigger;
+                case "bool":
+                    return TypeEnum.Bool;
+                case "complex":
+                    return TypeEnum.Complex;
+                case "float":
+                    return TypeEnum.Float;
+                case "integer":
+                    return TypeEnum.Integer;
+                case "string":
+                    return TypeEnum.String;
+                case "void":
+                    return TypeEnum.Void;
             }
             throw new Exception("Cannot unmarshal type TypeEnum");
         }
@@ -504,14 +625,23 @@ namespace Naki3D.Common.Json
             var value = (TypeEnum)untypedValue;
             switch (value)
             {
-                case TypeEnum.Event:
-                    serializer.Serialize(writer, "event");
+                case TypeEnum.Bool:
+                    serializer.Serialize(writer, "bool");
                     return;
-                case TypeEnum.Value:
-                    serializer.Serialize(writer, "value");
+                case TypeEnum.Complex:
+                    serializer.Serialize(writer, "complex");
                     return;
-                case TypeEnum.ValueTrigger:
-                    serializer.Serialize(writer, "valueTrigger");
+                case TypeEnum.Float:
+                    serializer.Serialize(writer, "float");
+                    return;
+                case TypeEnum.Integer:
+                    serializer.Serialize(writer, "integer");
+                    return;
+                case TypeEnum.String:
+                    serializer.Serialize(writer, "string");
+                    return;
+                case TypeEnum.Void:
+                    serializer.Serialize(writer, "void");
                     return;
             }
             throw new Exception("Cannot marshal type TypeEnum");

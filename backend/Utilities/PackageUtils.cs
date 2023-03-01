@@ -94,7 +94,8 @@ namespace backend.Utilities
 
             packageDescriptor.Metadata = new Metadata
             {
-                PackageName = package.Name,
+                Id = package.Id.ToString(),
+                Title = package.Name,
                 Description = package.Description,
                 Author = package.Metadata.SingleOrDefault(m => m.Key == "author")?.Value,
                 Exposition = package.Metadata.SingleOrDefault(m => m.Key == "expo")?.Value,
@@ -123,7 +124,12 @@ namespace backend.Utilities
                 packageDescriptor.Package = new Package { };
             }
 
-            packageDescriptor.Sync = new Sync();
+            packageDescriptor.Sync = new Sync
+            {
+                RelayAddress = "127.0.0.1",
+                Elements = null,
+                CanvasDimensions = null
+            };
 
             await writer.WriteAsync(packageDescriptor.ToJson());
         }

@@ -10,222 +10,202 @@ using System.IO;
 using Naki3D.Common.Protocol;
 using System.Text;
 using backend.Extensions;
+using Grpc.Net.Client;
+using Grpc.Core;
+using System.Net.NetworkInformation;
+using System.Linq;
+using Microsoft.Extensions.Logging;
+using Google.Protobuf.WellKnownTypes;
+using System.Collections.Generic;
 
 namespace backend.Communication
 {
-    public class ExhibitConnection : IDisposable
+    public class ExhibitConnection
     {
-        private readonly double TIMEOUT_INTERVAL = 10_000;
+        private static readonly double PING_INTERVAL = 10_000;
+        private static readonly int CURRENT_PROTOCOL_VERSION = 2;
 
-        TcpClient _connectionClient;
-        Stream _connectionStream;
-        JsonObjectStringReader _jsonReader;
-        Timer _timeoutTimer;
-        Task _receiveLoopTask;
-        bool _accepted = false;
+        ILogger<ExhibitConnection> _logger;
 
-        DeviceDescriptor _descriptor = null;
+        GrpcChannel _exhibitChannel;
+        ConnectionService.ConnectionServiceClient _connectionServiceClient;
+        DeviceService.DeviceServiceClient _deviceServiceClient;
+        PackageService.PackageServiceClient _packageServiceClient;
+        Timer _pingTimer;
+
+        private IPEndPoint _beaconSource;
+
+
+        public DeviceDescriptorResponse Descriptor { get; private set; }
 
         public string ConnectionId { get; private set; }
-        public string PublicKey { get; private set; }
+        public string ExhibitType { get; private set; }
 
 
-        public bool IsConnected { get { return _connectionClient.Connected; } }
+        public bool IsCompatible { get; private set; }
+        public bool IsConnected { get; private set; }
 
         // Events
-        public event EventHandler ExhibitTimedOut;
-        public event EventHandler DescriptorChanged;
+        public event EventHandler<bool> ConnectedChanged;
+        public event EventHandler<DeviceDescriptorResponse> DescriptorChanged;
 
-        public ExhibitConnection(TcpClient client)
+        private ExhibitConnection(BeaconMessage beacon, IPEndPoint beaconSource, bool useSSL, ILogger<ExhibitConnection> logger = null)
         {
-            _connectionClient = client;
-            _connectionStream = client.GetStream();
-            _jsonReader = new JsonObjectStringReader(_connectionStream);
-            _timeoutTimer = new Timer(TIMEOUT_INTERVAL);
-            _timeoutTimer.AutoReset = false;
-            _timeoutTimer.Elapsed += (object sender, ElapsedEventArgs e) => {
-                ExhibitTimedOut?.Invoke(this, new EventArgs());
-                Dispose();
-            };
-        }
-
-        private void ResetTimeout()
-        {
-            _timeoutTimer.Interval = TIMEOUT_INTERVAL;
-        }
-
-        private void MessageReceiveLoop()
-        {
-            while (true)
+            _logger = logger;
+            _beaconSource = beaconSource;
+            var channelAddress = beaconSource.ToUri(useSSL ? "https" : "http", 3917);
+            _exhibitChannel = GrpcChannel.ForAddress(channelAddress, new GrpcChannelOptions
             {
-                DeviceMessage message = null;
-                try 
-                {
-                    message = DeviceMessage.Parser.ParseJson(_jsonReader.NextJsonObject());
-                }
-                catch (InvalidProtocolBufferException e)
-                {
-                    Console.WriteLine("InvalidProtobuf: " + e.Message);
-                    // TODO: proper loging
-                    // Failed either due to message having invalid format
-                    // If the stream is still open, it will eventually time out.
-                    return;
-                }
-                catch (InvalidDataException e)
-                {
-                    Console.WriteLine("InvalidData: " + e.Message);
-                    // TODO: proper loging
-                    // Failed either due to the stream closing or because of another error.
-                    // If the stream is still open, it will eventually time out.
-                    return;
-                }
-                
-                switch (message.MessageCase)
-                {
-                    case DeviceMessage.MessageOneofCase.DeviceDescriptor:
-                        ResetTimeout();
-                        if (!_accepted)
-                            continue; // Ignore if coming from an unaccepted client
-                        _descriptor = message.DeviceDescriptor;
-                        DescriptorChanged?.Invoke(this, new EventArgs());
-                        break;
-                    case DeviceMessage.MessageOneofCase.Ping:
-                        ResetTimeout();
-                        break;
-                }
-            }
+                // TODO: proper settings
+            });
+            _connectionServiceClient = new ConnectionService.ConnectionServiceClient(_exhibitChannel);
+            _deviceServiceClient = new DeviceService.DeviceServiceClient(_exhibitChannel);
+            _packageServiceClient = new PackageService.PackageServiceClient(_exhibitChannel);
+
+            _pingTimer = new Timer();
+            _pingTimer.AutoReset = true;
+            _pingTimer.Elapsed += doPingExhibit;
+
+            ConnectionId = beacon.Hostname;
         }
 
-        public void ReceiveConnectionRequest()
+        private async void doPingExhibit(object sender, ElapsedEventArgs e)
         {
-            var verInfo = PerformVersionExchange();
-            if (!IsVersionCompatible(verInfo))
-            {
-                Dispose();
-                return;
-            }
+            PingRequest request = new PingRequest() { Msg = System.DateTime.UtcNow.Ticks.ToString() };
+            PingResponse response;
 
             try
             {
-                var request = ConnectionRequest.Parser.ParseJson(_jsonReader.NextJsonObject());
-                ConnectionId = request.ConnectionId;
-                PublicKey = request.PublicKey.ToStringUtf8();
+                response = await _connectionServiceClient.PingAsync(request);
             }
-            catch (InvalidProtocolBufferException)
+            catch (RpcException ex)
             {
-                // TODO: logging
-                Dispose();
-                return;
-            }
-            catch (InvalidDataException)
-            {
-                // TODO: logging
-                Dispose();
+                _logger?.LogWarning(ex, "[{0}] Device timed out. Disconnecting.", ConnectionId);
+                await Disconnect();
                 return;
             }
 
-            var ack = new ConnectionAcknowledgement();
-            ack.Verified = false;
-            ack.WriteJsonTo(_connectionStream);
+            if (request.Msg != response.Echo)
+            {
+                _logger?.LogWarning("[{0}] Device timed out. Disconnecting.", ConnectionId);
+                await Disconnect();
+                return;
+            }
 
-            _timeoutTimer.Start();
-
-            _receiveLoopTask = Task.Run(MessageReceiveLoop);
+            _pingTimer.Interval = PING_INTERVAL;
         }
 
-        private bool IsVersionCompatible(object verInfo)
+        public static ExhibitConnection FromBeacon(byte[] beaconPacket, IPEndPoint beaconSource, bool useSSL = false, ILogger<ExhibitConnection> logger = null)
         {
-            if (verInfo == null)
-                return false;
-            return true;
+            var message = BeaconMessage.Parser.ParseFrom(beaconPacket);
+            if (!isVersionCompatible(message.ProtocolVersion))
+            {
+                logger?.LogError("[{0}] Device of type {1} uses incompatible protocol version: {2}!", message.Hostname, message.DeviceType, message.ProtocolVersion);
+                return null;
+            }
+
+            var connection = new ExhibitConnection(message, beaconSource, useSSL, logger);
+
+            return connection;
         }
 
-        private object PerformVersionExchange()
+        public async Task Disconnect()
         {
-            var clientInfo = VersionInfo.Parser.ParseJson(_jsonReader.NextJsonObject());
+            _pingTimer.Stop();
+            await _exhibitChannel.ShutdownAsync();
 
-            // TODO: make these build-time constants
-            var serverInfo = new VersionInfo();
-            serverInfo.Major = 0;
-            serverInfo.Minor = 0;
-            serverInfo.Patch = 0;
-            serverInfo.Build = "";
-
-            serverInfo.WriteJsonTo(_connectionStream);
-
-            return clientInfo;
+            _logger?.LogInformation("[{0}] Device disconnected.", ConnectionId);
+            IsConnected = false;
+            ConnectedChanged?.Invoke(this, IsConnected);
         }
 
-        public void Dispose()
+        public async Task Connect()
         {
-            _connectionClient.Dispose();
-            if (_receiveLoopTask != null && !_receiveLoopTask.IsCompleted)
-                _receiveLoopTask.RunSynchronously();
-        }
-
-        public void AcceptConnection()
-        {
-            ConnectionAcknowledgement ack = new ConnectionAcknowledgement();
-            ack.ConnectionId = ConnectionId;
-            ack.Verified = true;
-
             try
             {
-                ack.WriteJsonTo(_connectionStream);
+                Descriptor = await _deviceServiceClient.GetDeviceDescriptorAsync(new Google.Protobuf.WellKnownTypes.Empty());
+                DescriptorChanged?.Invoke(this, Descriptor);
             }
-            catch (Exception)
+            catch (RpcException e)
             {
-                Dispose();
-                throw;
+                _logger?.LogError(e, "[{0}] Failed to get device descriptor! Disconnecting device.", ConnectionId);
+                await _exhibitChannel.ShutdownAsync();
             }
 
-            _accepted = true;
+            _pingTimer.Interval = PING_INTERVAL;
+            _pingTimer.Start();
+            _logger?.LogInformation("[{0}] Device descriptor received, device successfully connected.", ConnectionId);
+
+            IsConnected = true;
+            ConnectedChanged?.Invoke(this, IsConnected);
         }
 
-        public void SendEncryptionInfo()
+        private static bool isVersionCompatible(int version)
         {
-            ServerMessage message = new ServerMessage();
-            message.EncryptionInfo = new EncryptionInfo();
-
-            // TODO: actual certificate
-            message.EncryptionInfo.DeviceCertificate = ByteString.CopyFromUtf8("");
+            return version == CURRENT_PROTOCOL_VERSION;
         }
 
-        // TODO: proper signature
-        public void LoadPackage(bool isPreview, string descriptor)
+
+        public async Task<bool> LoadPackage(bool isPreview, string descriptor)
         {
-            ServerMessage message = new ServerMessage();
-            message.LoadPackage = new LoadPackage();
-            message.LoadPackage.IsPreview = isPreview;
-            message.LoadPackage.DescriptorJson = descriptor;
-
-            message.WriteJsonTo(_connectionStream);
-        }
-
-        public void ClearPackage(bool purge)
-        {
-            ServerMessage message = new ServerMessage();
-            message.ClearPackage = new ClearPackage();
-            message.ClearPackage.PurgeData = purge;
-
-            message.WriteJsonTo(_connectionStream);
-        }
-
-        public string GetSocketAddress()
-        {
-            var endpoint = _connectionClient.Client.LocalEndPoint as IPEndPoint;
-            if (endpoint != null)
+            var response = await _packageServiceClient.LoadPackageAsync(new LoadPackageRequest
             {
-                if (endpoint.Address.IsIPv4MappedToIPv6)
-                {
-                    return endpoint.Address.MapToIPv4().ToString();
-                }
-                else
-                {
-                    return $"[{endpoint.Address.MapToIPv6().ToString()}]";
-                }
+                IsPreview = isPreview,
+                DescriptorJson = descriptor
+            });
+            return response.Value;
+        }
+
+        public async Task<bool> StartPackage(string packageId)
+        {
+            var response = await _packageServiceClient.StartPackageAsync(new StartPackageRequest
+            {
+                PackageId = packageId
+            });
+            return response.Value;
+        }
+
+        public async Task<bool> SetStartupPackage(string packageId)
+        {
+            var response = await _packageServiceClient.SetStartupPackageAsync(new SetStartupPackageRequest
+            {
+                PackageId = packageId
+            });
+            return response.Value;
+        }
+
+        public async Task<string> GetStartupPackage()
+        {
+            var response = await _packageServiceClient.GetStartupPackageAsync(new Empty());
+            return response.PackageId;
+        }
+
+        public async Task<bool> ClearStartupPackage(bool purge)
+        {
+            var response = await _packageServiceClient.ClearStartupPackageAsync(new ClearStartupPackageRequest
+            {
+                PurgeData = purge
+            });
+            return response.Value;
+        }
+
+        public async Task PurgeCachedPackages()
+        {
+            await _packageServiceClient.PurgeCachedPackagesAsync(new Empty());
+        }
+
+        public IPAddress GetSocketAddress()
+        {
+            // Use an UDP socket "connected" to our destination address
+            // to figure out the source address. System assigns an address to the socket with the connect syscall.
+            // Source: https://stackoverflow.com/a/54156187
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                socket.Bind(new IPEndPoint(IPAddress.Any, 0));
+                socket.Connect(_beaconSource);
+
+                return ((IPEndPoint)socket.LocalEndPoint).Address;
             }
-            return null;
         }
     }
 }
