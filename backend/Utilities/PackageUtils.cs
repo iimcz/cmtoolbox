@@ -126,7 +126,7 @@ namespace backend.Utilities
 
             packageDescriptor.Sync = new Sync
             {
-                RelayAddress = "127.0.0.1",
+                RelayAddress = null,
                 Elements = null,
                 CanvasDimensions = null
             };
