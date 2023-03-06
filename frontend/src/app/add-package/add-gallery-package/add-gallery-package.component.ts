@@ -147,11 +147,9 @@ export class AddGalleryPackageComponent implements OnInit {
 
     let params = new ApiParameters({ displayType: 'gallery', settings: settings });
 
-    this.packagesClient.setPackageParameters(id, params)
-      .subscribe(
-        // TODO: handle
-      );
+    this.packagesClient.setPackageParameters(id, params).subscribe();
     this.packagesClient.setPackageInputs(id, [
+      // TODO: use API-provided per-package-type and per-exhibit-type inputs here
       new Action({
         effect: 'left',
         type: TypeEnum.Void,
@@ -238,35 +236,32 @@ export class AddGalleryPackageComponent implements OnInit {
       }),
       new Action({
         effect: 'cursor_position',
-        type: TypeEnum.Void,
+        type: TypeEnum.Complex,
         mapping: new Mapping({
           source: 'mediapipe/handtracking/hand/left/center_position'
         })
       }),
       new Action({
         effect: 'cursor_position',
-        type: TypeEnum.Void,
+        type: TypeEnum.Complex,
         mapping: new Mapping({
           source: 'mediapipe/handtracking/hand/right/center_position'
         })
       }),new Action({
-        effect: 'unzoom',
-        type: TypeEnum.Void,
+        effect: 'cursor_position',
+        type: TypeEnum.Complex,
         mapping: new Mapping({
           source: 'nuitrack/handtracking/user/0/hand/left/center_position'
         })
       }),
       new Action({
-        effect: 'unzoom',
-        type: TypeEnum.Void,
+        effect: 'cursor_position',
+        type: TypeEnum.Complex,
         mapping: new Mapping({
           source: 'nuitrack/handtracking/user/0/hand/right/center_position'
         })
       })
-    ]) // TODO: fill with actual data
-      .subscribe(
-        // TODO: handle
-      );
+    ]).subscribe();
   }
 
   refreshGalleryItems(pkg: PresentationPackage) {

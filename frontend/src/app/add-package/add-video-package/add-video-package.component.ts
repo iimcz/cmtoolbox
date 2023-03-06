@@ -149,47 +149,10 @@ export class AddVideoPackageComponent implements OnInit {
 
     let params = new ApiParameters({ displayType: 'video', settings: settings });
 
-    this.packagesClient.setPackageParameters(id, params)
-      .subscribe(
-        // TODO: handle
-      );
+    this.packagesClient.setPackageParameters(id, params).subscribe();
     this.packagesClient.setPackageInputs(id, [
-      // TESTING DATA
-      // new Action({
-      //   effect: 'play',
-      //   mapping: new Mapping({
-      //     source: 'atom_1_pir_1',
-      //     condition: Condition.Equals,
-      //     thresholdType: ThresholdType.Integer,
-      //     threshold: '0'
-      //   }),
-      //   type: TypeEnum.ValueTrigger
-      // }),
-      // new Action({
-      //   effect: 'play',
-      //   mapping: new Mapping({
-      //     source: 'atom_2_pir_1',
-      //     condition: Condition.Equals,
-      //     thresholdType: ThresholdType.Integer,
-      //     threshold: '0'
-      //   }),
-      //   type: TypeEnum.ValueTrigger
-      // }),
-      // new Action({
-      //   effect: 'setVolume',
-      //   mapping: new Mapping({
-      //     source: 'lightsensor1',
-      //     inMin: 0,
-      //     inMax: 150,
-      //     outMin: 0,
-      //     outMax: 1
-      //   }),
-      //   type: TypeEnum.Value
-      // })
-    ]) // TODO: fill with actual data
-      .subscribe(
-        // TODO: handle
-      );
+      // Nothing, video has no default inputs.
+    ]).subscribe();
   }
 
   stepperSelectionChange(event: StepperSelectionEvent) {
